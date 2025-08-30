@@ -1,0 +1,51 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE/editor folders
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Dependency directories
+/.pnp
+.pnp.js
+
+# Testing coverage
+coverage/
+
+# Misc
+*.log
+*.lock
+*.cache
+*.tmp
+
+# Optional: Tailwind JIT cache
+.tailwind/
+
+# Optional: Parcel cache
+.cache/
+
+# Optional: Next.js
+.next/
+out/
