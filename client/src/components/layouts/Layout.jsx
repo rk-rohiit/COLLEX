@@ -10,7 +10,7 @@ const Layout = () => {
       <Header />
 
       <motion.main
-        className="flex-1 bg-gray-50 dark:bg-gray-900"
+        className="flex-1 bg-gray-50"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -30 }}

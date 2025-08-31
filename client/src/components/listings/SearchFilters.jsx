@@ -30,7 +30,7 @@ const sortOptions = [
   { value: "boosted", label: "Boosted First" },
 ];
 
-const SearchFilters = () => {
+export function SearchFilters() {
   const {
     searchQuery,
     selectedCategory,
@@ -235,5 +235,4 @@ const SearchFilters = () => {
       </div>
     </div>
   );
-};
-export default SearchFilters;
+}

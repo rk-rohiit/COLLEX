@@ -1,35 +1,40 @@
 import React from "react";
 import { Plus, Search, MessageCircle, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export function QuickActions() {
+  const navigate = useNavigate();
+
   const actions = [
     {
       title: "List an Item",
       description: "Sell or rent your stuff",
       icon: Plus,
       color: "from-blue-500 to-blue-600",
-      action: () => window.navigateTo?.("/create"),
+      action: () => navigate("/create"),
     },
     {
       title: "Browse Items",
       description: "Find what you need",
       icon: Search,
       color: "from-emerald-500 to-emerald-600",
-      action: () => window.navigateTo?.("/listings"),
+      action: () => navigate("/listings"),
     },
     {
       title: "My Chats",
       description: "Continue conversations",
       icon: MessageCircle,
       color: "from-purple-500 to-purple-600",
-      action: () => window.navigateTo?.("/chat"),
+      //   action: () => navigate("/chat"),
+      alert: "Chat feature coming soon!",
+      // action: chatHandlePopup,
     },
     {
       title: "Boost Listing",
       description: "Get more visibility",
       icon: TrendingUp,
       color: "from-orange-500 to-orange-600",
-      action: () => window.navigateTo?.("/profile"),
+      action: () => navigate("/profile"),
     },
   ];
 

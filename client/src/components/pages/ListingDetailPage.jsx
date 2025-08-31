@@ -12,13 +12,15 @@ import {
   Flag,
 } from "lucide-react";
 import { useListings } from "../../context/ListingsContext";
-import { useChat } from "../../context/ChatContext";
+// import { useChat } from "../../context/ChatContext";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export function ListingDetailPage({ listingId }) {
   const { listings } = useListings();
-  const { createChat } = useChat();
+  //   const { createChat } = useChat();
   const { userProfile } = useAuth();
+  const navigate = useNavigate();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
 
@@ -44,15 +46,15 @@ export function ListingDetailPage({ listingId }) {
     listing.boostedUntil && new Date(listing.boostedUntil) > new Date();
   const isOwner = listing.ownerId === (userProfile && userProfile.id);
 
-  const handleStartChat = async () => {
-    if (!userProfile || isOwner) return;
-    try {
-      await createChat(listing.id, listing.ownerId);
-      window.navigateTo?.("/chat");
-    } catch (error) {
-      console.error("Failed to start chat:", error);
-    }
-  };
+  //   const handleStartChat = async () => {
+  //     if (!userProfile || isOwner) return;
+  //     try {
+  //       await createChat(listing.id, listing.ownerId);
+  //       navigate("/chat");
+  //     } catch (error) {
+  //       console.error("Failed to start chat:", error);
+  //     }
+  //   };
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("en-IN", {
@@ -81,7 +83,7 @@ export function ListingDetailPage({ listingId }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <button
-          onClick={() => window.navigateTo?.("/listings")}
+          onClick={() => navigate("/listings")}
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -224,7 +226,7 @@ export function ListingDetailPage({ listingId }) {
             {!isOwner ? (
               <div className="space-y-3">
                 <button
-                  onClick={handleStartChat}
+                  //   onClick={handleStartChat}
                   className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
                 >
                   <MessageCircle className="w-5 h-5" />
@@ -362,9 +364,7 @@ export function ListingDetailPage({ listingId }) {
             .map((similarListing) => (
               <div
                 key={similarListing.id}
-                onClick={() =>
-                  window.navigateTo?.("/listing", similarListing.id)
-                }
+                onClick={() => navigate(`/listing/${similarListing.id}`)}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
               >
                 <div className="aspect-square bg-gray-100">
