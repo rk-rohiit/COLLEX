@@ -1,11 +1,11 @@
 import React from "react";
 import Navbar from "../navigation/Navbar";
-import HeroSection from "../pages/HeroSection";
+// import HeroSection from "../pages/HeroSection";
 const LoginPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-blue-200">
       {/* <Navbar /> */}
-      <HeroSection />
+      {/* <HeroSection /> */}
     </div>
   );
 };
