@@ -2,31 +2,35 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+// Set this flag to `true` when developing, and `false` in production
+const DEV_MODE = false;
+
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
 
   // ================================
-  // 🚧 DEVELOPMENT MODE
-  // Temporarily disabling auth & role checks
+  // 🚧 DEVELOPMENT MODE (Skip Auth)
   // ================================
-  return children;
+  if (DEV_MODE) {
+    return children;
+  }
 
-  /* 
   // ================================
-  // 🚀 PRODUCTION MODE
-  // Enable this block when finalizing auth
+  // 🚀 PRODUCTION MODE (Enable Auth)
   // ================================
 
-  // Not logged in → Redirect to Signin
-  if (!user) return <Navigate to="/signin" replace />;
+  // 1️⃣ If user is NOT logged in → Redirect to Signin
+  if (!user) {
+    return <Navigate to="/signin" replace />;
+  }
 
-  // Role not allowed → Redirect to Home
+  // 2️⃣ If specific roles are required & user doesn't have one → Redirect to Home
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
 
+  // 3️⃣ Otherwise → Allow access
   return children;
-  */
 };
 
 export default ProtectedRoute;

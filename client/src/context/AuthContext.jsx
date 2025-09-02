@@ -7,10 +7,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Check for saved user in localStorage on first load
+  // ✅ Load user from localStorage on app start
   useEffect(() => {
-    const checkUser = async () => {
-      setLoading(true);
+    const fetchUser = () => {
       try {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -18,36 +17,34 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Error fetching user:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
-
-    checkUser();
+    fetchUser();
   }, []);
 
-  // ✅ Login function
-  const login = async (userData) => {
-    setLoading(true);
+  // ✅ Login function (save user & token)
+  const login = (userData) => {
     try {
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error("Error during login:", error);
     }
   };
 
-  // ✅ Logout function
-  const logout = async () => {
-    setLoading(true);
+  // ✅ Logout function (clear data)
+  const logout = () => {
     try {
       localStorage.removeItem("user");
       setUser(null);
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error("Error during logout:", error);
     }
   };
 
-  // ✅ Show loader until auth status is resolved
+  // ✅ Show loader until authentication is resolved
   if (loading) {
     return <Loader />;
   }
@@ -59,5 +56,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// ✅ Custom hook for easy usage
 export const useAuth = () => useContext(AuthContext);
 export default AuthContext;

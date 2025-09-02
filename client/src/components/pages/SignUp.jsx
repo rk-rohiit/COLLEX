@@ -73,12 +73,51 @@ const SignUp = () => {
 
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      alert("Account created successfully!");
-    } catch (error) {
-      alert("Something went wrong: " + error.message);
-    } finally {
+      const response = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
       setLoading(false);
+
+      if (response.ok && data.success) {
+        // ✅ Save token or user
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // Navigate to /user
+        navigate("/user");
+      } else {
+        window.alert(data.message || "Signup failed. Try again.");
+        setFormData({
+          email: "",
+          fullName: "",
+          phone: "",
+          course: "",
+          year: "",
+          hostelBlock: "",
+          password: "",
+        });
+        setCurrentStep(1); // reset back to step 1
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Signup error:", error);
+      window.alert("Something went wrong! Please try again later.");
+      setFormData({
+        email: "",
+        fullName: "",
+        phone: "",
+        course: "",
+        year: "",
+        hostelBlock: "",
+        password: "",
+      });
+      setCurrentStep(1);
     }
   };
 
