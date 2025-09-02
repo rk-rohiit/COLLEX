@@ -1,9 +1,60 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Send } from "lucide-react";
 import theme from "../../theme";
 
 const ContactUs = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  // Handle Input Change
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Handle Form Submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const { name, email, message } = formData;
+
+    // Frontend validation
+    if (!name || !email || !message) {
+      alert.error("⚠️ Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:8080/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert.success("✅ Message sent successfully!");
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        alert.error(result.message || "❌ Something went wrong");
+      }
+    } catch (error) {
+      console.error(error);
+      alert.error("❌ Server error! Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section
       className={`py-16 px-6 sm:px-10 lg:px-20 ${theme.gradients.section}`}
@@ -127,7 +178,7 @@ const ContactUs = () => {
               Send Us a Message
             </h3>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
               {/* Name */}
               <div>
                 <label
@@ -139,6 +190,9 @@ const ContactUs = () => {
                 <input
                   type="text"
                   placeholder="Enter your name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -154,6 +208,8 @@ const ContactUs = () => {
                 <input
                   type="email"
                   placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -169,6 +225,8 @@ const ContactUs = () => {
                 <textarea
                   rows="4"
                   placeholder="Write your message..."
+                  value={formData.message}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 ></textarea>
               </div>
@@ -176,13 +234,14 @@ const ContactUs = () => {
               {/* Submit Button */}
               <motion.button
                 type="submit"
+                disabled={loading}
                 className={`w-full py-3 text-white font-semibold ${theme.borderRadius.button} ${theme.gradients.primary} ${theme.gradients.primaryHover} ${theme.shadows.base} cursor-pointer`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.3 }}
               >
                 <div className="flex items-center justify-center gap-2">
-                  Send Message <Send size={20} />
+                  {loading ? "Sending..." : "Send Message"} <Send size={20} />
                 </div>
               </motion.button>
             </form>

@@ -1,14 +1,59 @@
-// SignIn.jsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    // Handle sign in logic here
-    console.log("Email:", email, "Password:", password);
+
+    if (!email || !password) {
+      window.alert("Please enter your email and password!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Send login request to backend API
+      const response = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (response.ok && data.success) {
+        // ✅ Save token or user data to localStorage for session management
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // ✅ Navigate to /user page
+        navigate("/user");
+      } else {
+        // ❌ Show popup error
+        window.alert(
+          data.message || "Invalid email or password. Please try again."
+        );
+
+        // Clear fields
+        setEmail("");
+        setPassword("");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoading(false);
+      window.alert("Something went wrong! Please try again later.");
+      setEmail("");
+      setPassword("");
+    }
   };
 
   return (
@@ -67,25 +112,23 @@ const SignIn = () => {
               />
             </div>
 
-            <div className="bg-gray-100 p-3 rounded text-sm text-gray-700">
-              <p>
-                <strong>Demo Credentials:</strong>
-              </p>
-              <p>Student: student@lpu.edu.in / password</p>
-              <p>Admin: admin@lpu.edu.in / password</p>
-            </div>
-
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-green-500 text-white py-2 rounded-lg font-bold hover:opacity-90 transition"
+              disabled={loading}
+              className={`w-full bg-gradient-to-r from-blue-500 to-green-500 text-white py-2 rounded-lg font-bold transition ${
+                loading ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+              }`}
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 
           <p className="mt-4 text-center text-gray-500">
             Don't have an account?{" "}
-            <span className="text-blue-500 font-medium cursor-pointer">
+            <span
+              className="text-blue-500 font-medium cursor-pointer"
+              onClick={() => navigate("/signup")}
+            >
               Sign Up
             </span>
           </p>
