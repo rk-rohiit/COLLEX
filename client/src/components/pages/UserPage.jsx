@@ -1,52 +1,125 @@
-import React from "react";
-import { FeaturedListings } from "../listings/FeaturedListings";
-import { QuickActions } from "../home/QuickActions";
-import { CategoryGrid } from "../home/CategoryGrid";
-import { RecentActivity } from "../home/RecentActivity";
-import { CampusStats } from "../home/CampusStats";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  LogOut,
+  Mail,
+  Phone,
+  GraduationCap,
+  Building2,
+  User,
+} from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const UserPage = () => {
+  const { hash } = useParams();
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    try {
+      // ✅ Get user from localStorage
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const storedHash = localStorage.getItem("userHash");
+
+      // ✅ Security check → If hash mismatch or user not found → redirect
+      if (!storedUser || storedHash !== hash) {
+        navigate("/signin");
+      } else {
+        setUserData(storedUser);
+      }
+    } catch (error) {
+      console.error("Error loading user data:", error);
+      navigate("/signin");
+    }
+  }, [hash, navigate]);
+
+  // ✅ Handle Logout
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("userHash");
+    localStorage.removeItem("token");
+    logout();
+    navigate("/signin");
+  };
+
+  if (!userData) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-500 mx-auto mb-4"></div>
+          <h2 className="text-gray-700 text-lg">Loading your dashboard...</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 mt-20">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-emerald-600 rounded-2xl p-8 text-white">
-          <div className="max-w-2xl">
-            <h1 className="text-3xl font-bold mb-4">
-              Find Everything You Need on Campus
-            </h1>
-            <p className="text-blue-100 text-lg mb-6">
-              Buy, sell, and rent textbooks, electronics, bikes, and more from
-              verified LPU students.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={() => navigate("/create")}
-                className="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors cursor-pointer"
-              >
-                List an Item
-              </button>
-              <button
-                onClick={() => navigate("/listings")}
-                className="bg-blue-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-800 transition-colors cursor-pointer"
-              >
-                Browse Items
-              </button>
+    <div className="min-h-screen bg-gray-100 flex justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-2xl">
+        {/* Header */}
+        <div className="flex flex-col items-center">
+          <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+            {userData.fullName?.charAt(0).toUpperCase()}
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mt-4">
+            {userData.fullName}
+          </h1>
+          <p className="text-gray-500 capitalize">{userData.role}</p>
+        </div>
+
+        <div className="mt-6 border-t border-gray-200 pt-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+            Account Details
+          </h2>
+
+          {/* User Details */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Mail className="w-5 h-5 text-blue-600" />
+              <span className="text-gray-700">{userData.email}</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Phone className="w-5 h-5 text-green-600" />
+              <span className="text-gray-700">{userData.phone}</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <GraduationCap className="w-5 h-5 text-purple-600" />
+              <span className="text-gray-700 capitalize">
+                {userData.course} — Year {userData.year}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Building2 className="w-5 h-5 text-orange-600" />
+              <span className="text-gray-700 capitalize">
+                {userData.hostelBlock || "Not Provided"}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Other Sections */}
-        <QuickActions />
-        <CampusStats />
-        <CategoryGrid />
-        <FeaturedListings />
-        <RecentActivity />
+        {/* Footer */}
+        <div className="mt-8 flex justify-between items-center">
+          <button
+            onClick={() => navigate("/listings")}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium shadow-md transition"
+          >
+            My Listings
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium shadow-md transition"
+          >
+            <LogOut className="w-5 h-5" />
+            Logout
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

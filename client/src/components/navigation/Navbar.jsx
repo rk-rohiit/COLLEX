@@ -34,15 +34,19 @@ const Navbar = () => {
             List Item
           </button>
           <Bell className="w-5 h-5 text-gray-600 cursor-pointer" />
+
           <div className="flex items-center space-x-2 cursor-pointer">
+            {/* Avatar */}
             <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
               <span className="text-white text-sm font-medium">
-                {user?.name?.[0]?.toUpperCase() || "U"}
+                {user?.fullName?.[0]?.toUpperCase() || "U"}
               </span>
             </div>
+
+            {/* Username & Logout */}
             <div className="text-sm">
               <div className="font-medium text-gray-900">
-                {user?.name || "User"}
+                {user?.fullName || "User"}
               </div>
               <div
                 className="text-red-500 hover:underline cursor-pointer"

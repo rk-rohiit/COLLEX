@@ -13,36 +13,52 @@ const SignIn = () => {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Please enter your email and password!");
+      window.alert("⚠ Please enter your email and password!");
       return;
     }
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      const response = await fetch("http://localhost:8080/api/auth/login", {
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
-      setLoading(false);
+      const data = await res.json();
+      console.log("Login API Response:", data);
 
-      if (response.ok && data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user)); // ✅ FIXED
-        login(data.user);
-        navigate("/user");
+      if (res.ok && data.success) {
+        // ✅ Save user data in Auth Context
+        login(data.data, data.token || null);
+
+        // ✅ Generate a unique userHash
+        const userHash = btoa(
+          `${data.data._id}-${data.data.email}-${Date.now()}`
+        );
+
+        // ✅ Save to localStorage
+        localStorage.setItem("user", JSON.stringify(data.data));
+        localStorage.setItem("userHash", userHash);
+
+        // ✅ Show success alert
+        window.alert(`✅ Welcome back, ${data.data.fullName}!`);
+
+        // ✅ Redirect user to secure UserPage
+        navigate(`/user/${userHash}`);
       } else {
-        alert(data.message || "Invalid email or password.");
+        window.alert(
+          data.message || "❌ Invalid email or password. Try again."
+        );
         setEmail("");
         setPassword("");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login Error:", error);
+      window.alert("❌ Something went wrong! Please try again later.");
+    } finally {
       setLoading(false);
-      alert("Something went wrong! Please try again later.");
     }
   };
 
@@ -60,9 +76,11 @@ const SignIn = () => {
           community.
         </p>
         <ul className="space-y-3">
-          <li>✅ Verified students only</li>
-          <li>⚡ List items in under 60 seconds</li>
-          <li>💬 Safe in-app messaging</li>
+          <li className="flex items-center gap-2">✅ Verified students only</li>
+          <li className="flex items-center gap-2">
+            ⚡ List items in under 60 seconds
+          </li>
+          <li className="flex items-center gap-2">💬 Safe in-app messaging</li>
         </ul>
       </div>
 
@@ -83,6 +101,9 @@ const SignIn = () => {
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 required
               />
+              <p className="text-gray-400 text-sm mt-1">
+                Use your official LPU email address
+              </p>
             </div>
 
             <div>
@@ -117,6 +138,12 @@ const SignIn = () => {
               Sign Up
             </span>
           </p>
+
+          <div className="mt-6 flex justify-center gap-6 text-gray-500 text-sm">
+            <div className="flex items-center gap-1">✅ Verified Only</div>
+            <div className="flex items-center gap-1">🔒 Secure</div>
+            <div className="flex items-center gap-1">⚡ Fast</div>
+          </div>
         </div>
       </div>
     </div>
