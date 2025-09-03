@@ -6,57 +6,35 @@ import SignIn from "../components/pages/SignIn";
 import SignUp from "../components/pages/SignUp";
 import Dashboard from "../components/pages/Dashboard";
 import UserPage from "../components/pages/UserPage.jsx";
-
-// New pages
 import { ListingsPage } from "../components/pages/ListingsPage";
 import { CreateListingPage } from "../components/pages/CreateListingPage";
 import { ListingDetailPage } from "../components/pages/ListingDetailPage";
-// import ChatPage from "../components/pages/ChatPage";
-// import ProfilePage from "../components/pages/ProfilePage";
-// import AdminPage from "../components/pages/AdminPage";
-
-// 🚧 Auth routes are disabled for now
-// import ProtectedRoute from "./ProtectedRoute";
-// import AdminRoute from "./AdminRoute";
 
 const AppRoutes = ({ userProfile, listingId }) => {
   return (
     <Routes>
-      {/* Public Layout Wrapper */}
+      {/* All routes inside Layout */}
       <Route element={<Layout />}>
-        {/* Home page */}
         <Route path="/" element={<Home />} />
-
-        {/* Listings pages */}
         <Route path="/listings" element={<ListingsPage />} />
         <Route path="/create" element={<CreateListingPage />} />
         <Route
           path="/listing"
           element={<ListingDetailPage listingId={listingId} />}
         />
-
-        {/* Chat and Profile */}
-        {/* <Route path="/chat" element={<ChatPage />} />
-        <Route path="/profile" element={<ProfilePage />} /> */}
-
-        {/* User page (accessible without login for now) */}
         <Route path="/user" element={<UserPage />} />
-
-        {/* Admin dashboard */}
         <Route
           path="/admin"
-          element={userProfile?.role === "admin" ? <AdminPage /> : <Home />}
+          element={userProfile?.role === "admin" ? <Dashboard /> : <Home />}
         />
-
-        {/* Admin dashboard route (legacy) */}
         <Route path="/admin/dashboard" element={<Dashboard />} />
       </Route>
 
-      {/* Authentication Pages */}
+      {/* Auth Routes */}
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
 
-      {/* 404 Fallback */}
+      {/* 404 */}
       <Route
         path="*"
         element={<h1 className="text-center mt-10">404 - Page Not Found</h1>}

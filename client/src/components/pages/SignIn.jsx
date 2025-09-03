@@ -1,29 +1,28 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      window.alert("Please enter your email and password!");
+      alert("Please enter your email and password!");
       return;
     }
 
     try {
       setLoading(true);
 
-      // Send login request to backend API
       const response = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
@@ -31,28 +30,19 @@ const SignIn = () => {
       setLoading(false);
 
       if (response.ok && data.success) {
-        // ✅ Save token or user data to localStorage for session management
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        // ✅ Navigate to /user page
+        localStorage.setItem("user", JSON.stringify(data.user)); // ✅ FIXED
+        login(data.user);
         navigate("/user");
       } else {
-        // ❌ Show popup error
-        window.alert(
-          data.message || "Invalid email or password. Please try again."
-        );
-
-        // Clear fields
+        alert(data.message || "Invalid email or password.");
         setEmail("");
         setPassword("");
       }
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);
-      window.alert("Something went wrong! Please try again later.");
-      setEmail("");
-      setPassword("");
+      alert("Something went wrong! Please try again later.");
     }
   };
 
@@ -70,11 +60,9 @@ const SignIn = () => {
           community.
         </p>
         <ul className="space-y-3">
-          <li className="flex items-center gap-2">✅ Verified students only</li>
-          <li className="flex items-center gap-2">
-            ⚡ List items in under 60 seconds
-          </li>
-          <li className="flex items-center gap-2">💬 Safe in-app messaging</li>
+          <li>✅ Verified students only</li>
+          <li>⚡ List items in under 60 seconds</li>
+          <li>💬 Safe in-app messaging</li>
         </ul>
       </div>
 
@@ -95,9 +83,6 @@ const SignIn = () => {
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 required
               />
-              <p className="text-gray-400 text-sm mt-1">
-                Use your official LPU email address
-              </p>
             </div>
 
             <div>
@@ -132,12 +117,6 @@ const SignIn = () => {
               Sign Up
             </span>
           </p>
-
-          <div className="mt-6 flex justify-center gap-6 text-gray-500 text-sm">
-            <div className="flex items-center gap-1">✅ Verified Only</div>
-            <div className="flex items-center gap-1">🔒 Secure</div>
-            <div className="flex items-center gap-1">⚡ Fast</div>
-          </div>
         </div>
       </div>
     </div>

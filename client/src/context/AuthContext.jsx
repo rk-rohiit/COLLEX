@@ -1,61 +1,40 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import Loader from "../components/common/Loader.jsx";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  // ✅ Load user from localStorage on app start
   useEffect(() => {
-    const fetchUser = () => {
-      try {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      } finally {
-        setLoading(false);
+    try {
+      const savedUser = localStorage.getItem("user");
+      if (savedUser && savedUser !== "undefined" && savedUser !== "null") {
+        setUser(JSON.parse(savedUser));
+      } else {
+        setUser(null);
       }
-    };
-    fetchUser();
-  }, []);
-
-  // ✅ Login function (save user & token)
-  const login = (userData) => {
-    try {
-      localStorage.setItem("user", JSON.stringify(userData));
-      setUser(userData);
     } catch (error) {
-      console.error("Error during login:", error);
-    }
-  };
-
-  // ✅ Logout function (clear data)
-  const logout = () => {
-    try {
+      console.error("Error parsing user from localStorage:", error);
       localStorage.removeItem("user");
       setUser(null);
-    } catch (error) {
-      console.error("Error during logout:", error);
     }
+  }, []);
+
+  const login = (userData) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData)); // ✅ Always save valid JSON
   };
 
-  // ✅ Show loader until authentication is resolved
-  if (loading) {
-    return <Loader />;
-  }
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// ✅ Custom hook for easy usage
 export const useAuth = () => useContext(AuthContext);
-export default AuthContext;

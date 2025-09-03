@@ -35,7 +35,7 @@ const App = () => {
   return (
     <AuthProvider>
       <ListingsProvider>
-        <AppContent />
+        <AppRoutes />
       </ListingsProvider>
     </AuthProvider>
   );

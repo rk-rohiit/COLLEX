@@ -1,24 +1,20 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import Header from "../navigation/Header";
+import Navbar from "../navigation/Navbar";
 import Footer from "../navigation/Footer";
-import { motion } from "framer-motion";
+import { useAuth } from "../../context/AuthContext";
 
 const Layout = () => {
+  const { user } = useAuth();
+
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
-
-      <motion.main
-        className="flex-1 bg-gray-50"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -30 }}
-        transition={{ duration: 0.5 }}
-      >
+      {/* ✅ Show Navbar if logged in, else Header */}
+      {user ? <Navbar /> : <Header />}
+      <main className="flex-1">
         <Outlet />
-      </motion.main>
-
+      </main>
       <Footer />
     </div>
   );
