@@ -10,6 +10,7 @@ import { ListingsPage } from "../components/pages/ListingsPage";
 import { CreateListingPage } from "../components/pages/CreateListingPage";
 import { ListingDetailPage } from "../components/pages/ListingDetailPage";
 import ProtectedRoute from "./ProtectedRoute";
+import NotFoundPage from "../components/pages/NotFoundPage.jsx";
 
 const AppRoutes = ({ userProfile }) => {
   return (
@@ -71,10 +72,7 @@ const AppRoutes = ({ userProfile }) => {
       <Route path="/signup" element={<SignUp />} />
 
       {/* ✅ 404 Fallback */}
-      <Route
-        path="*"
-        element={<h1 className="text-center mt-10">404 - Page Not Found</h1>}
-      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

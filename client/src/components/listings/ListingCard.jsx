@@ -168,7 +168,7 @@ export function ListingCard({ listing, viewMode = "grid" }) {
         <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={handleMessageSeller}
-            className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors cursor-pointer flex items-center justify-center"
           >
             <MessageCircle className="w-4 h-4" />
           </button>

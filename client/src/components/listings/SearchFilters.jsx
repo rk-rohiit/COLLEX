@@ -72,7 +72,7 @@ export function SearchFilters() {
         </div>
         <button
           onClick={clearFilters}
-          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+          className="text-blue-600 hover:text-blue-700 text-sm font-medium cursor-pointer"
         >
           Clear all
         </button>
@@ -103,7 +103,7 @@ export function SearchFilters() {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
                   selectedCategory === category
                     ? "bg-blue-100 text-blue-700 font-medium"
                     : "text-gray-700 hover:bg-gray-100"
@@ -158,7 +158,7 @@ export function SearchFilters() {
                     setTempPriceRange(quickFilter.range);
                     setPriceRange(quickFilter.range);
                   }}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200 transition-colors"
+                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs hover:bg-gray-200 transition-colors cursor-pointer"
                 >
                   {quickFilter.label}
                 </button>
@@ -177,7 +177,7 @@ export function SearchFilters() {
               <button
                 key={condition.value}
                 onClick={() => setSelectedCondition(condition.value)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
                   selectedCondition === condition.value
                     ? "bg-blue-100 text-blue-700 font-medium"
                     : "text-gray-700 hover:bg-gray-100"
@@ -203,7 +203,7 @@ export function SearchFilters() {
               <button
                 key={type.value}
                 onClick={() => setListingType(type.value)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
                   listingType === type.value
                     ? "bg-blue-100 text-blue-700 font-medium"
                     : "text-gray-700 hover:bg-gray-100"
@@ -223,7 +223,7 @@ export function SearchFilters() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>

@@ -207,6 +207,7 @@ const ContactUs = () => {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
@@ -223,6 +224,8 @@ const ContactUs = () => {
                   Message
                 </label>
                 <textarea
+                  type="text"
+                  name="message"
                   rows="4"
                   placeholder="Write your message..."
                   value={formData.message}
