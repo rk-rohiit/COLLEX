@@ -14,6 +14,7 @@ import {
   Building,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Logo from "../../assets/logo.png";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -347,8 +348,13 @@ const SignUp = () => {
       <div className="flex-1 bg-gradient-to-br from-blue-500 to-cyan-400 flex flex-col justify-center px-6 sm:px-8 lg:px-12 py-8 lg:py-0 text-white order-2 lg:order-1">
         <div className="max-w-md mx-auto lg:mx-0">
           {/* Logo */}
-          <div className="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center mb-8 mx-auto lg:mx-0">
-            <span className="text-2xl font-bold">C</span>
+          <div className="w-32 h-20  flex items-center justify-center mb-6">
+            <img
+              src={Logo}
+              alt="Collex Logo"
+              className="object-contain h-16 w-auto border-r-4 border-b-4 border-gray-100 rounded-xl"
+              style={{ maxWidth: "100%", height: "auto" }}
+            />
           </div>
 
           {/* Title and Description */}
@@ -364,7 +370,7 @@ const SignUp = () => {
           {/* Features */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3 justify-center lg:justify-start">
-              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-green-400 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
                 <Check className="w-4 h-4" />
               </div>
               <span className="text-sm sm:text-base">
@@ -373,7 +379,7 @@ const SignUp = () => {
             </div>
 
             <div className="flex items-center space-x-3 justify-center lg:justify-start">
-              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-blue-400 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
                 <Clock className="w-4 h-4" />
               </div>
               <span className="text-sm sm:text-base">
@@ -382,7 +388,7 @@ const SignUp = () => {
             </div>
 
             <div className="flex items-center space-x-3 justify-center lg:justify-start">
-              <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-green-400 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
                 <MessageCircle className="w-4 h-4" />
               </div>
               <span className="text-sm sm:text-base">

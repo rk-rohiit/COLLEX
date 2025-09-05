@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Logo from "../../assets/logo.png";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -24,8 +25,17 @@ const Header = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">C</span>
+              <div
+                className="w-10 h-10 bg-gradient-to-br flex items-center justify-center cursor-pointer"
+                onClick={() => navigate("/")}
+              >
+                {/* <span className="text-white font-bold text-lg">C</span>
+                 */}
+                <img
+                  src={Logo}
+                  alt="Collex Logo"
+                  className="object-contain h-16 w-auto"
+                />
               </div>
               <span className="text-2xl font-bold text-gray-900">Collex</span>
             </div>

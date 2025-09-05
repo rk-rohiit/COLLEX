@@ -1,5 +1,6 @@
 import React from "react";
 import { Instagram, Twitter, Mail } from "lucide-react";
+import Logo from "../../assets/logo.png";
 const Footer = () => {
   return (
     <>
@@ -8,8 +9,13 @@ const Footer = () => {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">C</span>
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center">
+                  {/* <span className="text-white font-bold text-lg">C</span> */}
+                  <img
+                    src={Logo}
+                    alt="Collex Logo"
+                    className="object-contain h-16 w-auto"
+                  />
                 </div>
                 <span className="text-2xl font-bold">Collex</span>
               </div>
@@ -17,10 +23,32 @@ const Footer = () => {
                 The trusted campus marketplace for verified students. Making
                 campus trading safe, fast, and reliable.
               </p>
-              <div className="flex space-x-4">
-                <Instagram className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-                <Twitter className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-                <Mail className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+              <div className="flex space-x-4 items-center">
+                <span className="text-gray-400">Follow us:</span>
+                <a
+                  href="https://instagram.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+                </a>
+                <a
+                  href="https://twitter.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Twitter"
+                >
+                  <Twitter className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+                </a>
+                <a
+                  href="mailto:info@collex.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Email"
+                >
+                  <Mail className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+                </a>
               </div>
             </div>
 
@@ -105,7 +133,7 @@ const Footer = () => {
 
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
             <p>
-              &copy; 2024 Collex. All rights reserved. Made with ❤️ for
+              &copy; 2025 Collex. All rights reserved. Made with ❤️ for
               students.
             </p>
           </div>

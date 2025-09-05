@@ -5,21 +5,22 @@ import Home from "../components/pages/Home";
 import SignIn from "../components/pages/SignIn";
 import SignUp from "../components/pages/SignUp";
 import Dashboard from "../components/pages/Dashboard";
-import UserPage from "../components/pages/UserPage.jsx";
+import UserPage from "../components/pages/UserPage";
 import { ListingsPage } from "../components/pages/ListingsPage";
 import { CreateListingPage } from "../components/pages/CreateListingPage";
 import { ListingDetailPage } from "../components/pages/ListingDetailPage";
 import ProtectedRoute from "./ProtectedRoute";
-import NotFoundPage from "../components/pages/NotFoundPage.jsx";
+import NotFoundPage from "../components/pages/NotFoundPage";
 
 const AppRoutes = ({ userProfile }) => {
   return (
     <Routes>
+      {/* ✅ Layout Wrapper */}
       <Route element={<Layout />}>
-        {/* ✅ Home Page */}
+        {/* ✅ Home */}
         <Route path="/" element={<Home />} />
 
-        {/* ✅ Listings Page */}
+        {/* ✅ Listings */}
         <Route
           path="/listings"
           element={
@@ -29,9 +30,9 @@ const AppRoutes = ({ userProfile }) => {
           }
         />
 
-        {/* ✅ Create Listing Page (only for logged-in users) */}
+        {/* ✅ Create Listing */}
         <Route
-          path="/create"
+          path="/create-listing"
           element={
             <ProtectedRoute allowedRoles={["student", "admin"]}>
               <CreateListingPage />
@@ -39,7 +40,7 @@ const AppRoutes = ({ userProfile }) => {
           }
         />
 
-        {/* ✅ Listing Details Page with :id — Restricted */}
+        {/* ✅ Listing Details */}
         <Route
           path="/listing/:id"
           element={
@@ -49,7 +50,7 @@ const AppRoutes = ({ userProfile }) => {
           }
         />
 
-        {/* ✅ Secure User Page */}
+        {/* ✅ User Profile (hash required) */}
         <Route
           path="/user/:hash"
           element={

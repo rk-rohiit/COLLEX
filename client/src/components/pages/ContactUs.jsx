@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Send } from "lucide-react";
 import theme from "../../theme";
+import { showSuccess, showError } from "../../utils/toastConfig";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -20,12 +21,11 @@ const ContactUs = () => {
   // Handle Form Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { name, email, message } = formData;
 
     // Frontend validation
     if (!name || !email || !message) {
-      alert.error("⚠️ Please fill in all fields");
+      showError("⚠️ Please fill in all fields");
       return;
     }
 
@@ -42,14 +42,14 @@ const ContactUs = () => {
       const result = await res.json();
 
       if (result.success) {
-        alert.success("✅ Message sent successfully!");
+        showSuccess("✅ Message sent successfully!");
         setFormData({ name: "", email: "", message: "" });
       } else {
-        alert.error(result.message || "❌ Something went wrong");
+        showError(result.message || "❌ Something went wrong");
       }
     } catch (error) {
       console.error(error);
-      alert.error("❌ Server error! Please try again.");
+      showError("❌ Server error! Please try again.");
     } finally {
       setLoading(false);
     }
@@ -85,7 +85,7 @@ const ContactUs = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Info */}
+          {/* Left Contact Info */}
           <motion.div
             className={`p-8 ${theme.borderRadius.card} ${theme.shadows.base} bg-white`}
             initial={{ opacity: 0, x: -50 }}
@@ -163,7 +163,7 @@ const ContactUs = () => {
             </div>
           </motion.div>
 
-          {/* Contact Form */}
+          {/* Right Contact Form */}
           <motion.div
             className={`p-8 ${theme.borderRadius.card} ${theme.shadows.base} bg-white`}
             initial={{ opacity: 0, x: 50 }}

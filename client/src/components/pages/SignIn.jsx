@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import Logo from "../../assets/logo.png";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -63,19 +64,31 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left section */}
-      <div className="w-1/2 bg-gradient-to-b from-blue-500 to-teal-500 text-white flex flex-col justify-center items-start p-16">
-        <div className="w-12 h-12 bg-blue-400 rounded-lg flex items-center justify-center mb-6">
-          <span className="text-2xl font-bold">C</span>
+      <div className="lg:w-1/2 w-full bg-gradient-to-b from-blue-500 to-teal-500 text-white flex flex-col justify-center items-start p-8 sm:p-12 md:p-16">
+        {/* Logo */}
+        <div className="w-32 h-20 flex items-center justify-center mb-6">
+          <img
+            src={Logo}
+            alt="Collex Logo"
+            className="object-contain h-16 w-auto border-r-4 border-b-4 border-gray-100 rounded-xl"
+            style={{ maxWidth: "100%", height: "auto" }}
+          />
         </div>
-        <h1 className="text-4xl font-bold mb-4">Welcome to Collex</h1>
-        <p className="mb-6">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+          Welcome to Collex
+        </h1>
+
+        {/* Description */}
+        <p className="mb-6 text-sm sm:text-base md:text-lg leading-relaxed max-w-lg">
           The trusted campus marketplace for LPU students. Buy, sell, and rent
           textbooks, electronics, bikes, and more within your verified campus
           community.
         </p>
-        <ul className="space-y-3">
+
+        {/* Features */}
+        <ul className="space-y-3 text-sm sm:text-base">
           <li className="flex items-center gap-2">✅ Verified students only</li>
           <li className="flex items-center gap-2">
             ⚡ List items in under 60 seconds
@@ -85,43 +98,56 @@ const SignIn = () => {
       </div>
 
       {/* Right section */}
-      <div className="w-1/2 flex justify-center items-center bg-gray-50">
-        <div className="bg-white p-10 rounded-xl shadow-lg w-3/4 max-w-md">
-          <h2 className="text-2xl font-bold mb-2">Welcome Back</h2>
-          <p className="mb-6 text-gray-500">Sign in to your account</p>
+      <div className="lg:w-1/2 w-full flex justify-center items-center bg-gray-50 p-6 sm:p-10">
+        <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-md">
+          {/* Title */}
+          <h2 className="text-xl sm:text-2xl font-bold mb-2 text-center lg:text-left">
+            Welcome Back
+          </h2>
+          <p className="mb-6 text-gray-500 text-center lg:text-left text-sm sm:text-base">
+            Sign in to your account
+          </p>
 
+          {/* Form */}
           <form onSubmit={handleSignIn} className="space-y-4">
+            {/* Email Input */}
             <div>
-              <label className="block mb-1 text-gray-700">College Email</label>
+              <label className="block mb-1 text-gray-700 text-sm sm:text-base">
+                College Email
+              </label>
               <input
                 type="email"
                 placeholder="your.name@lpu.edu.in"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
                 required
               />
-              <p className="text-gray-400 text-sm mt-1">
+              <p className="text-gray-400 text-xs sm:text-sm mt-1">
                 Use your official LPU email address
               </p>
             </div>
 
+            {/* Password Input */}
             <div>
-              <label className="block mb-1 text-gray-700">Password</label>
+              <label className="block mb-1 text-gray-700 text-sm sm:text-base">
+                Password
+              </label>
               <input
                 type="password"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
                 required
               />
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full bg-gradient-to-r from-blue-500 to-green-500 text-white py-2 rounded-lg font-bold transition ${
+              className={`w-full bg-gradient-to-r from-blue-500 to-green-500 text-white py-2 rounded-lg font-bold transition text-sm sm:text-base ${
                 loading ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
               }`}
             >
@@ -129,7 +155,8 @@ const SignIn = () => {
             </button>
           </form>
 
-          <p className="mt-4 text-center text-gray-500">
+          {/* Sign Up Link */}
+          <p className="mt-4 text-center text-gray-500 text-sm sm:text-base">
             Don't have an account?{" "}
             <span
               className="text-blue-500 font-medium cursor-pointer"
@@ -139,7 +166,8 @@ const SignIn = () => {
             </span>
           </p>
 
-          <div className="mt-6 flex justify-center gap-6 text-gray-500 text-sm">
+          {/* Footer Features */}
+          <div className="mt-6 flex justify-center gap-4 sm:gap-6 text-gray-500 text-xs sm:text-sm flex-wrap">
             <div className="flex items-center gap-1">✅ Verified Only</div>
             <div className="flex items-center gap-1">🔒 Secure</div>
             <div className="flex items-center gap-1">⚡ Fast</div>
