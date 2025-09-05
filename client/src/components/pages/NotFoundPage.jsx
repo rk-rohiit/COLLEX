@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { Home, Search, ArrowLeft, RefreshCw } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 const NotFoundPage = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isGlitching, setIsGlitching] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -24,11 +27,11 @@ const NotFoundPage = () => {
   }, []);
 
   const handleGoBack = () => {
-    window.history.back();
+    navigate(-1);
   };
 
   const handleRefresh = () => {
-    window.location.reload();
+    navigate(0);
   };
 
   return (
