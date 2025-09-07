@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/users.js";
 import { logger } from "./utils/logger.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import listingRoutes from "./routes/listingRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -53,6 +54,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/listings", listingRoutes);
 
 // ✅ Default Route
 app.get("/", (req, res) => {
