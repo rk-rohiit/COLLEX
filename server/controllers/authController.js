@@ -1,21 +1,12 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/userModel.js"; // ✅ Correct import
+import User from "../models/userModel.js";
 import crypto from "crypto";
 import {
   sendPasswordResetEmail,
   sendVerificationEmail,
 } from "../utils/emailService.js";
-
-// =============================
-// Helper: Generate JWT Token
-// =============================
-const generateToken = (id) => {
-  if (!process.env.JWT_SECRET) {
-    throw new Error("JWT_SECRET is missing in .env file");
-  }
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
-};
+import { generateToken } from "../middlewares/generateToken.js";
 
 // =============================
 // REGISTER USER
@@ -90,32 +81,41 @@ export const registerUser = async (req, res) => {
 // =============================
 // LOGIN USER
 // =============================
+// ✅ Login User
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // ✅ Validate input
     if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields are required" });
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
     }
 
+    // ✅ Find user by email
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
     }
 
+    // ✅ Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
     }
 
+    // ✅ Generate JWT Token
     const token = generateToken(user._id);
 
+    // ✅ Set Secure Cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -123,21 +123,23 @@ export const loginUser = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
+    // ✅ Return success response
     const { password: _, ...userData } = user.toObject();
-    res
-      .status(200)
-      .json({
-        success: true,
-        data: userData,
-        token,
-        message: "Login successful",
-      });
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      data: userData,
+    });
   } catch (error) {
     console.error("Login Error:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
   }
 };
-
 // =============================
 // LOGOUT USER
 // =============================

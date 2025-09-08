@@ -42,6 +42,7 @@ const SignIn = () => {
         // ✅ Save to localStorage
         localStorage.setItem("user", JSON.stringify(data.data));
         localStorage.setItem("userHash", userHash);
+        localStorage.setItem("token", data.token || "");
 
         // ✅ Show success alert
         window.alert(`✅ Welcome back, ${data.data.fullName}!`);

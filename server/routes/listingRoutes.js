@@ -8,7 +8,6 @@ import {
   getMyListings,
   getStudentListingsWithCount,
 } from "../controllers/listingController.js";
-
 import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
