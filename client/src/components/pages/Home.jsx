@@ -15,7 +15,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import theme from "../../theme";
-// import { motion } from "framer-motion";
+import { motion } from "framer-motion";
 import ContactUs from "./ContactUs";
 import FaqSection from "./FaqSection";
 

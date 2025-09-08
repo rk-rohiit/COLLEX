@@ -124,7 +124,14 @@ export const loginUser = async (req, res) => {
     });
 
     const { password: _, ...userData } = user.toObject();
-    res.status(200).json({ success: true, data: userData });
+    res
+      .status(200)
+      .json({
+        success: true,
+        data: userData,
+        token,
+        message: "Login successful",
+      });
   } catch (error) {
     console.error("Login Error:", error);
     res.status(500).json({ success: false, message: "Server Error" });
