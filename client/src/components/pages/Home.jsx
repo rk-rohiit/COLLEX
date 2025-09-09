@@ -144,7 +144,7 @@ const Home = () => {
               onClick={() => navigate("/signin")}
               className={`${theme.gradients.primary} text-white px-8 py-4 ${theme.borderRadius.button} text-lg font-semibold ${theme.gradients.primaryHover} ${theme.shadows.base} ${theme.shadows.hover} cursor-pointer`}
             >
-              Start Trading Now
+              Start Now
               <ArrowRight className="inline-block ml-2 w-5 h-5" />
             </motion.button>
 
