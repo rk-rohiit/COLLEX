@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import theme from "../../theme";
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const { logout } = useAuth();
@@ -24,20 +25,24 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     <div
       className={`${
         isSidebarOpen ? "w-64" : "w-20"
-      } bg-[#1f1f2e] text-white transition-all duration-300 flex flex-col`}
+      } transition-all duration-300 flex flex-col`}
+      style={{
+        backgroundColor: theme.colors.primary,
+        color: "white",
+        boxShadow: theme.shadows.base,
+      }}
     >
       {/* Logo & Toggle */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <h1
-          className={`text-xl font-bold text-white ${
-            !isSidebarOpen && "hidden"
-          }`}
+          className={`text-xl font-bold ${!isSidebarOpen && "hidden"}`}
+          style={{ color: "white" }}
         >
           Collex Admin
         </h1>
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="text-gray-300 hover:text-white"
+          className="hover:text-gray-200 transition-colors"
         >
           {isSidebarOpen ? <X /> : <Menu />}
         </button>
@@ -49,7 +54,10 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           <a
             key={idx}
             href={item.href}
-            className="flex items-center gap-3 px-4 py-3 hover:bg-[#29293d] transition-colors"
+            className={`flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-200 ${theme.shadows.hover}`}
+            style={{
+              borderRadius: theme.borderRadius.button,
+            }}
           >
             {item.icon}
             <span className={`${!isSidebarOpen && "hidden"}`}>{item.name}</span>
@@ -60,7 +68,11 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       {/* Logout */}
       <button
         onClick={logout}
-        className="flex items-center gap-3 px-4 py-3 bg-red-500 hover:bg-red-600 transition-colors m-4 rounded"
+        className={`flex items-center gap-3 px-4 py-3 transition-colors m-4 ${theme.shadows.hover}`}
+        style={{
+          backgroundColor: "#ef4444",
+          borderRadius: theme.borderRadius.button,
+        }}
       >
         <LogOut />
         <span className={`${!isSidebarOpen && "hidden"}`}>Logout</span>
