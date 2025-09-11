@@ -12,15 +12,13 @@ import { ListingDetailPage } from "../components/pages/ListingDetailPage";
 import ProtectedRoute from "./ProtectedRoute";
 import NotFoundPage from "../components/pages/NotFoundPage";
 
-const AppRoutes = ({ userProfile }) => {
+const AppRoutes = () => {
   return (
     <Routes>
-      {/* ✅ Layout Wrapper */}
+      {/* ✅ Normal Layout Routes (with Header + Footer) */}
       <Route element={<Layout />}>
-        {/* ✅ Home */}
         <Route path="/" element={<Home />} />
 
-        {/* ✅ Listings */}
         <Route
           path="/listings"
           element={
@@ -30,7 +28,6 @@ const AppRoutes = ({ userProfile }) => {
           }
         />
 
-        {/* ✅ Create Listing */}
         <Route
           path="/create-listing"
           element={
@@ -40,7 +37,6 @@ const AppRoutes = ({ userProfile }) => {
           }
         />
 
-        {/* ✅ Listing Details */}
         <Route
           path="/listing/:id"
           element={
@@ -50,7 +46,6 @@ const AppRoutes = ({ userProfile }) => {
           }
         />
 
-        {/* ✅ User Profile (hash required) */}
         <Route
           path="/user/:hash"
           element={
@@ -59,16 +54,13 @@ const AppRoutes = ({ userProfile }) => {
             </ProtectedRoute>
           }
         />
-
-        {/* ✅ Admin Dashboard */}
-        <Route
-          path="/admin"
-          element={userProfile?.role === "admin" ? <Dashboard /> : <Home />}
-        />
-        <Route path="/admin/dashboard" element={<Dashboard />} />
       </Route>
 
-      {/* ✅ Auth Routes */}
+      {/* ✅ Admin Dashboard (No Layout, No Protected while developing) */}
+      <Route path="/admin" element={<Dashboard />} />
+      <Route path="/admin/dashboard" element={<Dashboard />} />
+
+      {/* ✅ Auth Routes (No Layout) */}
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
 
