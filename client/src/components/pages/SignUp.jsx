@@ -28,6 +28,21 @@ const SignUp = () => {
     hostelBlock: "",
     password: "",
   });
+
+  const [open, setOpen] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isVerified, setIsVerified] = useState(false);
+
+  const handleVerifyOtp = () => {
+    if (otp === "1234") {
+      setIsVerified(true);
+      setOpen(false);
+      alert("✅ Email verified successfully!");
+    } else {
+      alert("❌ Invalid OTP. Try again.");
+    }
+  };
+
   const [loading, setLoading] = useState(false);
 
   const totalSteps = 4;
@@ -186,7 +201,8 @@ const SignUp = () => {
 
       case 2:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6 relative">
+            {/* Header */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Phone className="w-8 h-8 text-blue-600" />
@@ -219,6 +235,81 @@ const SignUp = () => {
                 Your phone number will be shared with buyers/sellers
               </p>
             </div>
+
+            {/* Email Section */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="example@email.com"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {!isVerified ? (
+                  <button
+                    type="button"
+                    onClick={() => setOpen(true)}
+                    className="text-blue-600 text-sm font-semibold hover:underline"
+                  >
+                    Verify
+                  </button>
+                ) : (
+                  <span className="text-green-600 text-sm font-semibold">
+                    Verified ✓
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* OTP Popup (Tailwind Modal) */}
+            {open && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+                <div className="bg-white rounded-lg shadow-lg w-80 p-6 text-center relative">
+                  <h2 className="text-lg font-semibold mb-2 text-gray-800">
+                    Email Verification
+                  </h2>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Enter the 4-digit OTP sent to{" "}
+                    <span className="font-medium text-gray-900">
+                      {formData.email || "your email"}
+                    </span>
+                  </p>
+
+                  <input
+                    type="text"
+                    maxLength="4"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="----"
+                    className="w-32 text-center tracking-widest text-lg border border-gray-300 rounded-lg py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none mx-auto mb-4"
+                  />
+
+                  <div className="flex justify-center gap-3">
+                    <button
+                      onClick={() => setOpen(false)}
+                      className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleVerifyOtp}
+                      className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                    >
+                      Verify
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         );
 
