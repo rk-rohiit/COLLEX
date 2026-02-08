@@ -1,4 +1,3 @@
-// src/theme.js
 const theme = {
   colors: {
     primary: "#2563EB", // blue-600

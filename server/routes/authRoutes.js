@@ -3,7 +3,6 @@ import {
   registerUser,
   loginUser,
   logoutUser,
-  sendOtp,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -11,6 +10,5 @@ const router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
-router.post("/send-otp", sendOtp);
 
 export default router;

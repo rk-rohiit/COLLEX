@@ -7,6 +7,7 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -14,7 +15,7 @@ const SignIn = () => {
     e.preventDefault();
 
     if (!email || !password) {
-      window.alert("⚠ Please enter your email and password!");
+      alert("⚠ Please enter your email and password!");
       return;
     }
 
@@ -31,34 +32,27 @@ const SignIn = () => {
       console.log("Login API Response:", data);
 
       if (res.ok && data.success) {
-        // ✅ Save user data in Auth Context
-        login(data.data, data.token || null);
+        // ✅ FIX: use data.user (not data.data)
+        login(data.user, data.token);
 
-        // ✅ Generate a unique userHash
         const userHash = btoa(
-          `${data.data._id}-${data.data.email}-${Date.now()}`
+          `${data.user.id}-${data.user.email}-${Date.now()}`
         );
 
-        // ✅ Save to localStorage
-        localStorage.setItem("user", JSON.stringify(data.data));
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("token", data.token);
         localStorage.setItem("userHash", userHash);
-        localStorage.setItem("token", data.token || "");
 
-        // ✅ Show success alert
-        window.alert(`✅ Welcome back, ${data.data.fullName}!`);
+        alert(`✅ Welcome back, ${data.user.fullName}!`);
 
-        // ✅ Redirect user to secure UserPage
         navigate(`/user/${userHash}`);
       } else {
-        window.alert(
-          data.message || "❌ Invalid email or password. Try again."
-        );
-        setEmail("");
+        alert(data.message || "❌ Invalid email or password");
         setPassword("");
       }
     } catch (error) {
       console.error("Login Error:", error);
-      window.alert("❌ Something went wrong! Please try again later.");
+      alert("❌ Something went wrong! Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -66,113 +60,60 @@ const SignIn = () => {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left section */}
-      <div className="lg:w-1/2 w-full bg-gradient-to-b from-blue-500 to-teal-500 text-white flex flex-col justify-center items-start p-8 sm:p-12 md:p-16">
-        {/* Logo */}
-        <div className="w-32 h-20 flex items-center justify-center mb-6">
-          <img
-            src={Logo}
-            alt="Collex Logo"
-            className="object-contain h-16 w-auto border-r-4 border-b-4 border-gray-100 rounded-xl"
-            style={{ maxWidth: "100%", height: "auto" }}
-          />
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-          Welcome to Collex
-        </h1>
-
-        {/* Description */}
-        <p className="mb-6 text-sm sm:text-base md:text-lg leading-relaxed max-w-lg">
-          The trusted campus marketplace for LPU students. Buy, sell, and rent
-          textbooks, electronics, bikes, and more within your verified campus
-          community.
+      {/* LEFT */}
+      <div className="lg:w-1/2 bg-gradient-to-b from-blue-500 to-teal-500 text-white flex flex-col justify-center p-10">
+        <img src={Logo} alt="Collex" className="h-16 mb-6" />
+        <h1 className="text-4xl font-bold mb-4">Welcome to Collex</h1>
+        <p className="mb-6">
+          Trusted campus marketplace for LPU students.
         </p>
-
-        {/* Features */}
-        <ul className="space-y-3 text-sm sm:text-base">
-          <li className="flex items-center gap-2">✅ Verified students only</li>
-          <li className="flex items-center gap-2">
-            ⚡ List items in under 60 seconds
-          </li>
-          <li className="flex items-center gap-2">💬 Safe in-app messaging</li>
-        </ul>
       </div>
 
-      {/* Right section */}
-      <div className="lg:w-1/2 w-full flex justify-center items-center bg-gray-50 p-6 sm:p-10">
-        <div className="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-md">
-          {/* Title */}
-          <h2 className="text-xl sm:text-2xl font-bold mb-2 text-center lg:text-left">
-            Welcome Back
-          </h2>
-          <p className="mb-6 text-gray-500 text-center lg:text-left text-sm sm:text-base">
-            Sign in to your account
-          </p>
+      {/* RIGHT */}
+      <div className="lg:w-1/2 flex items-center justify-center bg-gray-50 p-8">
+        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+          <h2 className="text-2xl font-bold mb-2">Welcome Back</h2>
+          <p className="text-gray-500 mb-6">Sign in to your account</p>
 
-          {/* Form */}
           <form onSubmit={handleSignIn} className="space-y-4">
-            {/* Email Input */}
-            <div>
-              <label className="block mb-1 text-gray-700 text-sm sm:text-base">
-                College Email
-              </label>
-              <input
-                type="email"
-                placeholder="your.name@lpu.edu.in"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
-                required
-              />
-              <p className="text-gray-400 text-xs sm:text-sm mt-1">
-                Use your official LPU email address
-              </p>
-            </div>
+            <input
+              type="email"
+              placeholder="your.name@lpu.edu.in"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border px-4 py-2 rounded-lg"
+              required
+            />
 
-            {/* Password Input */}
-            <div>
-              <label className="block mb-1 text-gray-700 text-sm sm:text-base">
-                Password
-              </label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
-                required
-              />
-            </div>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border px-4 py-2 rounded-lg"
+              required
+            />
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full bg-gradient-to-r from-blue-500 to-green-500 text-white py-2 rounded-lg font-bold transition text-sm sm:text-base ${
-                loading ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+              className={`w-full bg-blue-600 text-white py-2 rounded-lg ${
+                loading ? "opacity-50" : "hover:bg-blue-700"
               }`}
             >
               {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
 
-          {/* Sign Up Link */}
-          <p className="mt-4 text-center text-gray-500 text-sm sm:text-base">
-            Don't have an account?{" "}
+          <p className="mt-4 text-center text-gray-500">
+            Don’t have an account?{" "}
             <span
-              className="text-blue-500 font-medium cursor-pointer"
+              className="text-blue-500 cursor-pointer"
               onClick={() => navigate("/signup")}
             >
               Sign Up
             </span>
           </p>
-
-          {/* Footer Features */}
-          <div className="mt-6 flex justify-center gap-4 sm:gap-6 text-gray-500 text-xs sm:text-sm flex-wrap">
-            <div className="flex items-center gap-1">✅ Verified Only</div>
-            <div className="flex items-center gap-1">🔒 Secure</div>
-            <div className="flex items-center gap-1">⚡ Fast</div>
-          </div>
         </div>
       </div>
     </div>
