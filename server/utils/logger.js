@@ -1,4 +1,15 @@
+// src/utils/logger.js
+
 export const logger = {
-  info: (msg) => console.log(`✅ INFO: ${msg}`),
-  error: (msg) => console.error(`❌ ERROR: ${msg}`),
+  info: (message) => {
+    console.log(`✅ [INFO] ${new Date().toISOString()} - ${message}`);
+  },
+
+  warn: (message) => {
+    console.warn(`⚠️ [WARN] ${new Date().toISOString()} - ${message}`);
+  },
+
+  error: (message) => {
+    console.error(`❌ [ERROR] ${new Date().toISOString()} - ${message}`);
+  },
 };
