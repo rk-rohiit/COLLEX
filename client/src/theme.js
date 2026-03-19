@@ -1,16 +1,16 @@
 const theme = {
   colors: {
-    primary: "#2563EB", // blue-600
-    secondary: "#06B6D4", // cyan-500
+    primary: "#F97316", // orange-500
+    secondary: "#FB923C", // orange-400
     textDark: "#1F2937", // gray-900
     textLight: "#6B7280", // gray-600
     background: "#FFFFFF",
-    sectionBg: "#F9FAFB",
+    sectionBg: "#FFF7ED", // orange-50
   },
   gradients: {
-    primary: "bg-gradient-to-r from-blue-600 to-cyan-500",
-    primaryHover: "hover:from-blue-700 hover:to-cyan-600",
-    section: "bg-gradient-to-br from-gray-50 to-blue-50",
+    primary: "bg-gradient-to-r from-orange-500 to-amber-400",
+    primaryHover: "hover:from-orange-600 hover:to-amber-500",
+    section: "bg-gradient-to-br from-orange-50 to-amber-100",
   },
   borderRadius: {
     button: "rounded-full",

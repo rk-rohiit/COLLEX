@@ -1,5 +1,3 @@
-// src/models/user.model.js
-
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
@@ -11,10 +9,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [
-        /^[a-zA-Z0-9._%+-]+@lpu\.edu\.in$/,
-        "Use valid LPU email",
-      ],
+      match: [/^[a-zA-Z0-9._%+-]+@lpu\.edu\.in$/, "Use valid LPU email"],
     },
 
     fullName: {
@@ -44,14 +39,8 @@ const userSchema = new mongoose.Schema(
 
     hostelBlock: {
       type: String,
-      enum: ["block-a", "block-b", "block-c", "block-d", ""],
-      default: "",
-    },
-
-    campusId: {
-      type: String,
-      required: true,
-      default: "lpu",
+      enum: ["block-a", "block-b", "block-c", "block-d"],
+      default: null,
     },
 
     role: {
@@ -75,12 +64,16 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 8,
       select: false,
+      match: [
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/,
+        "Password must contain uppercase, lowercase and number",
+      ],
     },
   },
   { timestamps: true }
 );
 
-/* Password Hash */
+/* HASH PASSWORD */
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
@@ -89,7 +82,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-/* Compare Password */
+/* COMPARE PASSWORD */
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
