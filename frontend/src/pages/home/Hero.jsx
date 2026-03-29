@@ -169,7 +169,7 @@ const Hero = () => {
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={() => navigate("/signin")}
+                  onClick={() => navigate("/login")}
                   sx={{
                     px: 5,
                     py: 1.5,

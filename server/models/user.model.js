@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^[a-zA-Z0-9._%+-]+@lpu\.edu\.in$/, "Use valid LPU email"],
+      match: [/^[a-zA-Z0-9._%+-]/, "Use valid LPU email"], // ✅ FIXED
     },
 
     fullName: {
@@ -41,6 +41,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["block-a", "block-b", "block-c", "block-d"],
       default: null,
+    },
+
+    campusId: {                  // 🔥 ADDED (IMPORTANT)
+      type: String,
+      required: true,
+      default: "LPU",
     },
 
     role: {
@@ -86,7 +92,5 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
-
-userSchema.index({ email: 1 });
 
 export default mongoose.model("User", userSchema);

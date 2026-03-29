@@ -22,6 +22,7 @@ export const registerUserService = async (data) => {
       email: user.email,
       fullName: user.fullName,
       role: user.role,
+      campusId: user.campusId, // ✅ IMPORTANT
     },
   };
 };
@@ -48,6 +49,7 @@ export const loginUserService = async (data) => {
       email: user.email,
       fullName: user.fullName,
       role: user.role,
+      campusId: user.campusId, // ✅ IMPORTANT
     },
   };
 };

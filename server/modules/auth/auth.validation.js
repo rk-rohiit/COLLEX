@@ -7,6 +7,10 @@ export const validateRegisterInput = (data) => {
     throw new Error("All required fields must be provided");
   }
 
+  // if (!email.endsWith("@lpu.in")) {
+  //   throw new Error("Only LPU email allowed");
+  // }
+
   if (password.length < 8) {
     throw new Error("Password must be at least 8 characters");
   }

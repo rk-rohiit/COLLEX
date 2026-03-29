@@ -8,10 +8,21 @@ import {
 
 import { motion } from "framer-motion";
 import { useTheme } from "@mui/material/styles";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+import {
+  submitContact,
+  resetContactState,
+} from "@/features/contact/contactSlice";
 
 const Contact = () => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+
+  const { loading, error, success } = useSelector(
+    (state) => state.contact
+  );
 
   const gradient = `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`;
 
@@ -22,25 +33,47 @@ const Contact = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [localError, setLocalError] = useState("");
 
+  // 🔥 Handle Input
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setLocalError("");
   };
 
+  // 🔥 Validation
   const validate = () => {
     let temp = {};
+
     if (!form.name) temp.name = "Name is required";
     if (!form.email) temp.email = "Email is required";
     if (!form.message) temp.message = "Message is required";
+
     setErrors(temp);
     return Object.keys(temp).length === 0;
   };
 
+  // 🔥 Submit
   const handleSubmit = () => {
-    if (validate()) {
-      console.log("Form Data:", form);
-    }
+    if (!validate()) return;
+
+    dispatch(submitContact(form));
   };
+
+  // 🔥 Reset form after success
+  useEffect(() => {
+    if (success) {
+      setForm({
+        name: "",
+        email: "",
+        message: "",
+      });
+
+      setTimeout(() => {
+        dispatch(resetContactState());
+      }, 3000);
+    }
+  }, [success]);
 
   return (
     <Container
@@ -49,7 +82,7 @@ const Contact = () => {
         py: 12,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center", // 🔥 center everything
+        alignItems: "center",
         textAlign: "center",
       }}
     >
@@ -72,10 +105,7 @@ const Contact = () => {
           </span>
         </Typography>
 
-        <Typography
-          color="text.secondary"
-          sx={{ mb: 4, maxWidth: 600 }}
-        >
+        <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 600 }}>
           Have questions or ideas? We'd love to hear from you.
           Reach out and we’ll respond as soon as possible.
         </Typography>
@@ -98,7 +128,7 @@ const Contact = () => {
             background: "rgba(255,255,255,0.05)",
             border: "1px solid rgba(255,255,255,0.1)",
             boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
-            mx: "auto", // 🔥 center form
+            mx: "auto",
           }}
         >
           <TextField
@@ -136,6 +166,20 @@ const Contact = () => {
             helperText={errors.message}
           />
 
+          {/* 🔥 Errors */}
+          {(localError || error) && (
+            <Typography color="error" mt={1}>
+              {localError || error}
+            </Typography>
+          )}
+
+          {/* ✅ Success */}
+          {success && (
+            <Typography color="success.main" mt={1}>
+              Message sent successfully ✅
+            </Typography>
+          )}
+
           <Button
             fullWidth
             variant="contained"
@@ -147,7 +191,7 @@ const Contact = () => {
               background: gradient,
             }}
           >
-            Send Message 🚀
+            {loading ? "Sending..." : "Send Message 🚀"}
           </Button>
         </Box>
       </motion.div>

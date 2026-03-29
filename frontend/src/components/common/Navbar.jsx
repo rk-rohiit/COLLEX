@@ -109,7 +109,7 @@ const Navbar = () => {
           {/* CTA BUTTON */}
           <Button
             variant="contained"
-            onClick={() => navigate("/signin")}
+            onClick={() => navigate("/login")}
             sx={{
               ml: 3,
               px: 3,
