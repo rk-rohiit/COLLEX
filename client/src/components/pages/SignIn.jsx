@@ -1,38 +1,46 @@
 import React, { useState } from "react";
+import { Mail, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { toastStyle } from "../../toastConfig";
+import { loginUser } from "../../api/auth.api"; // ✅ API IMPORT
 import Logo from "../../assets/logo.png";
 
 const SignIn = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   const handleSignIn = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      alert("⚠ Please enter your email and password!");
+    if (!formData.email || !formData.password) {
+      toast.error("Please fill all fields", toastStyle);
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      // ✅ CALL API
+      const data = await loginUser(formData);
 
-      const data = await res.json();
-      console.log("Login API Response:", data);
-
-      if (res.ok && data.success) {
-        // ✅ FIX: use data.user (not data.data)
+      if (data.success) {
         login(data.user, data.token);
 
         const userHash = btoa(
@@ -43,81 +51,105 @@ const SignIn = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("userHash", userHash);
 
-        alert(`✅ Welcome back, ${data.user.fullName}!`);
+        toast.success(`Welcome back, ${data.user.fullName} 👋`, toastStyle);
 
-        navigate(`/user/${userHash}`);
-      } else {
-        alert(data.message || "❌ Invalid email or password");
-        setPassword("");
+        setTimeout(() => {
+          navigate(`/user/${userHash}`);
+        }, 1200);
       }
     } catch (error) {
-      console.error("Login Error:", error);
-      alert("❌ Something went wrong! Please try again later.");
+      toast.error(error.message || "Login failed", toastStyle);
+      setFormData((prev) => ({ ...prev, password: "" }));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* LEFT */}
-      <div className="lg:w-1/2 bg-gradient-to-b from-blue-500 to-teal-500 text-white flex flex-col justify-center p-10">
-        <img src={Logo} alt="Collex" className="h-16 mb-6" />
-        <h1 className="text-4xl font-bold mb-4">Welcome to Collex</h1>
-        <p className="mb-6">
-          Trusted campus marketplace for LPU students.
-        </p>
+    <div className="min-h-screen flex bg-gradient-to-br from-orange-50 to-amber-100">
+
+      {/* LEFT PANEL */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-orange-500 to-amber-400 text-white p-12 flex-col justify-between">
+        <img src={Logo} alt="Collex" className="h-16" />
+
+        <div>
+          <h1 className="text-4xl font-bold mb-4">
+            Welcome Back 👋
+          </h1>
+          <p className="text-lg opacity-90">
+            Continue your journey with Collex marketplace.
+          </p>
+        </div>
       </div>
 
-      {/* RIGHT */}
-      <div className="lg:w-1/2 flex items-center justify-center bg-gray-50 p-8">
-        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-bold mb-2">Welcome Back</h2>
-          <p className="text-gray-500 mb-6">Sign in to your account</p>
+      {/* RIGHT FORM */}
+      <div className="flex-1 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-xl"
+        >
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            Sign In
+          </h2>
+          <p className="text-gray-500 mb-6">
+            Access your account
+          </p>
 
-          <form onSubmit={handleSignIn} className="space-y-4">
-            <input
+          <form onSubmit={handleSignIn} className="space-y-5">
+
+            <Input
+              icon={Mail}
+              name="email"
               type="email"
               placeholder="your.name@lpu.edu.in"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border px-4 py-2 rounded-lg"
-              required
+              value={formData.email}
+              onChange={handleChange}
             />
 
-            <input
+            <Input
+              icon={Lock}
+              name="password"
               type="password"
               placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border px-4 py-2 rounded-lg"
-              required
+              value={formData.password}
+              onChange={handleChange}
             />
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={loading}
-              className={`w-full bg-blue-600 text-white py-2 rounded-lg ${
-                loading ? "opacity-50" : "hover:bg-blue-700"
-              }`}
+              className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-orange-500 to-amber-400 hover:from-orange-600 hover:to-amber-500 shadow-md disabled:opacity-50"
             >
               {loading ? "Signing In..." : "Sign In"}
-            </button>
+            </motion.button>
           </form>
 
-          <p className="mt-4 text-center text-gray-500">
+          <p className="mt-6 text-center text-gray-500 text-sm">
             Don’t have an account?{" "}
             <span
-              className="text-blue-500 cursor-pointer"
               onClick={() => navigate("/signup")}
+              className="text-orange-500 font-medium cursor-pointer hover:underline"
             >
               Sign Up
             </span>
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
 };
+
+// INPUT COMPONENT
+const Input = ({ icon: Icon, ...props }) => (
+  <div className="relative">
+    <Icon className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
+    <input
+      {...props}
+      className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none"
+    />
+  </div>
+);
 
 export default SignIn;

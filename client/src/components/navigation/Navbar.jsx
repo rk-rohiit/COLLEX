@@ -3,21 +3,21 @@ import { Search, Bell, Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import NotificationPopup from "../pages/NotificationPopup";
+import theme from "../../theme";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
   const [showNotifications, setShowNotifications] = useState(false);
   const [userHash, setUserHash] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
 
-  // ✅ Generate userHash when user logs in
   useEffect(() => {
     if (user) {
       const storedHash = localStorage.getItem("userHash");
-      if (storedHash) {
-        setUserHash(storedHash);
-      } else {
+      if (storedHash) setUserHash(storedHash);
+      else {
         const newHash = btoa(`${user._id}-${user.email}-${Date.now()}`);
         localStorage.setItem("userHash", newHash);
         setUserHash(newHash);
@@ -26,180 +26,146 @@ const Navbar = () => {
   }, [user]);
 
   return (
-    <header className="bg-white shadow-md border-b px-4 py-3 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Logo */}
+    <header
+      className="sticky top-0 z-50 backdrop-blur-lg border-b"
+      style={{
+        background: "rgba(255,255,255,0.9)",
+        borderColor: "#eee",
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+
+        {/* LOGO */}
         <div
-          className="flex items-center space-x-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer"
           onClick={() => navigate("/")}
         >
-          <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center shadow">
+          <div
+            className="w-9 h-9 flex items-center justify-center rounded-lg shadow"
+            style={{
+              background: `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
+            }}
+          >
             <span className="text-white font-bold text-sm">C</span>
           </div>
-          <span className="text-xl font-bold text-gray-900">Collex</span>
+
+          <span
+            className="text-xl font-bold"
+            style={{ color: theme.colors.textDark }}
+          >
+            Collex
+          </span>
         </div>
 
-        {/* Search (desktop only) */}
+        {/* SEARCH */}
         <div className="hidden md:flex flex-1 max-w-md mx-8">
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+              style={{ color: theme.colors.textLight }}
+            />
             <input
               type="text"
-              placeholder="Search books, electronics, bikes..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Search books, bikes, electronics..."
+              className="w-full pl-10 pr-4 py-2.5 outline-none transition"
+              style={{
+                borderRadius: "999px",
+                border: "1px solid #ddd",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = theme.colors.primary;
+              }}
             />
           </div>
         </div>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center space-x-5">
-          {/* Create Listing */}
+        {/* DESKTOP NAV */}
+        <div className="hidden md:flex items-center gap-5">
+
+          {/* LIST ITEM */}
           <button
             onClick={() => navigate("/create-listing")}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+            className="px-5 py-2 text-white text-sm rounded-full shadow-md"
+            style={{
+              background: `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
+            }}
           >
-            List Item
+            + List Item
           </button>
 
-          {/* Notification Bell */}
+          {/* NOTIFICATION */}
           <div className="relative">
             <Bell
-              className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600"
+              className="w-5 h-5 cursor-pointer"
+              style={{ color: theme.colors.textLight }}
               onClick={() => setShowNotifications((prev) => !prev)}
             />
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full shadow">
+            <span
+              className="absolute -top-2 -right-2 text-white text-xs px-1.5 py-0.5 rounded-full"
+              style={{ background: theme.colors.primary }}
+            >
               3
             </span>
           </div>
 
-          {/* Avatar + User Menu */}
-          <div
-            className="flex items-center space-x-2 cursor-pointer group"
-            onClick={() => {
-              if (user && userHash) {
-                navigate(`/user/${userHash}`);
-              } else {
-                navigate("/signin");
-              }
-            }}
-          >
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">
-                {user?.fullName?.[0]?.toUpperCase() || "U"}
-              </span>
-            </div>
-            <div className="text-sm">
-              <div className="font-medium text-gray-900 group-hover:text-blue-600">
-                {user?.fullName || "User"}
-              </div>
-              {user ? (
-                <div
-                  className="text-red-500 hover:underline cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    logout();
-                  }}
-                >
-                  Sign Out
-                </div>
-              ) : (
-                <div
-                  className="text-blue-500 hover:underline cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate("/signin");
-                  }}
-                >
-                  Sign In
-                </div>
-              )}
-            </div>
-          </div>
+          {/* USER MENU */}
+          <UserMenu
+            user={user}
+            logout={logout}
+            navigate={navigate}
+            userHash={userHash}
+          />
         </div>
 
-        {/* Mobile Menu Button */}
+        {/* MOBILE MENU BUTTON */}
         <div className="md:hidden">
           {mobileMenu ? (
-            <X
-              className="w-6 h-6 text-gray-700 cursor-pointer"
-              onClick={() => setMobileMenu(false)}
-            />
+            <X onClick={() => setMobileMenu(false)} />
           ) : (
-            <Menu
-              className="w-6 h-6 text-gray-700 cursor-pointer"
-              onClick={() => setMobileMenu(true)}
-            />
+            <Menu onClick={() => setMobileMenu(true)} />
           )}
         </div>
       </div>
 
-      {/* ✅ Notification Popup */}
+      {/* NOTIFICATIONS */}
       {showNotifications && (
         <NotificationPopup setShow={setShowNotifications} />
       )}
 
-      {/* ✅ Mobile Menu */}
+      {/* MOBILE MENU */}
       {mobileMenu && (
-        <div className="md:hidden bg-white shadow-lg rounded-lg mt-3 p-4 space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+        <div className="md:hidden px-4 pb-4 space-y-4 border-t">
+
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-full px-4 py-2 outline-none"
+            style={{
+              borderRadius: "999px",
+              border: "1px solid #ddd",
+            }}
+          />
 
           <button
             onClick={() => {
               setMobileMenu(false);
               navigate("/create-listing");
             }}
-            className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
-          >
-            List Item
-          </button>
-
-          <div
-            className="flex items-center space-x-3"
-            onClick={() => {
-              setMobileMenu(false);
-              if (user && userHash) navigate(`/user/${userHash}`);
-              else navigate("/signin");
+            className="w-full py-2 text-white rounded-full"
+            style={{
+              background: `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
             }}
           >
-            <div className="w-9 h-9 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-medium">
-                {user?.fullName?.[0]?.toUpperCase() || "U"}
-              </span>
-            </div>
-            <div>
-              <div className="font-medium text-gray-900">
-                {user?.fullName || "User"}
-              </div>
-              {user ? (
-                <div
-                  className="text-red-500 hover:underline cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    logout();
-                  }}
-                >
-                  Sign Out
-                </div>
-              ) : (
-                <div
-                  className="text-blue-500 hover:underline cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate("/signin");
-                  }}
-                >
-                  Sign In
-                </div>
-              )}
-            </div>
-          </div>
+            + List Item
+          </button>
+
+          <UserMenu
+            user={user}
+            logout={logout}
+            navigate={navigate}
+            userHash={userHash}
+            mobile
+          />
         </div>
       )}
     </header>
@@ -207,3 +173,82 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+
+
+// ✅ USER MENU COMPONENT
+const UserMenu = ({ user, logout, navigate, userHash, mobile }) => {
+  const [open, setOpen] = useState(false);
+
+  // 🔓 NOT LOGGED IN
+  if (!user) {
+    return (
+      <div className={`flex gap-3 ${mobile ? "flex-col w-full" : ""}`}>
+
+        <button
+          onClick={() => navigate("/signin")}
+          style={{ color: theme.colors.textDark }}
+        >
+          Sign In
+        </button>
+
+        <button
+          onClick={() => navigate("/signup")}
+          className={`${mobile ? "w-full" : ""} px-5 py-2 text-white rounded-full`}
+          style={{
+            background: `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
+          }}
+        >
+          Join Now 🚀
+        </button>
+      </div>
+    );
+  }
+
+  // 🔐 LOGGED IN
+  return (
+    <div className="relative">
+
+      {/* AVATAR */}
+      <div
+        onClick={() => (mobile ? navigate(`/user/${userHash}`) : setOpen(!open))}
+        className="flex items-center gap-2 cursor-pointer"
+      >
+        <div
+          className="w-9 h-9 rounded-full flex items-center justify-center"
+          style={{
+            background: `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
+          }}
+        >
+          <span className="text-white font-semibold">
+            {user.fullName?.[0]?.toUpperCase()}
+          </span>
+        </div>
+
+        {!mobile && <span>{user.fullName}</span>}
+      </div>
+
+      {/* DROPDOWN */}
+      {!mobile && open && (
+        <div
+          className="absolute right-0 mt-2 w-48 rounded-xl shadow-lg border p-2 z-50"
+          style={{ background: theme.colors.background }}
+        >
+          <button
+            onClick={() => navigate(`/user/${userHash}`)}
+            className="w-full text-left px-3 py-2 rounded"
+          >
+            Profile
+          </button>
+
+          <button
+            onClick={logout}
+            className="w-full text-left px-3 py-2 text-red-500 rounded"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};

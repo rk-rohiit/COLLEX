@@ -1,7 +1,7 @@
 const theme = {
   colors: {
-    primary: "#F97316", // orange-500
-    secondary: "#FB923C", // orange-400
+    primary: "#F97316", // orange
+    secondary: "#ff7300", // orange
     textDark: "#1F2937", // gray-900
     textLight: "#6B7280", // gray-600
     background: "#FFFFFF",

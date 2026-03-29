@@ -2,124 +2,125 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo.png";
+import theme from "../../theme";
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const [scrollY, setScrollY] = useState(0);
   const navigate = useNavigate();
+
+  const gradient = `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.secondary})`;
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
   return (
-    <>
-      <nav
-        className={`fixed w-full z-50 transition-all duration-300 ${
-          scrollY > 50
-            ? "bg-white/95 backdrop-blur-md shadow-lg"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
-              <div
-                className="w-10 h-10 bg-gradient-to-br flex items-center justify-center cursor-pointer"
-                onClick={() => navigate("/")}
-              >
-                {/* <span className="text-white font-bold text-lg">C</span>
-                 */}
-                <img
-                  src={Logo}
-                  alt="Collex Logo"
-                  className="object-contain h-16 w-auto"
-                />
-              </div>
-              <span className="text-2xl font-bold text-gray-900">Collex</span>
-            </div>
+    <nav
+      className="fixed w-full z-50 transition-all duration-300"
+      style={{
+        background:
+          scrollY > 50 ? "rgba(255,255,255,0.9)" : "transparent",
+        backdropFilter: scrollY > 50 ? "blur(10px)" : "none",
+        boxShadow:
+          scrollY > 50 ? "0 4px 20px rgba(0,0,0,0.05)" : "none",
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center py-4">
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-8">
-              <a
-                href="#features"
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Features
-              </a>
-              <a
-                href="#how-it-works"
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                How it Works
-              </a>
-              <a
-                href="#categories"
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Categories
-              </a>
-              <a
-                href="#contact"
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Contact
-              </a>
-              <button
-                className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-2 rounded-full hover:from-blue-700 hover:to-cyan-600 transition-all cursor-pointer"
-                onClick={() => navigate("/signIn")}
-              >
-                Join Now
-              </button>
-            </div>
+          {/* LOGO */}
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            <img src={Logo} alt="Collex" className="h-10 w-auto" />
 
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            <span
+              className="text-2xl font-bold"
+              style={{ color: theme.colors.textDark }}
             >
-              {isMenuOpen ? <X /> : <Menu />}
+              Collex
+            </span>
+          </div>
+
+          {/* DESKTOP MENU */}
+          <div className="hidden md:flex items-center gap-8">
+
+            {["features", "how-it-works", "categories", "contact"].map(
+              (item, i) => (
+                <a
+                  key={i}
+                  href={`#${item}`}
+                  className="text-sm font-medium transition"
+                  style={{ color: theme.colors.textLight }}
+                  onMouseEnter={(e) =>
+                    (e.target.style.color = theme.colors.primary)
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.color = theme.colors.textLight)
+                  }
+                >
+                  {item.replace("-", " ").toUpperCase()}
+                </a>
+              )
+            )}
+
+            {/* CTA BUTTON */}
+            <button
+              onClick={() => navigate("/signin")}
+              className="px-6 py-2 text-white rounded-full shadow-md transition"
+              style={{ background: gradient }}
+            >
+              Join Now
             </button>
           </div>
-        </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-4 py-4 space-y-4">
+          {/* MOBILE BUTTON */}
+          <button
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? (
+              <X style={{ color: theme.colors.textDark }} />
+            ) : (
+              <Menu style={{ color: theme.colors.textDark }} />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* MOBILE MENU */}
+      {isMenuOpen && (
+        <div
+          className="md:hidden border-t px-4 py-4 space-y-4"
+          style={{ background: theme.colors.background }}
+        >
+          {["features", "how-it-works", "categories", "contact"].map(
+            (item, i) => (
               <a
-                href="#features"
-                className="block text-gray-700 hover:text-blue-600"
+                key={i}
+                href={`#${item}`}
+                className="block text-sm"
+                style={{ color: theme.colors.textLight }}
               >
-                Features
+                {item.replace("-", " ").toUpperCase()}
               </a>
-              <a
-                href="#how-it-works"
-                className="block text-gray-700 hover:text-blue-600"
-              >
-                How it Works
-              </a>
-              <a
-                href="#categories"
-                className="block text-gray-700 hover:text-blue-600"
-              >
-                Categories
-              </a>
-              <a
-                href="#contact"
-                className="block text-gray-700 hover:text-blue-600"
-              >
-                Contact
-              </a>
-              <button className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-2 rounded-full">
-                Join Now
-              </button>
-            </div>
-          </div>
-        )}
-      </nav>
-    </>
+            )
+          )}
+
+          <button
+            onClick={() => navigate("/signin")}
+            className="w-full py-2 text-white rounded-full"
+            style={{ background: gradient }}
+          >
+            Join Now
+          </button>
+        </div>
+      )}
+    </nav>
   );
 };
 
