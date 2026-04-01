@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { Container, Typography, Button } from "@mui/material";
 import { removeFromCart } from "@/features/cart/cartSlice";
+import { createOrdersFromCart } from "@/features/order/orderSlice";
 
 const Cart = () => {
   const { items } = useSelector((state) => state.cart);
@@ -11,6 +12,15 @@ const Cart = () => {
     0
   );
 
+  const handleCheckout = () => {
+    dispatch(
+      createOrdersFromCart({
+        items,
+        meetType: "campus", // or protected
+      })
+    );
+  };
+
   return (
     <Container sx={{ mt: 4 }}>
       <Typography variant="h4">Cart</Typography>
@@ -19,6 +29,8 @@ const Cart = () => {
         <div key={item._id}>
           <Typography>{item.title}</Typography>
           <Typography>₹ {item.price}</Typography>
+          <Typography>Qty: {item.qty}</Typography>
+
           <Button onClick={() => dispatch(removeFromCart(item._id))}>
             Remove
           </Button>
@@ -27,8 +39,12 @@ const Cart = () => {
 
       <Typography variant="h5">Total: ₹ {total}</Typography>
 
-      <Button variant="contained" sx={{ mt: 2 }}>
-        Proceed to Checkout
+      <Button
+        variant="contained"
+        sx={{ mt: 2 }}
+        onClick={handleCheckout}
+      >
+        Place Order
       </Button>
     </Container>
   );
