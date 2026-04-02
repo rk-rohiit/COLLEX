@@ -15,6 +15,8 @@ import ProtectedRoute from "./ProtectedRoute"; // 🔥 IMPORTANT
 import ProductList from "../pages/products/ProductList";
 import Cart from "../pages/cart/Cart";
 import CheckoutPage from "../pages/checkout/CheckoutPage";
+import OrderSuccess from "../pages/order/OrderSuccess";
+import ProfilePage from "../pages/profile/ProfilePage";
 
 // 🔥 Landing Page Wrapper
 const LandingPage = () => {
@@ -32,7 +34,6 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* 🌐 Public */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -65,10 +66,29 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-        <Route path="/checkout"
-          element={<ProtectedRoute>
-            <CheckoutPage />
-          </ProtectedRoute>} />
+
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <CheckoutPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/order-success"
+          element={
+            <ProtectedRoute>
+              <OrderSuccess />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );

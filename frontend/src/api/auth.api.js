@@ -5,3 +5,6 @@ export const loginAPI = (data) => api.post("/auth/login", data);
 
 // REGISTER
 export const registerAPI = (data) => api.post("/auth/register", data);
+
+export const getMeAPI = (data) => { api.get("/auth/me",data);
+};
