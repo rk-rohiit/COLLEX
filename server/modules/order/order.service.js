@@ -12,11 +12,21 @@ export const createOrderService = async (listingId, user, meetType) => {
   if (!listing) throw new Error("Listing not found");
 
   if (listing.status !== "available") {
-    throw new Error("Listing is not available");
+    throw new Error(`Listing is ${listing.status}`);
   }
 
   if (listing.postedBy.toString() === user._id.toString()) {
     throw new Error("You cannot order your own listing");
+  }
+
+  // ✅ Prevent duplicate order
+  const existingOrder = await Order.findOne({
+    listing: listing._id,
+    buyer: user._id,
+  });
+
+  if (existingOrder) {
+    throw new Error("You already placed an order");
   }
 
   const extraFee = meetType === "protected" ? 10 : 0;
@@ -28,7 +38,7 @@ export const createOrderService = async (listingId, user, meetType) => {
     type: listing.type,
     meetType,
     extraFee,
-    campusId: user.campusId,
+    campusId: user.campusId || "lpu", // 🔥 FIX
   });
 
   listing.status = listing.type === "sell" ? "reserved" : "rented";

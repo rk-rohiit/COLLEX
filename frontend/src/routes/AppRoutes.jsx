@@ -14,6 +14,7 @@ import Dashboard from "@/pages/dashboard/Dashboard";
 import ProtectedRoute from "./ProtectedRoute"; // 🔥 IMPORTANT
 import ProductList from "../pages/products/ProductList";
 import Cart from "../pages/cart/Cart";
+import CheckoutPage from "../pages/checkout/CheckoutPage";
 
 // 🔥 Landing Page Wrapper
 const LandingPage = () => {
@@ -64,7 +65,10 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-
+        <Route path="/checkout"
+          element={<ProtectedRoute>
+            <CheckoutPage />
+          </ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );
