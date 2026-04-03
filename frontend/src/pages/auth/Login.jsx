@@ -44,7 +44,7 @@ const Login = () => {
   useEffect(() => {
     if (token) {
       console.log("Login Success, Token:", token); // ✅ debug
-      navigate("/dashboard");
+      navigate("/");
     }
   }, [token, navigate]);
 
