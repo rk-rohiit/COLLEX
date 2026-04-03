@@ -11,84 +11,95 @@ import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import Dashboard from "@/pages/dashboard/Dashboard";
 
-import ProtectedRoute from "./ProtectedRoute"; // 🔥 IMPORTANT
+import ProtectedRoute from "./ProtectedRoute";
 import ProductList from "../pages/products/ProductList";
 import Cart from "../pages/cart/Cart";
 import CheckoutPage from "../pages/checkout/CheckoutPage";
 import OrderSuccess from "../pages/order/OrderSuccess";
 import ProfilePage from "../pages/profile/ProfilePage";
 
-// 🔥 Landing Page Wrapper
-const LandingPage = () => {
-  return (
-    <MainLayout>
-      <Hero />
-      <About />
-      <Services />
-      <Contact />
-    </MainLayout>
-  );
-};
+// Landing page
+const LandingPage = () => (
+  <>
+    <Hero />
+    <About />
+    <Services />
+    <Contact />
+  </>
+);
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 🌐 Public */}
-        <Route path="/" element={<LandingPage />} />
+
+        {/* 🔥 ALL PAGES WITH NAVBAR + FOOTER */}
+        <Route element={<MainLayout />}>
+
+          {/* Public */}
+          <Route path="/" element={<LandingPage />} />
+
+          {/* Protected */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <ProductList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/order-success"
+            element={
+              <ProtectedRoute>
+                <OrderSuccess />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+        </Route>
+
+        {/* 🔥 NO NAVBAR HERE */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* 🔐 Protected */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/products"
-          element={
-            <ProtectedRoute>
-              <ProductList />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <CheckoutPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/order-success"
-          element={
-            <ProtectedRoute>
-              <OrderSuccess />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/profile" element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        } />
       </Routes>
     </BrowserRouter>
   );
