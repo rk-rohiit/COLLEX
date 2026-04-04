@@ -94,6 +94,9 @@ const Login = () => {
         >
           {loading ? "Logging in..." : "Login"}
         </Button>
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
+          Don't have an account? <a href="/register">Register</a>
+        </Typography>
       </Box>
     </Box>
   );
