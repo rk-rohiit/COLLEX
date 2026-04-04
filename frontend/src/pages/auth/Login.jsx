@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "@/features/auth/authSlice";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -27,18 +28,26 @@ const Login = () => {
   };
 
   // 🔥 Handle login
-  const handleLogin = async () => {
-    console.log("Form Data:", form); // ✅ debug
+ const handleLogin = async () => {
+  console.log("Form Data:", form);
 
-    if (!form.email || !form.password) {
-      console.log("Validation failed");
-      return;
-    }
+  if (!form.email || !form.password) {
+    console.log("Validation failed");
+    return;
+  }
 
-    const result = await dispatch(loginUser(form));
+  try {
+    const data = await dispatch(loginUser(form)).unwrap();
 
-    console.log("Redux Response:", result); // ✅ debug
-  };
+    console.log("Login Success:", data);
+
+    // Optional: redirect immediately
+    navigate("/");
+
+  } catch (err) {
+    console.error("Login Failed:", err);
+  }
+};;
 
   // 🔥 Redirect after login
   useEffect(() => {
@@ -94,9 +103,9 @@ const Login = () => {
         >
           {loading ? "Logging in..." : "Login"}
         </Button>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
-          Don't have an account? <a href="/register">Register</a>
-        </Typography>
+        <Typography align="center" sx={{ mt: 2 }}>
+  Don't have an account? <Link to="/register">Register</Link>
+</Typography>
       </Box>
     </Box>
   );
