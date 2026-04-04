@@ -33,6 +33,7 @@ const allowedOrigins =
     : [
         "http://localhost:5173",
         "http://localhost:5174", // 🔥 ADD THIS
+        process.env.FRONTEND_URL
       ];
 
 app.use(
