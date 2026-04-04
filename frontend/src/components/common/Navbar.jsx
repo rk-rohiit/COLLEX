@@ -118,7 +118,7 @@ const Navbar = () => {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
-            onClick={() => handleNavClick({ id: "home" })}
+            onClick={() => navigate("/")} // go root
           >
             Collex
           </Typography>

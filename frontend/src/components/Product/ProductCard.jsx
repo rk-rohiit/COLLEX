@@ -10,7 +10,7 @@ const ProductCard = ({ product }) => {
   <CardMedia
     component="img"
     height="200"
-    image={product.images?.[0] || "https://via.placeholder.com/300"}
+    image={product.images?.[0] || "https://placehold.co/600x400"}
   />
 
   <CardContent>
