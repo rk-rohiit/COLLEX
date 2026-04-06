@@ -33,47 +33,57 @@ const ProductList = () => {
     );
 
   return (
-    <Box sx={{  minHeight: "100vh", py: 6,mt: 4 }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        py: 6,
+        mt: 4,
+        bgcolor: "background.default",
+      }}
+    >
       <Container maxWidth="xl">
-        {/* Header */}
-        <Box textAlign="center" mb={5}>
+        {/* 🔥 Header */}
+        <Box textAlign="center" mb={6}>
           <Typography
-            variant="h4"
-            fontWeight={700}
-            sx={{ mb: 1 }}
+            variant="h3"
+            sx={{
+              fontWeight: 700,
+              mb: 1,
+            }}
           >
             Explore Our Products
           </Typography>
 
-          <Typography
-            variant="body1"
-            color="text.secondary"
-          >
+          <Typography variant="body1" color="text.secondary">
             Discover amazing deals from your campus
           </Typography>
         </Box>
 
-        {/* Product Grid */}
+        {/* 🔥 Product Grid */}
         {listings.length === 0 ? (
           <Typography textAlign="center" color="text.secondary">
             No products available 😢
           </Typography>
         ) : (
-          <Grid container spacing={4} alignItems="stretch">
-            {listings.map((item) => (
-              <Grid
-                item
-                key={item._id}
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-                sx={{ display: "flex" }}
-              >
-                <ProductCard product={item} />
-              </Grid>
-            ))}
-          </Grid>
+          <Box
+  sx={{
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "1fr",
+      sm: "repeat(2, 1fr)",
+      md: "repeat(3, 1fr)",
+      lg: "repeat(4, 1fr)",
+      xl: "repeat(5, 1fr)", // 🔥 better for large screens
+    },
+    gap: 3,
+  }}
+>
+  {listings.map((item) => (
+    <Box key={item._id}>
+      <ProductCard product={item} />
+    </Box>
+  ))}
+</Box>
         )}
       </Container>
     </Box>
