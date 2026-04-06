@@ -224,6 +224,7 @@ const ProfilePage = () => {
                 color: "secondary.contrastText",
                 mt: -6,
                 mb: 2,
+                border: "5px solid white",
               }}
             >
               {initials}

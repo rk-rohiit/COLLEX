@@ -2,13 +2,24 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchListings } from "@/features/listing/listingSlice";
 import {
-  Grid,
   Container,
-  CircularProgress,
   Typography,
   Box,
+  CircularProgress,
+  Skeleton,
 } from "@mui/material";
 import ProductCard from "@/components/Product/ProductCard";
+
+// 🔥 Skeleton Loader
+const ProductSkeleton = () => {
+  return (
+    <Box>
+      <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2 }} />
+      <Skeleton sx={{ mt: 1 }} />
+      <Skeleton width="60%" />
+    </Box>
+  );
+};
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -18,37 +29,23 @@ const ProductList = () => {
     dispatch(fetchListings());
   }, [dispatch]);
 
-  if (loading)
-    return (
-      <Box
-        sx={{
-          height: "60vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <CircularProgress size={50} />
-      </Box>
-    );
-
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        py: 6,
-        mt: 4,
         bgcolor: "background.default",
+        py: 6,
       }}
     >
-      <Container maxWidth="xl">
-        {/* 🔥 Header */}
+      <Container maxWidth="lg">
+        {/* 🔥 HEADER */}
         <Box textAlign="center" mb={6}>
           <Typography
             variant="h3"
             sx={{
-              fontWeight: 700,
+              fontWeight: 800,
               mb: 1,
+              mt:2
             }}
           >
             Explore Our Products
@@ -59,31 +56,37 @@ const ProductList = () => {
           </Typography>
         </Box>
 
-        {/* 🔥 Product Grid */}
-        {listings.length === 0 ? (
-          <Typography textAlign="center" color="text.secondary">
+        {/* 🔥 GRID */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+              lg: "repeat(4, 1fr)",
+            },
+            gap: 3,
+          }}
+        >
+          {/* Loading */}
+          {loading &&
+            Array.from(new Array(8)).map((_, i) => (
+              <ProductSkeleton key={i} />
+            ))}
+
+          {/* Products */}
+          {!loading &&
+            listings.map((item) => (
+              <ProductCard key={item._id} product={item} />
+            ))}
+        </Box>
+
+        {/* Empty */}
+        {!loading && listings.length === 0 && (
+          <Typography textAlign="center" mt={5} color="text.secondary">
             No products available 😢
           </Typography>
-        ) : (
-          <Box
-  sx={{
-    display: "grid",
-    gridTemplateColumns: {
-      xs: "1fr",
-      sm: "repeat(2, 1fr)",
-      md: "repeat(3, 1fr)",
-      lg: "repeat(4, 1fr)",
-      xl: "repeat(5, 1fr)", // 🔥 better for large screens
-    },
-    gap: 3,
-  }}
->
-  {listings.map((item) => (
-    <Box key={item._id}>
-      <ProductCard product={item} />
-    </Box>
-  ))}
-</Box>
         )}
       </Container>
     </Box>

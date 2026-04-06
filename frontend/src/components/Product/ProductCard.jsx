@@ -5,7 +5,9 @@ import {
   Typography,
   Button,
   Box,
+  IconButton,
 } from "@mui/material";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/features/cart/cartSlice";
 import { useTheme } from "@mui/material/styles";
@@ -17,15 +19,11 @@ const ProductCard = ({ product }) => {
   return (
     <Card
       sx={{
-        width: "100%",
-        height: "100%",
         display: "flex",
         flexDirection: "column",
         borderRadius: 3,
         overflow: "hidden",
-
         backgroundColor: "background.paper",
-
         boxShadow: theme.shadows[1],
         transition: "all 0.25s ease",
 
@@ -36,25 +34,30 @@ const ProductCard = ({ product }) => {
       }}
     >
       {/* IMAGE */}
-      <Box
-        sx={{
-          height: 200, // 🔥 bigger image
-          overflow: "hidden",
-        }}
-      >
+      <Box sx={{ position: "relative", height: 200 }}>
         <CardMedia
           component="img"
           image={product.images?.[0] || "https://placehold.co/600x400"}
           sx={{
             height: "100%",
-            width: "100%",
             objectFit: "cover",
-            transition: "transform 0.3s ease",
-            "&:hover": {
-              transform: "scale(1.05)", // 🔥 premium zoom
-            },
+            transition: "0.3s",
+            "&:hover": { transform: "scale(1.05)" },
           }}
         />
+
+        {/* ❤️ Wishlist */}
+        <IconButton
+          sx={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            bgcolor: "white",
+            "&:hover": { bgcolor: "grey.100" },
+          }}
+        >
+          <FavoriteBorderIcon fontSize="small" />
+        </IconButton>
       </Box>
 
       {/* CONTENT */}
@@ -63,58 +66,29 @@ const ProductCard = ({ product }) => {
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          p: 2, // 🔥 better spacing
+          p: 2,
         }}
       >
-        {/* TITLE */}
-        <Typography
-          variant="subtitle1"
-          sx={{
-            fontWeight: 700,
-            mb: 0.5,
-            display: "-webkit-box",
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
+        <Typography variant="subtitle1" fontWeight={700}>
           {product.title}
         </Typography>
 
-        {/* DESC */}
         <Typography
           variant="body2"
           color="text.secondary"
           sx={{
             fontSize: "0.85rem",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
+            mt: 0.5,
             minHeight: "40px",
           }}
         >
-          {product.description || "No description available"}
+          {product.description || "No description"}
         </Typography>
 
-        {/* SPACE */}
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* PRICE + BTN */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mt: 2,
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-            }}
-          >
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="h6" fontWeight={700}>
             ₹ {product.price}
           </Typography>
 
@@ -124,7 +98,7 @@ const ProductCard = ({ product }) => {
             onClick={() => dispatch(addToCart(product))}
             sx={{
               borderRadius: 5,
-              px: 2.5,
+              px: 2,
               textTransform: "none",
             }}
           >

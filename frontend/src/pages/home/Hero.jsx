@@ -14,7 +14,7 @@ import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike";
 import PeopleIcon from "@mui/icons-material/People";
 
 import { motion } from "framer-motion";
-import { useTheme } from "@mui/material/styles";
+import { useTheme, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
@@ -39,147 +39,102 @@ const Hero = () => {
 
   return (
     <Box
-      id="home"
       sx={{
         minHeight: "100vh",
         pt: "80px",
-        position: "relative",
-        overflow: "hidden",
         display: "flex",
         alignItems: "center",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      {/* 🔥 Animated Gradient Background */}
+      {/* 🌈 Gradient Background */}
       <Box
         component={motion.div}
         animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-        transition={{ duration: 15, repeat: Infinity }}
-        sx={{
-          position: "absolute",
-          inset: 0,
-          zIndex: -3,
-          background: `linear-gradient(270deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main}, #000)`,
-          backgroundSize: "400% 400%",
-          opacity: 0.15,
-        }}
-      />
-
-      {/* 🔥 Radial Glow */}
-      <Box
+        transition={{ duration: 20, repeat: Infinity }}
         sx={{
           position: "absolute",
           inset: 0,
           zIndex: -2,
-          background: `radial-gradient(circle at 20% 30%, ${theme.palette.primary.main}30, transparent 40%),
-                       radial-gradient(circle at 80% 70%, ${theme.palette.secondary.main}30, transparent 40%)`,
+          background: `linear-gradient(270deg, 
+            ${alpha(theme.palette.primary.main, 0.2)}, 
+            ${alpha(theme.palette.secondary.main, 0.2)}, 
+            ${alpha(theme.palette.primary.dark, 0.2)}
+          )`,
+          backgroundSize: "400% 400%",
         }}
       />
 
-      {/* 🔥 Floating Blobs */}
-      {[1, 2, 3].map((i) => (
-        <Box
-          key={i}
-          component={motion.div}
-          animate={{ y: [0, 40, 0], x: [0, 30, 0] }}
-          transition={{ duration: 8 + i, repeat: Infinity }}
-          sx={{
-            position: "absolute",
-            width: 300,
-            height: 300,
-            borderRadius: "50%",
-            filter: "blur(120px)",
-            opacity: 0.2,
-            background:
-              i % 2 === 0
-                ? theme.palette.secondary.main
-                : theme.palette.primary.main,
-            top: i === 1 ? "10%" : i === 2 ? "60%" : "30%",
-            left: i === 1 ? "10%" : i === 2 ? "70%" : "40%",
-          }}
-        />
-      ))}
+      {/* 🌟 Soft Glow */}
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          zIndex: -1,
+          background: `
+            radial-gradient(circle at 20% 30%, ${alpha(theme.palette.primary.main, 0.15)}, transparent 40%),
+            radial-gradient(circle at 80% 70%, ${alpha(theme.palette.secondary.main, 0.15)}, transparent 40%)
+          `,
+        }}
+      />
 
-      {/* CONTENT */}
-      <Container>
+      <Container maxWidth="lg">
         <Grid container spacing={6} alignItems="center">
           {/* LEFT */}
           <Grid item xs={12} md={6}>
-            <motion.div
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}>
+              
               {/* Badge */}
               <Chip
                 label="🚀 Now Live at LPU"
                 sx={{
-                  mb: 2,
-                  backdropFilter: "blur(10px)",
-                  background: "rgba(255,255,255,0.08)",
-                  color: theme.palette.primary.main,
+                  mb: 3,
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  color: "primary.main",
+                  fontWeight: 600,
                 }}
               />
 
-              {/* Floating Badge
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                <Chip
-                  label="🔥 Trusted by 2000+ Students"
-                  sx={{
-                    mb: 3,
-                    background: "rgba(255,255,255,0.06)",
-                  }}
-                />
-              </motion.div> */}
-
               {/* Heading */}
               <Typography
-                variant="h1"
-                fontWeight="bold"
+                variant="h2"
                 sx={{
+                  fontWeight: 800,
                   lineHeight: 1.1,
-                  fontSize: { xs: "2.5rem", md: "3.5rem" },
                 }}
               >
-                Smart Campus{" "}
-                <span
-                  style={{
+                Smart Campus{" "}<br></br>
+                <Box
+                  component="span"
+                  sx={{
                     background: gradient,
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                   }}
                 >
                   Marketplace
-                </span>
+                </Box>
               </Typography>
 
               {/* Subtitle */}
               <Typography
-                variant="h6"
+                variant="body1"
                 color="text.secondary"
-                sx={{ mt: 3, mb: 4 }}
+                sx={{ mt: 3, maxWidth: 450 }}
               >
                 Buy, sell & rent within your college community with trust and ease.
               </Typography>
 
               {/* Buttons */}
-              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
                 <Button
                   variant="contained"
                   size="large"
                   onClick={() => navigate("/login")}
                   sx={{
-                    px: 5,
-                    py: 1.5,
-                    borderRadius: "999px",
-                    background: gradient,
-                    boxShadow: `0 10px 30px ${theme.palette.primary.main}60`,
-                    "&:hover": {
-                      transform: "scale(1.05)",
-                      boxShadow: `0 15px 40px ${theme.palette.primary.main}80`,
-                    },
+                    px: 4,
+                    borderRadius: 5,
                   }}
                 >
                   Start Now →
@@ -188,9 +143,9 @@ const Hero = () => {
                 <Button
                   variant="outlined"
                   startIcon={<PlayArrowIcon />}
-                  sx={{ borderRadius: "999px" }}
+                  sx={{ borderRadius: 5 }}
                 >
-                  Watch Demo
+                  Demo
                 </Button>
               </Box>
 
@@ -198,69 +153,33 @@ const Hero = () => {
               <Grid container spacing={3} sx={{ mt: 5 }}>
                 {stats.map((item, i) => (
                   <Grid item xs={6} sm={3} key={i}>
-                    <motion.div whileHover={{ scale: 1.1 }}>
-                      <Typography variant="h5" fontWeight="bold">
-                        {item.number}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.label}
-                      </Typography>
-                    </motion.div>
+                    <Typography variant="h5" fontWeight={700}>
+                      {item.number}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.label}
+                    </Typography>
                   </Grid>
                 ))}
               </Grid>
             </motion.div>
           </Grid>
 
-          {/* RIGHT (Glass Card) */}
+          {/* RIGHT */}
           <Grid item xs={12} md={6}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-            >
+            <Box>
+              <Typography variant="subtitle1" color="text.secondary" mb={2}>
+                Hero Image Placeholder
+              </Typography>
               <Box
                 sx={{
-                  p: 4,
-                  borderRadius: 4,
-                  backdropFilter: "blur(20px)",
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  boxShadow: `
-                    0 10px 40px rgba(0,0,0,0.4),
-                    inset 0 0 20px rgba(255,255,255,0.05)
-                  `,
+                  width: "100%",
+                  height: 300,
+                  bgcolor: "grey.300",
+                  borderRadius: 2,
                 }}
-              >
-                <Typography variant="h6" mb={3}>
-                  Popular Categories
-                </Typography>
-
-                <Grid container spacing={2}>
-                  {categories.map((cat, index) => (
-                    <Grid item xs={6} key={index}>
-                      <Box
-                        sx={{
-                          p: 2,
-                          borderRadius: 3,
-                          textAlign: "center",
-                          background: "rgba(255,255,255,0.05)",
-                          transition: "0.3s",
-                          "&:hover": {
-                            transform: "translateY(-8px) scale(1.03)",
-                            background: "rgba(255,255,255,0.08)",
-                            boxShadow: `0 10px 30px ${theme.palette.primary.main}40`,
-                          },
-                        }}
-                      >
-                        {cat.icon}
-                        <Typography mt={1}>{cat.name}</Typography>
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
-            </motion.div>
+              />
+            </Box>
           </Grid>
         </Grid>
       </Container>
