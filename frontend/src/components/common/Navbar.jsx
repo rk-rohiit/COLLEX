@@ -88,230 +88,212 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="fixed" elevation={0} sx={{ background: "transparent" }}>
-      
-      {/* PROMO BAR */}
-      <Box
+   <AppBar
+  position="fixed"
+  elevation={0}
+  sx={{
+    background: "#fff",
+    borderBottom: "1px solid #E5E7EB",
+  }}
+>
+
+  {/* 🔥 TOP BAR */}
+  <Box
+    sx={{
+      textAlign: "center",
+      fontSize: "12px",
+      py: 0.6,
+      bgcolor: "primary.main",
+      color: "#fff",
+    }}
+  >
+    🚀 Free delivery above ₹499 | Use COLLEX10
+  </Box>
+
+  <Container maxWidth="xl">
+    <Toolbar sx={{ gap: 2, py: 1 }}>
+
+      {/* MOBILE MENU */}
+      <IconButton
+        sx={{ display: { xs: "flex", md: "none" } }}
+        onClick={() => setDrawerOpen(true)}
+      >
+        <MenuIcon />
+      </IconButton>
+
+      {/* LOGO */}
+      <Typography
+        variant="h5"
         sx={{
-          background: "#eaeafc",
-          color: "#4f46e5",
-          textAlign: "center",
-          fontSize: "13px",
+          fontWeight: 800,
+          cursor: "pointer",
+        }}
+        onClick={() => navigate("/")}
+      >
+        Collex<span style={{ color: theme.palette.primary.main }}>.</span>
+      </Typography>
+
+      {/* 🔥 SEARCH BAR */}
+      <Box
+        component="form"
+        onSubmit={handleSearch}
+        sx={{
+          flex: 1,
+          display: { xs: "none", md: "flex" },
+          alignItems: "center",
+          border: "1px solid #E5E7EB",
+          borderRadius: "999px",
+          px: 2,
           py: 0.5,
+          maxWidth: 600,
+          background: "#F9FAFB",
+          "&:hover": {
+            borderColor: "primary.main",
+          },
         }}
       >
-        → Free delivery on orders above ₹499 | Use code <b>COLLEX10</b> for 10% off
-      </Box>
-
-      <Container maxWidth="xl" sx={{ mt: 1 }}>
-        <Box
+        <Select
+          value={searchCategory}
+          onChange={(e) => setSearchCategory(e.target.value)}
+          variant="standard"
+          disableUnderline
           sx={{
-            backdropFilter: "blur(12px)",
-            background: "rgba(30,30,30,0.85)",
-            borderRadius: "16px",
-            border: "1px solid rgba(255,255,255,0.08)",
-            px: 2,
-            color: "white",
+            mr: 1,
+            fontSize: 13,
           }}
         >
-          <Toolbar sx={{ gap: 2 }}>
+          {CATEGORIES.map((c) => (
+            <MenuItem key={c} value={c}>{c}</MenuItem>
+          ))}
+        </Select>
 
-            {/* MOBILE MENU */}
-            <IconButton
-              sx={{ display: { xs: "flex", md: "none" }, color: "white" }}
-              onClick={() => setDrawerOpen(true)}
-            >
-              <MenuIcon />
+        <InputBase
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{ flex: 1 }}
+        />
+
+        <IconButton type="submit" color="primary">
+          <SearchIcon />
+        </IconButton>
+      </Box>
+
+      {/* 🔥 ACTIONS */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+
+        {/* WISHLIST */}
+        {user && (
+          <IconButton>
+            <Badge badgeContent={wishlistCount} color="error">
+              <FavoriteBorderIcon />
+            </Badge>
+          </IconButton>
+        )}
+
+        {/* CART */}
+        <IconButton onClick={() => navigate("/cart")}>
+          <Badge badgeContent={cartCount} color="error">
+            <ShoppingCartIcon />
+          </Badge>
+        </IconButton>
+
+        {/* AUTH */}
+        {user ? (
+          <>
+            <IconButton onClick={handleMenuOpen}>
+              <Avatar>
+                {user?.name?.charAt(0)}
+              </Avatar>
             </IconButton>
 
-            {/* LOGO */}
-            <Typography
-              variant="h5"
-              sx={{
-                fontWeight: 700,
-                cursor: "pointer",
-                color: "#6c63ff",
-              }}
-              onClick={() => navigate("/")}
-            >
-              Collex<span style={{ color: "#ff6f61" }}>.</span>
-            </Typography>
+            <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
+              <MenuItem onClick={() => navigate("/profile")}>
+                <ListItemIcon><PersonIcon /></ListItemIcon>
+                Profile
+              </MenuItem>
 
-            {/* SEARCH */}
-            <Box
-              component="form"
-              onSubmit={handleSearch}
-              sx={{
-                flex: 1,
-                display: { xs: "none", sm: "flex" },
-                alignItems: "center",
-                background: "#1e1e1e",
-                borderRadius: "999px",
-                px: 1,
-                maxWidth: 600,
-              }}
-            >
-              <Select
-                value={searchCategory}
-                onChange={(e) => setSearchCategory(e.target.value)}
-                variant="standard"
-                disableUnderline
-                sx={{
-                  color: "white",
-                  px: 1,
-                  fontSize: 13,
-                }}
-              >
-                {CATEGORIES.map((c) => (
-                  <MenuItem key={c} value={c}>{c}</MenuItem>
-                ))}
-              </Select>
+              <MenuItem onClick={handleLogout}>
+                <ListItemIcon><LogoutIcon /></ListItemIcon>
+                Logout
+              </MenuItem>
+            </Menu>
+          </>
+        ) : (
+          <Button
+            variant="contained"
+            onClick={() => navigate("/login")}
+            sx={{ borderRadius: 999 }}
+          >
+            Sign In
+          </Button>
+        )}
+      </Box>
+    </Toolbar>
 
-              <InputBase
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                sx={{ flex: 1, px: 1, color: "white" }}
-              />
+    {/* 🔥 CATEGORY BAR */}
+    <Box
+      sx={{
+        display: { xs: "none", md: "flex" },
+        gap: 1,
+        pb: 1,
+        overflowX: "auto",
+      }}
+    >
+      {CATEGORIES.map((cat) => (
+        <Button
+          key={cat}
+          onClick={() => handleCategoryClick(cat)}
+          sx={{
+            borderRadius: "999px",
+            px: 2,
+            fontSize: 13,
+            color: activeCategory === cat ? "#fff" : "text.primary",
+            bgcolor: activeCategory === cat ? "primary.main" : "transparent",
+            "&:hover": {
+              bgcolor: "primary.main",
+              color: "#fff",
+            },
+          }}
+        >
+          {cat}
+        </Button>
+      ))}
+    </Box>
+  </Container>
 
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  borderRadius: "999px",
-                  textTransform: "none",
-                  px: 3,
-                }}
-              >
-                Search
-              </Button>
-            </Box>
+  {/* 🔥 MOBILE DRAWER */}
+  <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+    <Box sx={{ width: 260 }}>
+      <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
+        <Typography fontWeight="bold">Menu</Typography>
+        <IconButton onClick={() => setDrawerOpen(false)}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
-            {/* ACTIONS */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Divider />
 
-              {/* WISHLIST */}
-              {user && (
-                <IconButton sx={{ color: "white", flexDirection: "column" }}>
-                  <Badge badgeContent={wishlistCount} color="error">
-                    <FavoriteBorderIcon />
-                  </Badge>
-                  <Typography fontSize={10}>Wishlist</Typography>
-                </IconButton>
-              )}
+      <List>
+        {CATEGORIES.map((cat) => (
+          <ListItem button key={cat} onClick={() => handleCategoryClick(cat)}>
+            <ListItemText primary={cat} />
+          </ListItem>
+        ))}
+      </List>
 
-              {/* CART */}
-              <IconButton
-                onClick={() => navigate("/cart")}
-                sx={{ color: "white", flexDirection: "column" }}
-              >
-                <Badge badgeContent={cartCount} color="error">
-                  <ShoppingCartIcon />
-                </Badge>
-                <Typography fontSize={10}>Cart</Typography>
-              </IconButton>
+      <Divider />
 
-              {/* AUTH */}
-              {user ? (
-                <Box textAlign="center">
-                  <IconButton onClick={handleMenuOpen}>
-                    <Avatar sx={{ width: 32, height: 32 }}>
-                      {user?.name?.charAt(0)}
-                    </Avatar>
-                  </IconButton>
-                  <Typography fontSize={10}>Account</Typography>
-
-                  <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
-                    <MenuItem onClick={() => navigate("/profile")}>
-                      <ListItemIcon><PersonIcon /></ListItemIcon>
-                      Profile
-                    </MenuItem>
-                    <MenuItem onClick={handleLogout}>
-                      <ListItemIcon><LogoutIcon /></ListItemIcon>
-                      Logout
-                    </MenuItem>
-                  </Menu>
-                </Box>
-              ) : (
-                <Button
-                  variant="outlined"
-                  onClick={() => navigate("/login")}
-                  sx={{
-                    borderRadius: "999px",
-                    textTransform: "none",
-                    color: "white",
-                    borderColor: "rgba(255,255,255,0.2)",
-                  }}
-                >
-                  Sign In
-                </Button>
-              )}
-            </Box>
-          </Toolbar>
-
-          {/* CATEGORY BAR */}
-          {user && (
-            <Box
-              sx={{
-                display: { xs: "none", md: "flex" },
-                gap: 1,
-                pb: 1,
-                overflowX: "auto",
-              }}
-            >
-              {CATEGORIES.map((cat) => (
-                <Button
-                  key={cat}
-                  onClick={() => handleCategoryClick(cat)}
-                  sx={{
-                    borderRadius: "999px",
-                    px: 2,
-                    fontSize: 13,
-                    color: activeCategory === cat ? "black" : "white",
-                    bgcolor: activeCategory === cat ? "primary.main" : "transparent",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                  }}
-                >
-                  {cat}
-                </Button>
-              ))}
-            </Box>
-          )}
+      {!user && (
+        <Box p={2}>
+          <Button fullWidth variant="contained" onClick={() => navigate("/login")}>
+            Sign In
+          </Button>
         </Box>
-      </Container>
-
-      {/* MOBILE DRAWER */}
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-        <Box sx={{ width: 250 }}>
-          <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
-            <Typography fontWeight="bold">Menu</Typography>
-            <IconButton onClick={() => setDrawerOpen(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-
-          <Divider />
-
-          <List>
-            {CATEGORIES.map((cat) => (
-              <ListItem button key={cat} onClick={() => handleCategoryClick(cat)}>
-                <ListItemText primary={cat} />
-              </ListItem>
-            ))}
-          </List>
-
-          <Divider />
-
-          {!user && (
-            <Box p={2}>
-              <Button fullWidth variant="contained" onClick={() => navigate("/login")}>
-                Sign In
-              </Button>
-            </Box>
-          )}
-        </Box>
-      </Drawer>
-    </AppBar>
+      )}
+    </Box>
+  </Drawer>
+</AppBar>
   );
 };
 
