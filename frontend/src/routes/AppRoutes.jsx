@@ -19,6 +19,7 @@ import OrderSuccess from "../pages/order/OrderSuccess";
 import ProfilePage from "../pages/profile/ProfilePage";
 import CategoryBar from "../pages/home/CategoryBar";
 import ProductView from "../pages/products/ProductView";
+import OrderDetail from "../pages/order/OrderDetail";
 
 // Landing page
 const LandingPage = () => (
@@ -101,6 +102,14 @@ const AppRoutes = () => {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+          path="/order/:id"
+            element={
+              <ProtectedRoute>
+                <OrderDetail />
               </ProtectedRoute>
             }
           />

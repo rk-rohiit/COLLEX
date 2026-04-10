@@ -1,18 +1,26 @@
 import { useSelector } from "react-redux";
+import { useState } from "react";
 import { 
   Container, Grid, Box, Typography, Button, Paper, 
   Stack, TextField, Radio, RadioGroup, FormControlLabel, 
-  FormControl, Divider, Alert 
+  FormControl, Divider, Alert ,  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import HandshakeIcon from "@mui/icons-material/Handshake";
+import { useDispatch } from "react-redux";
+import { clearCart } from "@/features/cart/cartSlice";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items } = useSelector((state) => state.cart);
   const total = items.reduce((acc, item) => acc + item.price * (item.qty || 1), 0);
+  const dispatch = useDispatch();
+  const [openDialog, setOpenDialog] = useState(false);
 
   const colors = {
     primary: "#0A2647",
@@ -20,7 +28,15 @@ const CheckoutPage = () => {
     bg: "#F4F7F9"
   };
 
+  const handleConfirmDeal = () => {
+  dispatch(clearCart()); // 🔥 clear cart
+  alert("Deal Confirmed 🎉"); // optional
+  // navigate("/order-success"); // redirect
+  setOpenDialog(true);
+};
+
   return (
+     <>
     <Box sx={{ bgcolor: colors.bg, minHeight: "100vh", pt: 12, pb: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="900" color={colors.primary} sx={{ mb: 4 }}>
@@ -130,7 +146,8 @@ const CheckoutPage = () => {
                 variant="contained" 
                 size="large"
                 startIcon={<HandshakeIcon />}
-                onClick={() => navigate("/order-success")}
+                // onClick={() => navigate("/order-success")}
+                onClick={handleConfirmDeal}
                 sx={{ 
                   mt: 4, 
                   bgcolor: colors.primary, 
@@ -147,6 +164,34 @@ const CheckoutPage = () => {
         </Grid>
       </Container>
     </Box>
+   <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+  
+  <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>
+    🎉 Order Confirmed!
+  </DialogTitle>
+
+  <DialogContent>
+    <Typography align="center" sx={{ mt: 1 }}>
+      Your deal has been successfully confirmed.
+      Please meet the seller at your selected location.
+    </Typography>
+  </DialogContent>
+
+  <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+    <Button
+      variant="contained"
+      onClick={() => {
+        setOpenDialog(false);
+        navigate("/"); // 🏠 go home
+      }}
+      sx={{ borderRadius: 3 }}
+    >
+      Go to Home
+    </Button>
+  </DialogActions>
+
+</Dialog>
+    </>
   );
 };
 
