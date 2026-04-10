@@ -20,6 +20,7 @@ import ProfilePage from "../pages/profile/ProfilePage";
 import CategoryBar from "../pages/home/CategoryBar";
 import ProductView from "../pages/products/ProductView";
 import OrderDetail from "../pages/order/OrderDetail";
+import AdminLayout from "../layouts/AdminLayout";
 
 // Landing page
 const LandingPage = () => (
@@ -34,94 +35,97 @@ const LandingPage = () => (
 
 const AppRoutes = () => {
   return (
-    <BrowserRouter>
-      <Routes>
+  <BrowserRouter>
+  <Routes>
 
-        {/* 🔥 ALL PAGES WITH NAVBAR + FOOTER */}
-        <Route element={<MainLayout />}>
+    {/* 🔥 PUBLIC + USER PAGES (WITH NAVBAR) */}
+    <Route element={<MainLayout />}>
 
-          {/* Public */}
-          <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<LandingPage />} />
 
-          {/* Protected */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+      <Route
+        path="/products"
+        element={
+          <ProtectedRoute>
+            <ProductList />
+          </ProtectedRoute>
+        }
+      />
 
-          <Route
-            path="/products"
-            element={
-              <ProtectedRoute>
-                <ProductList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="product/:id"
-            element={
-              <ProtectedRoute>
-                <ProductView />
-              </ProtectedRoute>
-            }
-          />
+      <Route
+        path="product/:id"
+        element={
+          <ProtectedRoute>
+            <ProductView />
+          </ProtectedRoute>
+        }
+      />
 
-          <Route
-            path="/cart"
-            element={
-              <ProtectedRoute>
-                <Cart />
-              </ProtectedRoute>
-            }
-          />
+      <Route
+        path="/cart"
+        element={
+          <ProtectedRoute>
+            <Cart />
+          </ProtectedRoute>
+        }
+      />
 
-          <Route
-            path="/checkout"
-            element={
-              <ProtectedRoute>
-                <CheckoutPage />
-              </ProtectedRoute>
-            }
-          />
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute>
+            <CheckoutPage />
+          </ProtectedRoute>
+        }
+      />
 
-          <Route
-            path="/order-success"
-            element={
-              <ProtectedRoute>
-                <OrderSuccess />
-              </ProtectedRoute>
-            }
-          />
+      <Route
+        path="/order-success"
+        element={
+          <ProtectedRoute>
+            <OrderSuccess />
+          </ProtectedRoute>
+        }
+      />
 
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-          path="/order/:id"
-            element={
-              <ProtectedRoute>
-                <OrderDetail />
-              </ProtectedRoute>
-            }
-          />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
 
-        </Route>
+      <Route
+        path="/order/:id"
+        element={
+          <ProtectedRoute>
+            <OrderDetail />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* 🔥 NO NAVBAR HERE */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    </Route>
 
-      </Routes>
-    </BrowserRouter>
+    {/* 🔥 ADMIN PANEL (NO NAVBAR) */}
+    <Route
+      path="/dashboard"
+      element={
+        <ProtectedRoute>
+          <AdminLayout>
+            <Dashboard />
+          </AdminLayout>
+        </ProtectedRoute>
+      }
+    />
+
+    {/* 🔥 AUTH (NO NAVBAR) */}
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+
+  </Routes>
+</BrowserRouter>
   );
 };
 
