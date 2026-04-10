@@ -17,11 +17,14 @@ import Cart from "../pages/cart/Cart";
 import CheckoutPage from "../pages/checkout/CheckoutPage";
 import OrderSuccess from "../pages/order/OrderSuccess";
 import ProfilePage from "../pages/profile/ProfilePage";
+import CategoryBar from "../pages/home/CategoryBar";
+import ProductView from "../pages/products/ProductView";
 
 // Landing page
 const LandingPage = () => (
   <>
     <Hero />
+    <CategoryBar />
     <About />
     <Services />
     <Contact />
@@ -57,6 +60,15 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="product/:id"
+            element={
+              <ProtectedRoute>
+                <ProductView />
+              </ProtectedRoute>
+            }
+          />
+
 
           <Route
             path="/cart"

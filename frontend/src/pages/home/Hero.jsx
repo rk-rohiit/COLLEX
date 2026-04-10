@@ -147,7 +147,7 @@ const Hero = () => {
                 }}
               >
                 <Typography variant="h6" fontWeight="800" color={colors.primary} gutterBottom>
-                  Trending in Chandigarh University
+                  Trending in LPU University
                 </Typography>
 
                 {/* MOCK PRODUCT LISTING 1 */}

@@ -1,6 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// 🔥 Load from localStorage
+/* =========================
+   🔥 LOCAL STORAGE HELPERS
+========================= */
+
 const loadCart = () => {
   try {
     const data = localStorage.getItem("cartItems");
@@ -10,10 +13,13 @@ const loadCart = () => {
   }
 };
 
-// 🔥 Save to localStorage
 const saveCart = (items) => {
   localStorage.setItem("cartItems", JSON.stringify(items));
 };
+
+/* =========================
+   🔥 SLICE
+========================= */
 
 const cartSlice = createSlice({
   name: "cart",
@@ -22,25 +28,31 @@ const cartSlice = createSlice({
   },
 
   reducers: {
-    // ✅ Add to cart
-   addToCart: (state, action) => {
-  const item = {
-    ...action.payload,
-    price: Number(action.payload.price), // 🔥 FIX
-  };
+    /* =========================
+       ✅ ADD TO CART
+    ========================= */
+    addToCart: (state, action) => {
+      const item = {
+        _id: action.payload._id,
+        title: action.payload.title,
+        price: Number(action.payload.price) || 0,
+        image: action.payload.images?.[0] || "",
+      };
 
-  const exist = state.items.find((i) => i._id === item._id);
+      const exist = state.items.find((i) => i._id === item._id);
 
-  if (exist) {
-    exist.qty += 1;
-  } else {
-    state.items.push({ ...item, qty: 1 });
-  }
+      if (exist) {
+        exist.qty += 1;
+      } else {
+        state.items.push({ ...item, qty: 1 });
+      }
 
-  saveCart(state.items);
-},
+      saveCart(state.items);
+    },
 
-    // ✅ Remove item completely
+    /* =========================
+       ❌ REMOVE ITEM
+    ========================= */
     removeFromCart: (state, action) => {
       state.items = state.items.filter(
         (i) => i._id !== action.payload
@@ -49,41 +61,66 @@ const cartSlice = createSlice({
       saveCart(state.items);
     },
 
-    // ✅ Increase quantity
-   increaseQty: (state, action) => {
-  const item = state.items.find((i) => i._id === action.payload);
+    /* =========================
+       ➕ INCREASE QTY
+    ========================= */
+    increaseQty: (state, action) => {
+      const item = state.items.find((i) => i._id === action.payload);
 
-  if (item) {
-    item.qty += 1;
-  }
+      if (item) {
+        item.qty += 1;
+      }
 
-  saveCart(state.items);
-},
+      saveCart(state.items);
+    },
 
-    // ✅ Decrease quantity
+    /* =========================
+       ➖ DECREASE QTY
+    ========================= */
     decreaseQty: (state, action) => {
-  const item = state.items.find((i) => i._id === action.payload);
+      const item = state.items.find((i) => i._id === action.payload);
 
-  if (!item) return;
+      if (!item) return;
 
-  if (item.qty > 1) {
-    item.qty -= 1;
-  } else {
-    state.items = state.items.filter(
-      (i) => i._id !== action.payload
-    );
-  }
+      if (item.qty > 1) {
+        item.qty -= 1;
+      } else {
+        state.items = state.items.filter(
+          (i) => i._id !== action.payload
+        );
+      }
 
-  saveCart(state.items);
-},
+      saveCart(state.items);
+    },
 
-    // ✅ Clear cart (after order)
+    /* =========================
+       🧹 CLEAR CART
+    ========================= */
     clearCart: (state) => {
       state.items = [];
       saveCart(state.items);
     },
   },
 });
+
+/* =========================
+   🔥 SELECTORS (IMPORTANT)
+========================= */
+
+// ✅ Total items count
+export const selectCartCount = (state) =>
+  state.cart.items.reduce((acc, item) => acc + item.qty, 0);
+
+// ✅ Total price
+export const selectCartTotal = (state) =>
+  state.cart.items.reduce(
+    (acc, item) => acc + item.price * item.qty,
+    0
+  );
+
+/* =========================
+   🔥 EXPORTS
+========================= */
 
 export const {
   addToCart,

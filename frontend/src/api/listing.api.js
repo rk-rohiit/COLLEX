@@ -4,3 +4,9 @@ export const fetchListingsAPI = async () => {
   const res = await api.get("/listings"); // ✅ FIXED
   return res.data.data;
 };
+
+// 🔥 Get listing by ID
+export const fetchListingByIdAPI = async (id) => {
+  const res = await api.get(`/listings/${id}`);
+  return res.data.data;
+};
