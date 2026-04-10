@@ -69,7 +69,6 @@ const AppRoutes = () => {
             }
           />
 
-
           <Route
             path="/cart"
             element={
