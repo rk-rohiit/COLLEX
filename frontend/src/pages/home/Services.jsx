@@ -5,130 +5,152 @@ import {
   CardContent,
   Typography,
   Box,
+  Stack,
 } from "@mui/material";
 
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
-import GroupsIcon from "@mui/icons-material/Groups";
-import StorefrontIcon from "@mui/icons-material/Storefront";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import SecurityIcon from "@mui/icons-material/Security";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import PaymentsIcon from "@mui/icons-material/Payments";
 
 import { motion } from "framer-motion";
-import { useTheme } from "@mui/material/styles";
+import { useTheme, alpha } from "@mui/material/styles";
 
 const Services = () => {
   const theme = useTheme();
 
-  const gradient = `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`;
+  // Collex Brand Palette
+  const colors = {
+    primary: "#0A2647", // Deep Blue
+    accent: "#E86A33",  // Orange Action
+    bg: "#F4F7F9"
+  };
 
   const services = [
     {
-      icon: <SwapHorizIcon fontSize="large" />,
-      title: "Resource Sharing",
-      desc: "Exchange notes, books, and study materials easily within your campus.",
+      icon: <ShoppingCartIcon sx={{ fontSize: 32 }} />,
+      title: "Hyper-Local Market",
+      desc: "Find everything from lab coats to dorm furniture, listed by students in your own hostel or block.",
     },
     {
-      icon: <GroupsIcon fontSize="large" />,
-      title: "Collaboration",
-      desc: "Work on projects, connect with peers, and grow together.",
+      icon: <SecurityIcon sx={{ fontSize: 32 }} />,
+      title: "Verified Student Profiles",
+      desc: "Every buyer and seller is authenticated via university email, ensuring a 100% trusted community.",
     },
     {
-      icon: <StorefrontIcon fontSize="large" />,
-      title: "Marketplace",
-      desc: "Buy, sell, and rent items safely inside your college ecosystem.",
+      icon: <LocalShippingIcon sx={{ fontSize: 32 }} />,
+      title: "Zero Shipping Cost",
+      desc: "Forget logistics. Coordinate a meeting at the library or canteen and exchange items hand-to-hand.",
+    },
+    {
+      icon: <PaymentsIcon sx={{ fontSize: 32 }} />,
+      title: "Transparent Pricing",
+      desc: "No hidden fees. Negotiate prices directly through our secure chat and pay via UPI or cash on exchange.",
     },
   ];
 
   return (
-    <Container id="services" sx={{ py: 12 }}>
-      {/* HEADING */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <Typography
-          variant="h3"
-          fontWeight="bold"
-          textAlign="center"
-          gutterBottom
+    <Box sx={{ py: 12, bgcolor: "white" }}>
+      <Container id="services">
+        {/* HEADING */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
         >
-          What We{" "}
-          <span
-            style={{
-              background: gradient,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Do
-          </span>
-        </Typography>
-
-        <Typography
-          textAlign="center"
-          color="text.secondary"
-          sx={{ mb: 6 }}
-        >
-          Everything you need to buy, sell, and collaborate within your campus.
-        </Typography>
-      </motion.div>
-
-      {/* CARDS */}
-      <Grid container spacing={4}>
-        {services.map((item, index) => (
-          <Grid item xs={12} md={4} key={index}>
-            <motion.div
-              initial={{ opacity: 0, y: 60 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.2 }}
+          <Stack alignItems="center" spacing={1} sx={{ mb: 8 }}>
+            <Typography
+              variant="overline"
+              sx={{ color: colors.accent, fontWeight: 900, letterSpacing: 2 }}
             >
-              <Card
-                sx={{
-                  p: 3,
-                  borderRadius: 4,
-                  backdropFilter: "blur(20px)",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  transition: "0.4s",
-                  height: "100%",
-                  "&:hover": {
-                    transform: "translateY(-10px) scale(1.02)",
-                    boxShadow: `0 20px 50px ${theme.palette.primary.main}40`,
-                  },
-                }}
+              OUR ECOSYSTEM
+            </Typography>
+            <Typography
+              variant="h3"
+              fontWeight="900"
+              textAlign="center"
+              sx={{ color: colors.primary, maxWidth: 600, lineHeight: 1.2 }}
+            >
+              The Smartest Way to <br />
+              <Box component="span" sx={{ color: colors.accent }}>Buy & Sell on Campus</Box>
+            </Typography>
+          </Stack>
+        </motion.div>
+
+        {/* CARDS */}
+        <Grid container spacing={4}>
+          {services.map((item, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <motion.div
+                initial={{ opacity: 0, y: 60 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                viewport={{ once: true }}
               >
-                <CardContent>
-                  {/* ICON */}
-                  <Box
-                    sx={{
-                      mb: 2,
-                      width: 60,
-                      height: 60,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 3,
-                      background: gradient,
-                    }}
-                  >
-                    {item.icon}
-                  </Box>
+                <Card
+                  elevation={0}
+                  sx={{
+                    p: 1,
+                    borderRadius: 5,
+                    bgcolor: colors.bg,
+                    transition: "0.4s",
+                    height: "100%",
+                    border: "1px solid transparent",
+                    "&:hover": {
+                      transform: "translateY(-10px)",
+                      bgcolor: "white",
+                      borderColor: alpha(colors.accent, 0.2),
+                      boxShadow: `0 20px 40px ${alpha(colors.primary, 0.08)}`,
+                    },
+                  }}
+                >
+                  <CardContent sx={{ textAlign: "center" }}>
+                    {/* ICON CIRCLE */}
+                    <Box
+                      sx={{
+                        mb: 3,
+                        width: 70,
+                        height: 70,
+                        mx: "auto",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "50%",
+                        background: `linear-gradient(135deg, ${colors.primary}, ${alpha(colors.primary, 0.8)})`,
+                        color: "white",
+                        boxShadow: `0 10px 20px ${alpha(colors.primary, 0.2)}`,
+                      }}
+                    >
+                      {item.icon}
+                    </Box>
 
-                  {/* TITLE */}
-                  <Typography variant="h6" fontWeight="bold" gutterBottom>
-                    {item.title}
-                  </Typography>
+                    {/* TITLE */}
+                    <Typography 
+                      variant="h6" 
+                      fontWeight="800" 
+                      gutterBottom 
+                      sx={{ color: colors.primary, fontSize: "1.1rem" }}
+                    >
+                      {item.title}
+                    </Typography>
 
-                  {/* DESC */}
-                  <Typography color="text.secondary">
-                    {item.desc}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
+                    {/* DESC */}
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      sx={{ lineHeight: 1.6 }}
+                    >
+                      {item.desc}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </Box>
   );
 };
 

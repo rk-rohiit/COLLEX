@@ -21,14 +21,20 @@ import CategoryBar from "../pages/home/CategoryBar";
 import ProductView from "../pages/products/ProductView";
 import OrderDetail from "../pages/order/OrderDetail";
 import AdminLayout from "../layouts/AdminLayout";
+import HowItWorks from "../pages/home/HowItWorks";
+import FeatureSection from "../pages/home/FeatureSection";
+import Testimonials from "../pages/home/Testimonials";
 
 // Landing page
 const LandingPage = () => (
   <>
     <Hero />
     <CategoryBar />
-    <About />
-    <Services />
+    {/* <About /> */}
+    <HowItWorks />
+    {/* <Services /> */}
+    <FeatureSection />
+    <Testimonials />
     <Contact />
   </>
 );

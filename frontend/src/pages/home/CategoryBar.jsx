@@ -1,130 +1,119 @@
-import { 
-  Box, 
-  Typography, 
-  Stack, 
-  IconButton, 
-  Container 
+import {
+  Box,
+  Typography,
+  Container,
+  Grid,
+  Paper,
 } from "@mui/material";
-import { useRef } from "react";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-// Updated categories from the prototype
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import ChairIcon from "@mui/icons-material/Chair";
+import LaptopMacIcon from "@mui/icons-material/LaptopMac";
+import CheckroomIcon from "@mui/icons-material/Checkroom";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+
 const categories = [
-  { name: "Books", icon: "📚", color: "#0A2647" },
-  { name: "Electronics", icon: "💻", color: "#2E86C1" },
-  { name: "Dorm Goods", icon: "🛏️", color: "#E67E22" },
-  { name: "Apparel", icon: "👕", color: "#E74C3C" },
-  { name: "Stationery", icon: "✏️", color: "#16A085" },
-  { name: "Sports Gear", icon: "🏸", color: "#27AE60" },
-  { name: "Cycles", icon: "🚲", color: "#2980B9" },
-  { name: "Lab Gear", icon: "🧪", color: "#8E44AD" },
+  {
+    name: "Textbooks",
+    icon: <MenuBookIcon fontSize="large" />,
+    items: "2,340 items",
+  },
+  {
+    name: "Furniture",
+    icon: <ChairIcon fontSize="large" />,
+    items: "1,820 items",
+  },
+  {
+    name: "Electronics",
+    icon: <LaptopMacIcon fontSize="large" />,
+    items: "1,560 items",
+  },
+  {
+    name: "Clothing",
+    icon: <CheckroomIcon fontSize="large" />,
+    items: "980 items",
+  },
+  {
+    name: "Sports",
+    icon: <SportsSoccerIcon fontSize="large" />,
+    items: "720 items",
+  },
+  {
+    name: "More",
+    icon: <MoreHorizIcon fontSize="large" />,
+    items: "View all",
+  },
 ];
 
-const CategoryBar = ({ onCategorySelect }) => {
-  const scrollRef = useRef(null);
-
-  const scroll = (direction) => {
-    if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollTo = direction === "left" 
-        ? scrollLeft - clientWidth / 2 
-        : scrollLeft + clientWidth / 2;
-      
-      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
-    }
-  };
-
+const CategorySection = ({ onCategorySelect }) => {
   return (
-    <Container maxWidth="xl" sx={{ my: 4, position: "relative" }}>
-      <Typography variant="h6" fontWeight="800" sx={{ mb: 2, color: "#0A2647" }}>
-        Popular Categories in your University
-      </Typography>
-
-      <Box sx={{ display: "flex", alignItems: "center", position: "relative" }}>
-        {/* Left Scroll Button */}
-        <IconButton 
-          onClick={() => scroll("left")}
-          sx={{ 
-            position: "absolute", left: -20, zIndex: 2, 
-            bgcolor: "white", boxShadow: 2, 
-            "&:hover": { bgcolor: "#f5f5f5" },
-            display: { xs: "none", md: "flex" }
-          }}
+    <Box sx={{ py: 8, bgcolor: "background.default" }}>
+      <Container maxWidth="lg">
+        
+        {/* HEADING */}
+        <Typography
+          variant="h4"
+          // fontWeight="800"
+          align="center"
+          gutterBottom
+          color="primary.main"
+          letterSpacing={0.5}
         >
-          <ChevronLeftIcon />
-        </IconButton>
+          Popular Categories
+        </Typography>
 
-        {/* Scrollable Container */}
-        <Stack
-          ref={scrollRef}
-          direction="row"
-          spacing={2}
-          sx={{
-            overflowX: "auto",
-            scrollBehavior: "smooth",
-            pb: 2,
-            px: 1,
-            "&::-webkit-scrollbar": { display: "none" }, // Hide scrollbar for clean UI
-            msOverflowStyle: "none",
-            scrollbarWidth: "none",
-          }}
+        <Typography
+          variant="body1"
+          align="center"
+          color="text.secondary"
+          sx={{ mb: 5 }}
         >
+          Find exactly what you need for campus life
+        </Typography>
+
+        {/* GRID */}
+        <Grid container spacing={3} justifyContent="center">
           {categories.map((cat) => (
-            <Box
-              key={cat.name}
-              onClick={() => onCategorySelect?.(cat.name)}
-              sx={{
-                minWidth: { xs: 120, md: 160 },
-                height: { xs: 100, md: 130 },
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                bgcolor: "white",
-                borderRadius: "20px",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                border: "2px solid transparent",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                "&:hover": {
-                  transform: "translateY(-5px)",
-                  borderColor: "#E86A33", // Accent Orange from prototype
-                  boxShadow: "0 8px 20px rgba(232, 106, 51, 0.15)",
-                },
-              }}
-            >
-              <Typography sx={{ fontSize: { xs: "2rem", md: "2.5rem" }, mb: 1 }}>
-                {cat.icon}
-              </Typography>
-              <Typography 
-                fontWeight="700" 
-                sx={{ 
-                  color: "#0A2647", 
-                  fontSize: { xs: "0.8rem", md: "0.9rem" } 
+            <Grid item xs={6} sm={4} md={2} key={cat.name}>
+              <Paper
+                onClick={() => onCategorySelect?.(cat.name)}
+                elevation={0}
+                sx={{
+                  p: 3,
+                  borderRadius: "16px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  padding: 6,
+                  border: "1px solid #eee",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+                  },
                 }}
               >
-                {cat.name}
-              </Typography>
-            </Box>
-          ))}
-        </Stack>
+                {/* ICON */}
+                <Box sx={{ mb: 1, color: "secondary.main",bgcolor:"rgba(0,0,0,0.05)", width: 60, height: 60, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", mx: "auto" }}>
+                  {cat.icon}
+                </Box>
 
-        {/* Right Scroll Button */}
-        <IconButton 
-          onClick={() => scroll("right")}
-          sx={{ 
-            position: "absolute", right: -20, zIndex: 2, 
-            bgcolor: "white", boxShadow: 2, 
-            "&:hover": { bgcolor: "#f5f5f5" },
-            display: { xs: "none", md: "flex" }
-          }}
-        >
-          <ChevronRightIcon />
-        </IconButton>
-      </Box>
-    </Container>
+                {/* NAME */}
+                <Typography fontWeight="100" fontSize="0.95rem" color="primary.main">
+                  {cat.name}
+                </Typography>
+
+                {/* ITEMS */}
+                <Typography variant="caption" color="text.secondary">
+                  {cat.items}
+                </Typography>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </Box>
   );
 };
 
-export default CategoryBar;
+export default CategorySection;
