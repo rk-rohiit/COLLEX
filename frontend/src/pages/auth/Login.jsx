@@ -7,35 +7,37 @@ import {
   Alert,
   Collapse,
   CircularProgress,
+  Stack,
+  alpha,
 } from "@mui/material";
 
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
-import TrendingDownOutlinedIcon from "@mui/icons-material/TrendingDownOutlined";
+import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import HandshakeOutlinedIcon from "@mui/icons-material/HandshakeOutlined";
+import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
 
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "@/features/auth/authSlice";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
+// 🔥 Updated Features for Campus Marketplace context
 const FEATURES = [
   {
-    icon: <LocalShippingOutlinedIcon fontSize="small" />,
-    title: "Fast delivery",
-    sub: "Get it in 24–48 hours",
+    icon: <VerifiedUserOutlinedIcon fontSize="small" />,
+    title: "Verified Students",
+    sub: "Exclusive to your university",
   },
   {
-    icon: <SecurityOutlinedIcon fontSize="small" />,
-    title: "Secure payments",
-    sub: "100% safe & encrypted",
+    icon: <HandshakeOutlinedIcon fontSize="small" />,
+    title: "Hand-to-Hand Exchange",
+    sub: "Safe meetups on campus",
   },
   {
-    icon: <TrendingDownOutlinedIcon fontSize="small" />,
-    title: "Best prices",
-    sub: "Deals updated daily",
+    icon: <GroupsOutlinedIcon fontSize="small" />,
+    title: "Peer Community",
+    sub: "Direct chat with sellers",
   },
 ];
 
@@ -48,6 +50,13 @@ const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [successMsg, setSuccessMsg] = useState("");
 
+  // Brand Palette
+  const colors = {
+    primary: "#0A2647", // Deep Blue
+    accent: "#E86A33",  // Orange Action
+    bg: "#F4F7F9",
+  };
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -55,10 +64,10 @@ const Login = () => {
     if (!form.email || !form.password) return;
     try {
       await dispatch(loginUser(form)).unwrap();
-      setSuccessMsg("Login successful! Redirecting...");
+      setSuccessMsg("Welcome back! Redirecting...");
       setTimeout(() => navigate("/"), 1200);
     } catch (err) {
-      // error shown via Redux state
+      // Error handled by Redux
     }
   };
 
@@ -77,222 +86,185 @@ const Login = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "background.default",
-        p: 2,
+        bgcolor: colors.bg,
+        p: { xs: 0, md: 2 },
       }}
     >
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+          gridTemplateColumns: { xs: "1fr", md: "45% 55%" },
           width: "100%",
-          maxWidth: 860,
-          border: "0.5px solid",
-          borderColor: "divider",
-          borderRadius: 3,
+          maxWidth: 960,
+          minHeight: 600,
+          bgcolor: "white",
+          borderRadius: { xs: 0, md: 5 },
           overflow: "hidden",
+          boxShadow: "0 20px 60px rgba(10, 38, 71, 0.1)",
         }}
       >
-        {/* ── LEFT PANEL ── */}
+        {/* ── LEFT PANEL: BRANDING & FEATURES ── */}
         <Box
           sx={{
-            bgcolor: "primary.main",
+            background: `linear-gradient(135deg, ${colors.primary}, ${alpha(colors.primary, 0.9)})`,
             display: { xs: "none", md: "flex" },
             flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            p: 5,
-            gap: 3,
+            justifyContent: "space-between",
+            p: 6,
+            color: "white",
           }}
         >
-          {/* Logo */}
-          <Box sx={{ textAlign: "center" }}>
-            <Typography
-              variant="h4"
-              fontWeight="500"
-              color="white"
-              letterSpacing="-0.5px"
-            >
-              Collex
-              <Box component="span" sx={{ color: "secondary.light" }}>
-                .
-              </Box>
+          <Typography variant="h5" fontWeight="900" sx={{ letterSpacing: "-1px" }}>
+            Collex
+          </Typography>
+
+          <Box>
+            <Typography variant="h3" fontWeight="900" sx={{ mb: 2, lineHeight: 1.1 }}>
+              Back to the <br /> 
+              <Box component="span" sx={{ color: colors.accent }}>Campus Loop.</Box>
             </Typography>
-            <Typography variant="body2" sx={{ color: "primary.100", mt: 1 }}>
-              Your one-stop shop for everything you love
+            <Typography variant="body1" sx={{ opacity: 0.8, mb: 4, maxWidth: 300 }}>
+              Sign in to manage your listings and discover new deals from your peers.
             </Typography>
+
+            <Stack spacing={2}>
+              {FEATURES.map((f) => (
+                <Stack key={f.title} direction="row" spacing={2} alignItems="center">
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 2,
+                      bgcolor: "rgba(255,255,255,0.1)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {f.icon}
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" fontWeight="700">{f.title}</Typography>
+                    <Typography variant="caption" sx={{ opacity: 0.7 }}>{f.sub}</Typography>
+                  </Box>
+                </Stack>
+              ))}
+            </Stack>
           </Box>
 
-          {/* Feature list */}
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, width: "100%" }}>
-            {FEATURES.map((f) => (
-              <Box
-                key={f.title}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.5,
-                  bgcolor: "rgba(255,255,255,0.10)",
-                  borderRadius: 2,
-                  px: 2,
-                  py: 1.25,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 1.5,
-                    bgcolor: "rgba(255,255,255,0.15)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    flexShrink: 0,
-                  }}
-                >
-                  {f.icon}
-                </Box>
-                <Box>
-                  <Typography variant="body2" fontWeight="500" color="white">
-                    {f.title}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "primary.100" }}>
-                    {f.sub}
-                  </Typography>
-                </Box>
-              </Box>
-            ))}
-          </Box>
+          <Typography variant="caption" sx={{ opacity: 0.5 }}>
+            🔒 Secured Student Environment
+          </Typography>
         </Box>
 
-        {/* ── RIGHT PANEL ── */}
+        {/* ── RIGHT PANEL: LOGIN FORM ── */}
         <Box
           sx={{
-            bgcolor: "background.paper",
-            p: { xs: 3, sm: 5 },
+            p: { xs: 4, sm: 8 },
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
           }}
         >
-          {/* Mobile logo */}
-          <Typography
-            variant="h5"
-            fontWeight="500"
-            color="primary"
-            sx={{ display: { xs: "block", md: "none" }, mb: 3 }}
-          >
-            Collex
-            <Box component="span" color="secondary.main">.</Box>
-          </Typography>
-
-          <Typography variant="h5" fontWeight="500" gutterBottom>
-            Welcome back
-          </Typography>
-          <Typography variant="body2" color="text.secondary" mb={3}>
-            Sign in to your Collex account
-          </Typography>
-
-          {/* ✅ SUCCESS TOAST */}
-          <Collapse in={Boolean(successMsg)}>
-            <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
-              {successMsg}
-            </Alert>
-          </Collapse>
-
-          {/* ❌ ERROR TOAST */}
-          <Collapse in={Boolean(error)}>
-            <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
-              {error || "Invalid email or password. Please try again."}
-            </Alert>
-          </Collapse>
-
-          <TextField
-            name="email"
-            label="Email address"
-            type="email"
-            fullWidth
-            margin="normal"
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailOutlinedIcon fontSize="small" color="action" />
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <TextField
-            name="password"
-            label="Password"
-            type="password"
-            fullWidth
-            margin="normal"
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockOutlinedIcon fontSize="small" color="action" />
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <Box sx={{ textAlign: "right", mt: 0.5, mb: 2 }}>
-            <Typography
-              component={Link}
-              to="/forgot-password"
-              variant="caption"
-              color="primary"
-              sx={{ textDecoration: "none" }}
-            >
-              Forgot password?
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h4" fontWeight="900" color={colors.primary} gutterBottom>
+              Welcome back
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Enter your credentials to access your account
             </Typography>
           </Box>
 
-          <Button
-            fullWidth
-            variant="contained"
-            size="large"
-            onClick={handleLogin}
-            disabled={loading}
-            sx={{
-              borderRadius: 2,
-              textTransform: "none",
-              fontSize: 15,
-              py: 1.2,
-            }}
-            startIcon={
-              loading ? (
-                <CircularProgress size={16} color="inherit" />
-              ) : null
-            }
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </Button>
+          <Collapse in={Boolean(successMsg)}>
+            <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>{successMsg}</Alert>
+          </Collapse>
 
-          <Typography
-            variant="body2"
-            align="center"
-            color="text.secondary"
-            sx={{ mt: 3 }}
-          >
-            Don't have an account?{" "}
-            <Typography
-              component={Link}
-              to="/register"
-              variant="body2"
-              color="primary"
-              fontWeight="500"
-              sx={{ textDecoration: "none" }}
+          <Collapse in={Boolean(error)}>
+            <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>
+          </Collapse>
+
+          <Stack spacing={2.5}>
+            <TextField
+              name="email"
+              label="University Email"
+              fullWidth
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              InputProps={{
+                sx: { borderRadius: 2.5 },
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailOutlinedIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Box>
+              <TextField
+                name="password"
+                label="Password"
+                type="password"
+                fullWidth
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                InputProps={{
+                  sx: { borderRadius: 2.5 },
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockOutlinedIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Box sx={{ textAlign: "right", mt: 1 }}>
+                <Typography
+                  component={Link}
+                  to="/forgot-password"
+                  variant="caption"
+                  fontWeight="700"
+                  color={colors.primary}
+                  sx={{ textDecoration: "none", "&:hover": { color: colors.accent } }}
+                >
+                  Forgot password?
+                </Typography>
+              </Box>
+            </Box>
+
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              onClick={handleLogin}
+              disabled={loading}
+              sx={{
+                bgcolor: colors.accent,
+                borderRadius: 3,
+                py: 1.6,
+                fontWeight: "900",
+                fontSize: "1rem",
+                textTransform: "none",
+                boxShadow: `0 8px 20px ${alpha(colors.accent, 0.3)}`,
+                "&:hover": { bgcolor: "#d15b28", boxShadow: "none" },
+              }}
             >
-              Register
+              {loading ? <CircularProgress size={24} color="inherit" /> : "Sign In"}
+            </Button>
+
+            <Typography variant="body2" align="center" color="text.secondary" sx={{ mt: 2 }}>
+              New to the campus marketplace?{" "}
+              <Link
+                to="/register"
+                style={{ 
+                    color: colors.primary, 
+                    fontWeight: "800", 
+                    textDecoration: "none" 
+                }}
+              >
+                Create an Account
+              </Link>
             </Typography>
-          </Typography>
+          </Stack>
         </Box>
       </Box>
     </Box>

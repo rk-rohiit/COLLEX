@@ -6,6 +6,7 @@ const theme = createTheme({
 
     primary: {
       main: "#1E3A8A", // 🔵 Trust Blue
+      contrast:"#000",
     },
     secondary: {
       main: "#FF6A00", // 🟠 Action Orange
