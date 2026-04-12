@@ -116,15 +116,15 @@ const AppRoutes = () => {
 
     {/* 🔥 ADMIN PANEL (NO NAVBAR) */}
     <Route
-      path="/dashboard"
-      element={
-        <ProtectedRoute>
-          <AdminLayout>
-            <Dashboard />
-          </AdminLayout>
-        </ProtectedRoute>
-      }
-    />
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <AdminLayout />
+    </ProtectedRoute>
+  }
+>
+  <Route index element={<Dashboard />} />
+</Route>
 
     {/* 🔥 AUTH (NO NAVBAR) */}
     <Route path="/login" element={<Login />} />
