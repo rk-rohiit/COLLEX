@@ -27,6 +27,7 @@ const ProductView = () => {
   const addToCartHandler = () => {
     dispatch(addToCart(product));
   alert("Added to cart 🛒");
+  navigate("/cart");
   }
 
   useEffect(() => {

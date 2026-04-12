@@ -72,20 +72,6 @@ const Sidebar = () => {
 
   return (
     <Box
-      // sx={{
-      //   width: 220,
-      //   height: "100vh",
-      //   bgcolor: "background.paper",
-      //   borderRight: "0.5px solid",
-      //   borderColor: "divider",
-      //   display: "flex",
-      //   flexDirection: "column",
-      //   flexShrink: 0,
-      //   position: "fixed",
-      //   left: 0,
-      //   top: 0,
-      //   zIndex: 100,
-      // }}
       sx={{
         width: 220,
         height: "100vh",

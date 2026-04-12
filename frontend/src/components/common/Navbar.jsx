@@ -25,11 +25,13 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-import DashboardIcon from "@mui/icons-material/Dashboard";
+// import DashboardIcon from "@mui/icons-material/Dashboard";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from "@mui/icons-material/Logout";
 import MessageIcon from "@mui/icons-material/Message";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import SchoolIcon from "@mui/icons-material/School";
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -80,7 +82,7 @@ const Navbar = () => {
         <Toolbar sx={{ justifyContent: "space-between", py: 0.5 }}>
           
           {/* LEFT: LOGO & MOBILE MENU */}
-          <Stack direction="row" alignItems="center" spacing={1}>
+          {/* <Stack direction="row" alignItems="center" spacing={1}>
             <IconButton
               sx={{ display: { xs: "flex", md: "none" }, color: colors.primary }}
               onClick={() => setDrawer(true)}
@@ -101,7 +103,35 @@ const Navbar = () => {
             >
               <Box component="span" sx={{ mr: 1 }}>📦</Box> COLLEX
             </Typography>
-          </Stack>
+          </Stack> */}
+          <Box
+        sx={{
+          px: 2.5,
+          py: 2,
+          display: "flex",
+          alignItems: "center",
+          gap: 1.25,
+          borderColor: "divider",
+          mb: 1,
+        }}
+      >
+        <Box
+          sx={{
+            width: 32,
+            height: 32,
+            borderRadius: "9px",
+            bgcolor: "primary.main",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <SchoolIcon sx={{ fontSize: 17, color: "white" }} />
+        </Box>
+        <Typography fontWeight={800} fontSize="0.95rem" color="text.primary">
+          COLLEX
+        </Typography>
+      </Box>
 
           {/* CENTER: SEARCH BAR (DESKTOP) */}
           <Box sx={{ flex: 1, display: { xs: "none", md: "flex" }, justifyContent: "center" }}>
@@ -183,9 +213,9 @@ const Navbar = () => {
                     sx: { mt: 1.5, width: 200, borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }
                   }}
                 >
-                  <MenuItem onClick={() => navigate("/dashboard")}>
-                    <ListItemIcon><DashboardIcon fontSize="small" /></ListItemIcon>
-                    Dashboard
+                  <MenuItem onClick={() => navigate("/profile")}>
+                    <ListItemIcon><AccountCircleIcon fontSize="small" /></ListItemIcon>
+                    Profile
                   </MenuItem>
                   <MenuItem onClick={() => navigate("/messages")}>
                     <ListItemIcon><MessageIcon fontSize="small" /></ListItemIcon>
