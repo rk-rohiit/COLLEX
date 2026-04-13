@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^[a-zA-Z0-9._%+-]/, "Use valid LPU email"], // ✅ FIXED
+      match: [/^[a-zA-Z0-9._%+-]/, "Use valid LPU email"], // ✅ FIXED demo@lpu.in
     },
 
     fullName: {
@@ -75,6 +75,13 @@ const userSchema = new mongoose.Schema(
         "Password must contain uppercase, lowercase and number",
       ],
     },
+     isVerified: {
+    type: Boolean,
+    default: false,
+  },
+
+  otp: String,
+  otpExpiry: Date,
   },
   { timestamps: true }
 );
