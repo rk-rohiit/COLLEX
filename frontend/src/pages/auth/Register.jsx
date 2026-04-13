@@ -14,8 +14,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "@/features/auth/authSlice";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import VerifyOtpDialog from "@/components/ui/VerifyOtpDialog";
+import { toast } from "react-toastify";
 
-// Icons for the Welcome Panel
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const Register = () => {
@@ -24,11 +25,13 @@ const Register = () => {
 
   const { loading, error } = useSelector((state) => state.auth);
 
-  // Collex Brand Palette
+  const [otpOpen, setOtpOpen] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+
   const colors = {
-    primary: "#0A2647", // Deep Blue from prototype
-    accent: "#E86A33",  // Orange Action from prototype
-    verified: "#2ECC71", // Green
+    primary: "#0A2647",
+    accent: "#E86A33",
+    verified: "#2ECC71",
   };
 
   const [form, setForm] = useState({
@@ -78,160 +81,111 @@ const Register = () => {
     const res = await dispatch(registerUser(payload));
 
     if (res.meta.requestStatus === "fulfilled") {
-      navigate("/login");
+      const data = res.payload;
+
+      if (data?.requiresOtp && data.email) {
+        toast.success("OTP sent to your email");
+
+        setRegisteredEmail(data.email);
+        setOtpOpen(true);
+
+        // reset form
+        setForm({
+          fullName: "",
+          email: "",
+          phone: "",
+          course: "",
+          year: "",
+          hostelBlock: "",
+          password: "",
+          confirmPassword: "",
+        });
+      }
+    } else {
+      toast.error(res.payload || "Registration failed");
     }
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        bgcolor: "#F4F7F9", // Clean grey background
-        p: { xs: 0, md: 4 }, // No padding on mobile
-      }}
-    >
-      <Paper
-        elevation={0}
+    <>
+      <Box
         sx={{
+          minHeight: "100vh",
           display: "flex",
-          width: "100%",
-          maxWidth: 1000,
-          minHeight: 650,
-          borderRadius: { xs: 0, md: 5 }, // Square on mobile, rounded on desktop
-          overflow: "hidden",
-          border: '1px solid #edf2f7',
-          flexDirection: { xs: "column", md: "row" }, // Stack on mobile
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "#F4F7F9",
         }}
       >
-        {/* 🔥 LEFT PANEL: WELCOME (Based on Image 11) */}
-        <Grid item xs={12} md={6} sx={{ display: 'flex' }}>
-          <Box
-            sx={{
-              flex: 1,
-              p: 6,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              // Dark Blue Gradient from Collex theme
-              background: `linear-gradient(135deg, ${colors.primary}, ${alpha(colors.primary, 0.9)})`,
-              color: "white",
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            {/* Visual elements (Watermark birds from image 11) */}
-            <Box sx={{ 
-              position: 'absolute', top: 40, right: 40, 
-              fontSize: '120px', opacity: 0.1, pointerEvents: 'none' 
-            }}>
-              🎓
-            </Box>
+        <Paper sx={{ display: "flex", maxWidth: 1000, width: "100%" }}>
+          
+          {/* LEFT */}
+          <Grid item xs={12} md={6}>
+            <Box
+              sx={{
+                p: 6,
+                height: "100%",
+                background: `linear-gradient(135deg, ${colors.primary}, ${alpha(colors.primary, 0.9)})`,
+                color: "white",
+              }}
+            >
+              <Typography variant="h5">Collex</Typography>
 
-            <Typography variant="h5" fontWeight="900" sx={{ letterSpacing: '-1px' }}>
-              Collex
-            </Typography>
-
-            <Box>
-              <Typography
-                variant="h2"
-                sx={{
-                  fontWeight: 900,
-                  mb: 1.5,
-                  lineHeight: 1.1,
-                  letterSpacing: "-1.5px",
-                }}
-              >
-                Join the <br />
-                Campus Loop.
+              <Typography variant="h3" mt={4}>
+                Join the Campus Loop.
               </Typography>
 
-              <Typography
-                variant="body1"
-                sx={{ mb: 4, maxWidth: 350, opacity: 0.8 }}
-              >
-                Create your verified student account to start exchanging books, 
-                dorm gear, and notes safely within your university.
-              </Typography>
-              
-              <Stack direction="row" spacing={1} sx={{ mt: 2, color: colors.verified }}>
-                <CheckCircleIcon fontSize="small" />
-                <Typography variant="caption" fontWeight="bold">Verified student network only.</Typography>
+              <Stack direction="row" mt={3}>
+                <CheckCircleIcon />
+                <Typography ml={1}>
+                  Verified student network only
+                </Typography>
               </Stack>
             </Box>
+          </Grid>
 
-            <Typography variant="caption" sx={{ opacity: 0.5 }}>
-              🔒 Powered by Collex Security Ecosystem.
-            </Typography>
-          </Box>
-        </Grid>
+          {/* RIGHT */}
+          <Grid item xs={12} md={6}>
+            <Box p={4}>
+              <Typography variant="h4" mb={3}>
+                Create Account
+              </Typography>
 
-        {/* 🔥 RIGHT PANEL: REGISTER FORM (Single Column) */}
-        <Grid item xs={12} md={6}>
-          <Box
-            sx={{
-              p: { xs: 4, md: 6 },
-              bgcolor: "white",
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
-              justifyContent: "center",
-            }}
-          >
-            <Typography variant="h4" fontWeight="900" color={colors.primary} sx={{ mb: 4, letterSpacing: '-1px' }}>
-              Create Account
-            </Typography>
+              <Stack spacing={2}>
 
-            {/* FORM: All fields in a single column */}
-            <Box component="form">
-              <Stack spacing={1.5}>
-                
-                {/* FULL NAME */}
                 <TextField
                   name="fullName"
                   label="Full Name"
-                  fullWidth
-                  variant="outlined"
+                  value={form.fullName || ""}
                   onChange={handleChange}
-                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
                 />
 
-                {/* EMAIL */}
                 <TextField
                   name="email"
-                  label="University Email (@youruni.edu)"
-                  fullWidth
-                  variant="outlined"
+                  label="Email"
+                  value={form.email || ""}
                   onChange={handleChange}
-                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
                 />
 
-                {/* PHONE */}
                 <TextField
                   name="phone"
-                  label="Phone Number"
-                  fullWidth
-                  variant="outlined"
+                  label="Phone"
+                  value={form.phone || ""}
                   onChange={handleChange}
-                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
                 />
 
-                {/* COURSE + YEAR (Arranged together) */}
-                <Stack direction="row" spacing={1.5}>
+                <Stack direction="row" spacing={2}>
                   <TextField
                     select
                     name="course"
                     label="Course"
-                    fullWidth
-                    variant="outlined"
+                    value={form.course || ""}
                     onChange={handleChange}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+                    fullWidth
                   >
                     {["btech", "mtech", "bba", "mba", "bca", "mca"].map((c) => (
                       <MenuItem key={c} value={c}>
-                        {c.toUpperCase()}
+                        {c}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -240,107 +194,75 @@ const Register = () => {
                     select
                     name="year"
                     label="Year"
-                    fullWidth
-                    variant="outlined"
+                    value={form.year || ""}
                     onChange={handleChange}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+                    fullWidth
                   >
-                    {[1, 2, 3, 4, 5].map((y) => (
-                      <MenuItem key={y} value={y}>
-                        Year {y}
-                      </MenuItem>
+                    {[1,2,3,4,5].map((y)=>(
+                      <MenuItem key={y} value={y}>{y}</MenuItem>
                     ))}
                   </TextField>
                 </Stack>
 
-                {/* HOSTEL (Optional) */}
                 <TextField
                   select
                   name="hostelBlock"
-                  label="Hostel Block (Optional)"
-                  fullWidth
-                  variant="outlined"
+                  label="Hostel"
+                  value={form.hostelBlock || ""}
                   onChange={handleChange}
-                  sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
                 >
-                  {["block-a", "block-b", "block-c", "block-d"].map((b) => (
-                    <MenuItem key={b} value={b}>
-                      {b.toUpperCase()}
-                    </MenuItem>
+                  {["block-a","block-b","block-c","block-d"].map((b)=>(
+                    <MenuItem key={b} value={b}>{b}</MenuItem>
                   ))}
                 </TextField>
 
-                {/* PASSWORDS */}
-                <Stack direction="row" spacing={1.5}>
+                <Stack direction="row" spacing={2}>
                   <TextField
                     name="password"
-                    label="Password"
                     type="password"
-                    fullWidth
-                    variant="outlined"
+                    label="Password"
+                    value={form.password || ""}
                     onChange={handleChange}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
                   />
                   <TextField
                     name="confirmPassword"
-                    label="Confirm"
                     type="password"
-                    fullWidth
-                    variant="outlined"
+                    label="Confirm"
+                    value={form.confirmPassword || ""}
                     onChange={handleChange}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
                   />
                 </Stack>
+
+                {(localError || error) && (
+                  <Typography color="error">
+                    {localError || error}
+                  </Typography>
+                )}
+
+                <Button
+                  variant="contained"
+                  onClick={handleRegister}
+                  disabled={loading}
+                >
+                  {loading ? "Loading..." : "Sign Up"}
+                </Button>
               </Stack>
             </Box>
+          </Grid>
+        </Paper>
+      </Box>
 
-            {/* ERROR */}
-            {(localError || error) && (
-              <Typography color="error" mt={2} sx={{ fontSize: '0.85rem' }}>
-                {localError || error}
-              </Typography>
-            )}
-
-            {/* BUTTON (Vibrant Orange from prototype) */}
-            <Button
-              fullWidth
-              variant="contained"
-              size="large"
-              sx={{
-                mt: 4,
-                py: 1.5,
-                bgcolor: colors.accent,
-                borderRadius: 3,
-                fontWeight: "bold",
-                textTransform: "none",
-                fontSize: '1rem',
-                "&:hover": { bgcolor: "#d15b28" },
-              }}
-              onClick={handleRegister}
-            >
-              {loading ? "Creating Ecosystem Profile..." : "Sign Up"}
-            </Button>
-
-            {/* LOGIN LINK */}
-            <Typography mt={3} textAlign="center" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-              Already have an account?{" "}
-              <Box
-                component="span"
-                sx={{
-                  color: colors.primary,
-                  cursor: "pointer",
-                  fontWeight: 700,
-                  "&:hover": { textDecoration: 'underline' }
-                }}
-                onClick={() => navigate("/login")}
-              >
-                Sign In
-              </Box>
-            </Typography>
-          </Box>
-        </Grid>
-      </Paper>
-    </Box>
+      {/* OTP DIALOG */}
+      <VerifyOtpDialog
+        open={otpOpen}
+        onClose={() => setOtpOpen(false)}
+        email={registeredEmail}
+        onSuccess={() => {
+          toast.success("Account verified 🎉");
+          navigate("/login");
+        }}
+      />
+    </>
   );
 };
 
