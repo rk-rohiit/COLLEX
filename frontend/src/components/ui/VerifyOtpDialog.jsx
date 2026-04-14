@@ -14,18 +14,26 @@ import { toast } from "react-toastify";
 const VerifyOtpDialog = ({ open, onClose, email, onSuccess }) => {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const handleVerify = async () => {
+    if (!otp) return toast.error("Enter OTP");
+
     try {
       setLoading(true);
 
       const res = await verifyOtpAPI({ email, otp });
 
-      toast.success("Account verified successfully");
+      const { token, user } = res.data;
 
-      localStorage.setItem("token", res.data.token);
+      toast.success("Account verified successfully 🎉");
 
-      onSuccess(); // redirect/dashboard
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      setOtp(""); // 🔥 reset
+
+      onSuccess();
       onClose();
     } catch (err) {
       toast.error(err.response?.data?.message || "Invalid OTP");
@@ -36,10 +44,15 @@ const VerifyOtpDialog = ({ open, onClose, email, onSuccess }) => {
 
   const handleResend = async () => {
     try {
+      setResending(true);
+
       await resendOtpAPI({ email });
+
       toast.success("OTP resent");
     } catch (err) {
-      toast.error(err.response?.data?.message);
+      toast.error(err.response?.data?.message || "Failed to resend OTP");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -68,8 +81,12 @@ const VerifyOtpDialog = ({ open, onClose, email, onSuccess }) => {
             {loading ? "Verifying..." : "Verify"}
           </Button>
 
-          <Button variant="text" onClick={handleResend}>
-            Resend OTP
+          <Button
+            variant="text"
+            onClick={handleResend}
+            disabled={resending}
+          >
+            {resending ? "Sending..." : "Resend OTP"}
           </Button>
         </Stack>
       </DialogContent>

@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "@/features/auth/authSlice";
+import { sendOtp } from "@/features/auth/authSlice"; 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import VerifyOtpDialog from "@/components/ui/VerifyOtpDialog";
@@ -78,30 +78,26 @@ const Register = () => {
       password: form.password,
     };
 
-    const res = await dispatch(registerUser(payload));
+    const res = await dispatch(sendOtp(payload));
 
     if (res.meta.requestStatus === "fulfilled") {
-      const data = res.payload;
+  toast.success("OTP sent to your email");
 
-      if (data?.requiresOtp && data.email) {
-        toast.success("OTP sent to your email");
+  setRegisteredEmail(form.email); // 🔥 FIX
+  setOtpOpen(true);               // 🔥 OPEN DIALOG
 
-        setRegisteredEmail(data.email);
-        setOtpOpen(true);
-
-        // reset form
-        setForm({
-          fullName: "",
-          email: "",
-          phone: "",
-          course: "",
-          year: "",
-          hostelBlock: "",
-          password: "",
-          confirmPassword: "",
-        });
-      }
-    } else {
+  // reset form
+  setForm({
+    fullName: "",
+    email: "",
+    phone: "",
+    course: "",
+    year: "",
+    hostelBlock: "",
+    password: "",
+    confirmPassword: "",
+  });
+} else {
       toast.error(res.payload || "Registration failed");
     }
   };

@@ -5,21 +5,21 @@ import api from "./axios";
 ========================= */
 
 // 🔐 LOGIN
-export const loginAPI = (data) => 
+export const loginAPI = (data) =>
   api.post("/auth/login", data);
 
-// 📝 REGISTER (SEND OTP)
-export const registerAPI = (data) => 
-  api.post("/auth/register", data);
+// 📝 SEND OTP (REGISTER STEP 1)
+export const sendOtpAPI = (data) =>
+  api.post("/auth/send-otp", data);
 
-// ✅ VERIFY OTP (REGISTER + LOGIN)
-export const verifyOtpAPI = (data) => 
+// ✅ VERIFY OTP + REGISTER (STEP 2)
+export const verifyOtpAPI = (data) =>
   api.post("/auth/verify-otp", data);
 
 // 🔁 RESEND OTP
-export const resendOtpAPI = (data) => 
+export const resendOtpAPI = (data) =>
   api.post("/auth/resend-otp", data);
 
 // 👤 GET CURRENT USER
-export const getMeAPI = () => 
+export const getMeAPI = () =>
   api.get("/auth/me");
