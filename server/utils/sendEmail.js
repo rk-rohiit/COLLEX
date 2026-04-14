@@ -1,45 +1,50 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+/* =========================
+   SMTP TRANSPORT (BREVO)
+========================= */
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 /* =========================
    SEND OTP EMAIL
 ========================= */
 export const sendEmail = async (email, otp) => {
   try {
-    const response = await resend.emails.send({
-      from: "onboarding@resend.dev", // default working sender
+    const info = await transporter.sendMail({
+      from: `"Collex" <askrohiit@gmail.com>`, // ✅ IMPORTANT
       to: email,
       subject: "OTP Verification",
-      // html: `<h2>Your OTP is: ${otp}</h2>`,
       html: `
 <div style="font-family: Arial, sans-serif; background:#f4f7f9; padding:20px;">
   <div style="max-width:500px; margin:auto; background:white; border-radius:10px; padding:30px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
     
-    <h2 style="color:#0A2647; margin-bottom:10px;">Collex</h2>
-    
-    <p style="color:#555; font-size:14px;">
-      Verify your email to continue
-    </p>
+    <h2 style="color:#0A2647;">Collex</h2>
 
-    <h1 style="letter-spacing:8px; font-size:32px; margin:20px 0; color:#E86A33;">
+    <p style="color:#555;">Verify your email to continue</p>
+
+    <h1 style="letter-spacing:8px; color:#E86A33;">
       ${otp}
     </h1>
 
-    <p style="color:#777; font-size:14px;">
-      This OTP is valid for <b>10 minutes</b>.
-    </p>
+    <p>This OTP is valid for <b>10 minutes</b>.</p>
 
-    <p style="color:#999; font-size:12px; margin-top:20px;">
-      If you didn’t request this, you can safely ignore this email.
+    <p style="font-size:12px;color:#999;">
+      If you didn’t request this, ignore it.
     </p>
-
   </div>
 </div>
-`
+      `,
     });
 
-    console.log("✅ Email sent:", response);
+    console.log("✅ OTP Email sent:", info.messageId);
   } catch (error) {
     console.error("❌ Email Error:", error);
     throw new Error("Failed to send OTP email");
@@ -47,70 +52,38 @@ export const sendEmail = async (email, otp) => {
 };
 
 /* =========================
-   SEND VERIFICATION SUCCESS EMAIL
+   SEND WELCOME EMAIL
 ========================= */
 export const sendVerificationSuccessEmail = async (user) => {
   try {
-    await resend.emails.send({
-      from: "onboarding@resend.dev",
+    const info = await transporter.sendMail({
+      from: `"Collex" <askrohiit@gmail.com>`, // ✅ IMPORTANT
       to: user.email,
       subject: "🎉 Welcome to Collex",
-      // html: `
-      //   <h1>Welcome to Collex 🚀</h1>
-      //   <p>Hi ${user.fullName},</p>
-
-      //   <p>Your account has been successfully verified.</p>
-
-      //   <p>🎉 You are now officially a member of <b>Collex</b>.</p>
-
-      //   <p>Start exploring, connecting, and growing with us.</p>
-
-      //   <br/>
-
-      //   <a href="https://collex-nine.vercel.app" 
-      //      style="padding:10px 20px;background:#cc0102;color:white;text-decoration:none;border-radius:5px;">
-      //      Go to Dashboard
-      //   </a>
-
-      //   <br/><br/>
-
-      //   <p>Thanks,<br/>Team Collex</p>
-      // `,
       html: `
 <div style="font-family: Arial, sans-serif; background:#f4f7f9; padding:20px;">
-  <div style="max-width:600px; margin:auto; background:white; border-radius:12px; padding:30px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
-
+  <div style="max-width:600px; margin:auto; background:white; border-radius:12px; padding:30px; text-align:center;">
+    
     <h2 style="color:#0A2647;">Welcome to Collex 🚀</h2>
 
-    <p style="color:#555; font-size:16px;">
-      Hi <b>${user.fullName}</b>,
-    </p>
+    <p>Hi <b>${user.fullName}</b>,</p>
 
-    <p style="color:#555; font-size:15px;">
-      Your account has been successfully verified 🎉
-    </p>
-
-    <div style="margin:20px 0; padding:15px; background:#f0f7ff; border-radius:8px;">
-      <p style="margin:0; color:#0A2647;">
-        You are now officially part of the <b>Collex community</b>
-      </p>
-    </div>
+    <p>Your account has been successfully verified 🎉</p>
 
     <a href="https://collex-nine.vercel.app"
-       style="display:inline-block; margin-top:20px; padding:12px 25px; background:#E86A33; color:white; text-decoration:none; border-radius:6px; font-weight:bold;">
+       style="display:inline-block; margin-top:20px; padding:12px 25px; background:#E86A33; color:white; text-decoration:none; border-radius:6px;">
        Explore Now
     </a>
 
-    <p style="color:#999; font-size:12px; margin-top:30px;">
-      Thanks,<br/>Team Collex
+    <p style="font-size:12px;color:#999;margin-top:20px;">
+      Team Collex
     </p>
-
   </div>
 </div>
-`
+      `,
     });
 
-    console.log("✅ Welcome Email sent");
+    console.log("✅ Welcome Email sent:", info.messageId);
   } catch (error) {
     console.error("❌ Welcome Email Error:", error);
   }

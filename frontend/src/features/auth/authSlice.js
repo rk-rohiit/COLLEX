@@ -14,7 +14,7 @@ export const loginUser = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const res = await loginAPI(formData);
-      return res.data.data;
+      return res.data;
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Login failed"

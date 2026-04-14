@@ -16,6 +16,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import HandshakeOutlinedIcon from "@mui/icons-material/HandshakeOutlined";
 import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
+import VerifyOtpDialog from "@/components/ui/VerifyOtpDialog";
 
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "@/features/auth/authSlice";
@@ -50,6 +51,8 @@ const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [successMsg, setSuccessMsg] = useState("");
 
+const [otpOpen, setOtpOpen] = useState(false);
+const [loginEmail, setLoginEmail] = useState("");
   // Brand Palette
   const colors = {
     primary: "#0A2647", // Deep Blue
@@ -57,19 +60,36 @@ const Login = () => {
     bg: "#F4F7F9",
   };
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+  setForm({ ...form, [e.target.name]: e.target.value });
+  setSuccessMsg(""); // ✅ clear old success
+};
+const handleLogin = async () => {
+  if (!form.email || !form.password) return;
 
-  const handleLogin = async () => {
-    if (!form.email || !form.password) return;
-    try {
-      await dispatch(loginUser(form)).unwrap();
-      setSuccessMsg("Welcome back! Redirecting...");
-      setTimeout(() => navigate("/"), 1200);
-    } catch (err) {
-      // Error handled by Redux
+  try {
+    const data = await dispatch(
+      loginUser({
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+      })
+    ).unwrap();
+
+    if (data?.requiresOtp) {
+      setLoginEmail(form.email);
+      setOtpOpen(true);
+      setForm((prev) => ({ ...prev, password: "" }));
+      return;
     }
-  };
+
+    setSuccessMsg("Welcome back! Redirecting...");
+    setTimeout(() => navigate("/"), 1200);
+
+  } catch (err) {
+    console.log("Login error:", err);
+    setSuccessMsg("");
+  }
+};
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleLogin();
@@ -80,6 +100,7 @@ const Login = () => {
   }, [token, navigate]);
 
   return (
+    <>
     <Box
       sx={{
         minHeight: "100vh",
@@ -184,7 +205,7 @@ const Login = () => {
           </Collapse>
 
           <Stack spacing={2.5}>
-            <TextField
+            {/* <TextField
               name="email"
               label="University Email"
               fullWidth
@@ -198,25 +219,42 @@ const Login = () => {
                   </InputAdornment>
                 ),
               }}
-            />
+            /> */}
+            <TextField
+  name="email"
+  label="University Email"
+  value={form.email}
+  onChange={handleChange}
+  onKeyDown={handleKeyDown}
+  fullWidth
+  InputProps={{
+    sx: { borderRadius: 2.5 },
+    startAdornment: (
+      <InputAdornment position="start">
+        <EmailOutlinedIcon fontSize="small" />
+      </InputAdornment>
+    ),
+  }}
+/>
 
             <Box>
               <TextField
-                name="password"
-                label="Password"
-                type="password"
-                fullWidth
-                onChange={handleChange}
-                onKeyDown={handleKeyDown}
-                InputProps={{
-                  sx: { borderRadius: 2.5 },
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LockOutlinedIcon fontSize="small" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
+  name="password"
+  label="Password"
+  type="password"
+  value={form.password}
+  onChange={handleChange}
+  onKeyDown={handleKeyDown}
+  fullWidth
+  InputProps={{
+    sx: { borderRadius: 2.5 },
+    startAdornment: (
+      <InputAdornment position="start">
+        <LockOutlinedIcon fontSize="small" />
+      </InputAdornment>
+    ),
+  }}
+/>
               <Box sx={{ textAlign: "right", mt: 1 }}>
                 <Typography
                   component={Link}
@@ -268,6 +306,17 @@ const Login = () => {
         </Box>
       </Box>
     </Box>
+    
+    <VerifyOtpDialog
+  open={otpOpen}
+  onClose={() => setOtpOpen(false)}
+  email={loginEmail}
+  onSuccess={() => {
+    setSuccessMsg("Login successful 🎉");
+    setTimeout(() => navigate("/"), 1200);
+  }}
+/>
+    </>
   );
 };
 
