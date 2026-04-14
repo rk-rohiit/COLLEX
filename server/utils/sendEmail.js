@@ -1,7 +1,16 @@
 import nodemailer from "nodemailer";
 
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS,
+//   },
+// });
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // 🔥 VERY IMPORTANT
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -46,7 +55,7 @@ export const sendVerificationSuccessEmail = async (user) => {
 
         <br/>
 
-        <a href="https://collex-nine.verce;.app" 
+        <a href="https://collex-nine.verce.app" 
            style="padding:10px 20px;background:#cc0102;color:white;text-decoration:none;border-radius:5px;">
            Go to Dashboard
         </a>
