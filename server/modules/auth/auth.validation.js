@@ -1,5 +1,3 @@
-// src/modules/auth/auth.validation.js
-
 export const validateRegisterInput = (data) => {
   const { email, fullName, phone, course, year, password } = data;
 
@@ -7,12 +5,16 @@ export const validateRegisterInput = (data) => {
     throw new Error("All required fields must be provided");
   }
 
-  // if (!email.endsWith("@lpu.in")) {
-  //   throw new Error("Only LPU email allowed");
-  // }
-
   if (password.length < 8) {
     throw new Error("Password must be at least 8 characters");
+  }
+};
+
+export const validateOtpInput = (data) => {
+  const { email, otp } = data;
+
+  if (!email || !otp) {
+    throw new Error("Email and OTP are required");
   }
 };
 
