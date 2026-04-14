@@ -1,28 +1,30 @@
-import nodemailer from "nodemailer";
+import SibApiV3Sdk from "sib-api-v3-sdk";
 
-/* =========================
-   SMTP TRANSPORT (BREVO)
-========================= */
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const client = SibApiV3Sdk.ApiClient.instance;
+const apiKey = client.authentications["api-key"];
+
+apiKey.apiKey = process.env.BREVO_API_KEY;
+
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 /* =========================
    SEND OTP EMAIL
 ========================= */
 export const sendEmail = async (email, otp) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"Collex" <askrohiit@gmail.com>`, // ✅ IMPORTANT
-      to: email,
+    await apiInstance.sendTransacEmail({
+      sender: {
+        email: "askrohiit@gmail.com", // ✅ verified sender
+        name: "Collex",
+      },
+      to: [{ email }],
       subject: "OTP Verification",
-      html: `
+
+      // ✅ ADD TEXT (important for delivery)
+      textContent: `Your OTP is ${otp}`,
+
+      // ✅ YOUR SAME HTML (unchanged)
+      htmlContent: `
 <div style="font-family: Arial, sans-serif; background:#f4f7f9; padding:20px;">
   <div style="max-width:500px; margin:auto; background:white; border-radius:10px; padding:30px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
     
@@ -44,7 +46,7 @@ export const sendEmail = async (email, otp) => {
       `,
     });
 
-    console.log("✅ OTP Email sent:", info.messageId);
+    console.log("✅ OTP Email sent");
   } catch (error) {
     console.error("❌ Email Error:", error);
     throw new Error("Failed to send OTP email");
@@ -56,11 +58,17 @@ export const sendEmail = async (email, otp) => {
 ========================= */
 export const sendVerificationSuccessEmail = async (user) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"Collex" <askrohiit@gmail.com>`, // ✅ IMPORTANT
-      to: user.email,
+    await apiInstance.sendTransacEmail({
+      sender: {
+        email: "askrohiit@gmail.com",
+        name: "Collex",
+      },
+      to: [{ email: user.email }],
       subject: "🎉 Welcome to Collex",
-      html: `
+
+      textContent: `Welcome ${user.fullName}, your account is verified!`,
+
+      htmlContent: `
 <div style="font-family: Arial, sans-serif; background:#f4f7f9; padding:20px;">
   <div style="max-width:600px; margin:auto; background:white; border-radius:12px; padding:30px; text-align:center;">
     
@@ -83,7 +91,7 @@ export const sendVerificationSuccessEmail = async (user) => {
       `,
     });
 
-    console.log("✅ Welcome Email sent:", info.messageId);
+    console.log("✅ Welcome Email sent");
   } catch (error) {
     console.error("❌ Welcome Email Error:", error);
   }
