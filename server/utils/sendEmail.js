@@ -1,52 +1,33 @@
-import dns from "dns";
-dns.setDefaultResultOrder("ipv4first"); // 🔥 CRITICAL FIX
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-// const transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     user: process.env.EMAIL_USER,
-//     pass: process.env.EMAIL_PASS,
-//   },
-// });
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  family: 4,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
+/* =========================
+   SEND OTP EMAIL
+========================= */
 export const sendEmail = async (email, otp) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"Your App" <${process.env.EMAIL_USER}>`,
+    const response = await resend.emails.send({
+      from: "onboarding@resend.dev", // default working sender
       to: email,
       subject: "OTP Verification",
       html: `<h2>Your OTP is: ${otp}</h2>`,
     });
 
-    console.log("✅ Email sent:", info.response);
+    console.log("✅ Email sent:", response);
   } catch (error) {
     console.error("❌ Email Error:", error);
     throw new Error("Failed to send OTP email");
   }
 };
 
-
 /* =========================
    SEND VERIFICATION SUCCESS EMAIL
 ========================= */
 export const sendVerificationSuccessEmail = async (user) => {
   try {
-    await transporter.sendMail({
-      from: `"Collex" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: "onboarding@resend.dev",
       to: user.email,
       subject: "🎉 Welcome to Collex",
       html: `
@@ -75,6 +56,5 @@ export const sendVerificationSuccessEmail = async (user) => {
     console.log("✅ Welcome Email sent");
   } catch (error) {
     console.error("❌ Welcome Email Error:", error);
-    // ❗ Don't throw error (not critical)
   }
 };
