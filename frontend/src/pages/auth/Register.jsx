@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 
 import { useDispatch, useSelector } from "react-redux";
-import { sendOtp } from "@/features/auth/authSlice"; 
+import { sendOtp } from "@/features/auth/authSlice";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import VerifyOtpDialog from "@/components/ui/VerifyOtpDialog";
@@ -51,23 +51,42 @@ const Register = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setLocalError("");
   };
-
   const handleRegister = async () => {
+    // ✅ Required fields check
     if (
       !form.fullName ||
       !form.email ||
       !form.phone ||
       !form.course ||
       !form.year ||
-      !form.password
+      !form.password ||
+      !form.confirmPassword
     ) {
       return setLocalError("All required fields must be filled");
     }
 
+    // ✅ Phone validation (10 digits)
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(form.phone)) {
+      return setLocalError("Phone number must be exactly 10 digits");
+    }
+
+    // ✅ Password match check
     if (form.password !== form.confirmPassword) {
       return setLocalError("Passwords do not match");
     }
 
+    // ✅ Strong password validation
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{6,}$/;
+
+    if (!passwordRegex.test(form.password)) {
+      return setLocalError(
+        "Password must contain at least 1 uppercase, 1 lowercase, 1 special character and be minimum 6 characters"
+      );
+    }
+
+    // ✅ Prepare payload
     const payload = {
       fullName: form.fullName,
       email: form.email,
@@ -78,26 +97,27 @@ const Register = () => {
       password: form.password,
     };
 
+    // ✅ Send OTP
     const res = await dispatch(sendOtp(payload));
 
     if (res.meta.requestStatus === "fulfilled") {
-  toast.success("OTP sent to your email");
+      toast.success("OTP sent to your email");
 
-  setRegisteredEmail(form.email); // 🔥 FIX
-  setOtpOpen(true);               // 🔥 OPEN DIALOG
+      setRegisteredEmail(form.email);
+      setOtpOpen(true);
 
-  // reset form
-  setForm({
-    fullName: "",
-    email: "",
-    phone: "",
-    course: "",
-    year: "",
-    hostelBlock: "",
-    password: "",
-    confirmPassword: "",
-  });
-} else {
+      // ✅ Reset form AFTER OTP sent
+      setForm({
+        fullName: "",
+        email: "",
+        phone: "",
+        course: "",
+        year: "",
+        hostelBlock: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } else {
       toast.error(res.payload || "Registration failed");
     }
   };
@@ -113,37 +133,71 @@ const Register = () => {
           bgcolor: "#F4F7F9",
         }}
       >
-        <Paper sx={{ display: "flex", maxWidth: 1000, width: "100%" }}>
-          
+        <Paper sx={{
+    display: "flex",
+    flexDirection: { xs: "column", md: "row" }, // ✅ mobile column
+    maxWidth: 1000,
+    width: "100%",
+    borderRadius: 3,
+    overflow: "hidden",
+  }}>
+
           {/* LEFT */}
-          <Grid item xs={12} md={6}>
+
+          <Box 
+          sx={{
+    position: "relative",
+    width: { xs: "100%", md: "45%" },
+    height: { xs: 200, sm: 250, md: "auto" }, // ✅ responsive height
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    overflow: "hidden",
+  }}
+          >
+            {/* Hero image */}
             <Box
-              sx={{
-                p: 6,
-                height: "100%",
-                background: `linear-gradient(135deg, ${colors.primary}, ${alpha(colors.primary, 0.9)})`,
-                color: "white",
-              }}
-            >
-              <Typography variant="h5">Collex</Typography>
-
-              <Typography variant="h3" mt={4}>
-                Join the Campus Loop.
+              component="img"
+              src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=900&q=80"
+              alt="campus"
+              sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.35 }}
+            />
+            {/* Gradient overlay */}
+            <Box sx={{
+              position: "absolute", inset: 0,
+              background: `linear-gradient(to top, ${colors.primary} 30%, ${alpha(colors.primary, 0.5)} 70%, ${alpha(colors.primary, 0.2)} 100%)`,
+            }} />
+            {/* Content */}
+            <Box sx={{ position: "relative", zIndex: 2, color: "white", p: { xs: "22px 20px", sm: "32px 28px", md: "40px 36px" } }}>
+              <Typography sx={{ fontWeight: 700, fontSize: { xs: 18, md: 20 }, color: colors.accent, mb: { xs: 2, md: 3 } }}>
+                Collex
               </Typography>
-
-              <Stack direction="row" mt={3}>
-                <CheckCircleIcon />
-                <Typography ml={1}>
-                  Verified student network only
-                </Typography>
+              <Typography sx={{ fontWeight: 700, fontSize: { xs: 22, sm: 26, md: 30 }, lineHeight: 1.25, letterSpacing: "-0.8px", mb: { xs: 1.5, md: 2.5 } }}>
+                Join the{" "}
+                <Box component="span" sx={{ color: colors.accent }}>Campus</Box>
+                <br />Loop.
+              </Typography>
+              <Stack spacing={1.5} sx={{ mb: { xs: 1.5, md: 3 }, flexDirection: { xs: "row", md: "column" }, flexWrap: "wrap", gap: 1 }}>
+                {["Verified student network only", "Buy, sell & share on campus", "Connect with your hostel block"].map((t) => (
+                  <Stack direction="row" alignItems="center" spacing={1} key={t}>
+                    <CheckCircleIcon sx={{ color: colors.accent, fontSize: 16 }} />
+                    <Typography sx={{ fontSize: { xs: 12, md: 13.5 }, opacity: 0.88 }}>{t}</Typography>
+                  </Stack>
+                ))}
               </Stack>
+              <Typography sx={{ fontSize: 11, opacity: 0.35, display: { xs: "none", md: "block" } }}>
+                © 2025 Collex · Campus Edition
+              </Typography>
             </Box>
-          </Grid>
+          </Box>
 
           {/* RIGHT */}
           <Grid item xs={12} md={6}>
             <Box p={4}>
-              <Typography variant="h4" mb={3}>
+              <Typography variant="h4" mb={3} sx={{
+                textAlign: "center",
+                borderBottom: "1px solid #000"
+              }}>
                 Create Account
               </Typography>
 
@@ -194,7 +248,7 @@ const Register = () => {
                     onChange={handleChange}
                     fullWidth
                   >
-                    {[1,2,3,4,5].map((y)=>(
+                    {[1, 2, 3, 4, 5].map((y) => (
                       <MenuItem key={y} value={y}>{y}</MenuItem>
                     ))}
                   </TextField>
@@ -207,7 +261,7 @@ const Register = () => {
                   value={form.hostelBlock || ""}
                   onChange={handleChange}
                 >
-                  {["block-a","block-b","block-c","block-d"].map((b)=>(
+                  {["block-a", "block-b", "block-c", "block-d"].map((b) => (
                     <MenuItem key={b} value={b}>{b}</MenuItem>
                   ))}
                 </TextField>
@@ -228,6 +282,12 @@ const Register = () => {
                     onChange={handleChange}
                   />
                 </Stack>
+                <Typography variant="caption" color="secondary.warning" sx={{
+                  textAlign: "center",
+                  fontWeight: "bold"
+                }}>
+                  Must include uppercase, lowercase, special character (min 6 chars)
+                </Typography>
 
                 {(localError || error) && (
                   <Typography color="error">
@@ -243,6 +303,16 @@ const Register = () => {
                   {loading ? "Loading..." : "Sign Up"}
                 </Button>
               </Stack>
+              <Typography variant="body2" textAlign="center" color="text.secondary">
+                Already have an account?{" "}
+                <Box
+                  component="span"
+                  onClick={() => navigate("/login")}
+                  sx={{ color: colors.primary, fontWeight: 700, cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+                >
+                  Log in
+                </Box>
+              </Typography>
             </Box>
           </Grid>
         </Paper>

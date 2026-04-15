@@ -24,6 +24,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import HowItWorks from "../pages/home/HowItWorks";
 import FeatureSection from "../pages/home/FeatureSection";
 import Testimonials from "../pages/home/Testimonials";
+import NotFound from "../components/ui/NotFound";
 
 // Landing page
 const LandingPage = () => (
@@ -129,6 +130,8 @@ const AppRoutes = () => {
     {/* 🔥 AUTH (NO NAVBAR) */}
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
+     {/* Not Found page */}
+  <Route path="*" element={<NotFound />} />
 
   </Routes>
 </BrowserRouter>
