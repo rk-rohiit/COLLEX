@@ -134,26 +134,26 @@ const Register = () => {
         }}
       >
         <Paper sx={{
-    display: "flex",
-    flexDirection: { xs: "column", md: "row" }, // ✅ mobile column
-    maxWidth: 1000,
-    width: "100%",
-    borderRadius: 3,
-    overflow: "hidden",
-  }}>
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" }, // ✅ mobile column
+          maxWidth: 1000,
+          width: "100%",
+          borderRadius: 3,
+          overflow: "hidden",
+        }}>
 
           {/* LEFT */}
 
-          <Box 
-          sx={{
-    position: "relative",
-    width: { xs: "100%", md: "45%" },
-    height: { xs: 200, sm: 250, md: "auto" }, // ✅ responsive height
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    overflow: "hidden",
-  }}
+          <Box
+            sx={{
+              position: "relative",
+              width: { xs: "100%", md: "45%" },
+              height: { xs: 200, sm: 250, md: "auto" }, // ✅ responsive height
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+              overflow: "hidden",
+            }}
           >
             {/* Hero image */}
             <Box

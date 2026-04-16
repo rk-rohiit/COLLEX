@@ -5,67 +5,90 @@ import {
   getReceivedOrdersAPI,
 } from "@/api/order.api";
 
-// 🔥 Create Orders
+/* =========================
+   🔥 CREATE MULTIPLE ORDERS
+========================= */
 export const createOrdersFromCart = createAsyncThunk(
   "order/createMultiple",
   async ({ items, meetType }, { rejectWithValue }) => {
     try {
-      const results = [];
-
-      for (let item of items) {
-        const order = await createOrderAPI(item._id, meetType);
-        results.push(order);
-      }
+      // ✅ Parallel execution (faster than loop)
+      const results = await Promise.all(
+        items.map((item) =>
+          createOrderAPI(item._id, meetType)
+        )
+      );
 
       return results;
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
 
-// 🔥 My Orders
+/* =========================
+   🔥 GET MY ORDERS
+========================= */
 export const getMyOrders = createAsyncThunk(
   "order/my",
   async (_, { rejectWithValue }) => {
     try {
       return await getMyOrdersAPI();
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
 
-// 🔥 Received Orders
+/* =========================
+   🔥 GET RECEIVED ORDERS
+========================= */
 export const getReceivedOrders = createAsyncThunk(
   "order/received",
   async (_, { rejectWithValue }) => {
     try {
       return await getReceivedOrdersAPI();
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
 
+/* =========================
+   🔥 SLICE
+========================= */
 const orderSlice = createSlice({
   name: "order",
   initialState: {
     loading: false,
     success: false,
-    myOrders: [],        // ✅ FIXED
-    receivedOrders: [],  // ✅ FIXED
+    myOrders: [],
+    receivedOrders: [],
     error: null,
   },
 
-  reducers: {},
+  reducers: {
+    // ✅ Reset after success (important for UI)
+    resetOrderState: (state) => {
+      state.success = false;
+      state.error = null;
+    },
+  },
 
   extraReducers: (builder) => {
     builder
-      // 🔥 CREATE ORDER
+
+      /* 🔥 CREATE ORDER */
       .addCase(createOrdersFromCart.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.success = false;
       })
       .addCase(createOrdersFromCart.fulfilled, (state) => {
         state.loading = false;
@@ -76,7 +99,7 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // 🔥 MY ORDERS
+      /* 🔥 MY ORDERS */
       .addCase(getMyOrders.pending, (state) => {
         state.loading = true;
       })
@@ -84,11 +107,12 @@ const orderSlice = createSlice({
         state.loading = false;
         state.myOrders = action.payload;
       })
-      .addCase(getMyOrders.rejected, (state) => {
+      .addCase(getMyOrders.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
       })
 
-      // 🔥 RECEIVED ORDERS
+      /* 🔥 RECEIVED ORDERS */
       .addCase(getReceivedOrders.pending, (state) => {
         state.loading = true;
       })
@@ -96,10 +120,12 @@ const orderSlice = createSlice({
         state.loading = false;
         state.receivedOrders = action.payload;
       })
-      .addCase(getReceivedOrders.rejected, (state) => {
+      .addCase(getReceivedOrders.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
+export const { resetOrderState } = orderSlice.actions;
 export default orderSlice.reducer;
