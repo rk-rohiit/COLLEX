@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import {
-  Container, Typography, Card, CardContent, Button, Tabs, Tab,
-  Grid, Box, Avatar, Divider, LinearProgress, Stack, Paper, IconButton
+  Container, Typography, Button, Tabs, Tab,
+  Grid, Box, Avatar, Stack, Paper, IconButton, Chip
 } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import { useState, useEffect } from "react";
@@ -12,81 +12,138 @@ import { getMyOrders, getReceivedOrders } from "@/features/order/orderSlice";
 import AddIcon from "@mui/icons-material/Add";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import SellIcon from "@mui/icons-material/Sell";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import SchoolIcon from "@mui/icons-material/School";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import SettingsIcon from "@mui/icons-material/Settings";
 
-// ─── Stat Card (Updated for Dashboard) ──────────────────────────
+/* =========================
+   STAT CARD
+========================= */
 const DashboardStat = ({ label, value, icon, color }) => (
-  <Paper 
-    elevation={0} 
-    sx={{ 
-      p: 3, borderRadius: 4, bgcolor: "white", 
-      border: "1px solid", borderColor: "divider",
-      transition: "0.3s", "&:hover": { boxShadow: "0 10px 20px rgba(0,0,0,0.05)" }
+  <Paper
+    elevation={0}
+    sx={{
+      p: 2.5,
+      borderRadius: 6,
+      border: "1px solid",
+      borderColor: "divider",
+      flex: 1,
     }}
   >
-    <Stack direction="row" justifyContent="space-between" alignItems="center">
-      <Box>
-        <Typography variant="overline" color="text.secondary" fontWeight="700">
-          {label}
-        </Typography>
-        <Typography variant="h4" fontWeight="900" sx={{ color: color }}>
-          {value}
-        </Typography>
-      </Box>
-      <Avatar sx={{ bgcolor: alpha(color, 0.1), color: color }}>
+    <Stack direction="row" spacing={2} alignItems="center">
+      <Avatar sx={{ bgcolor: alpha(color, 0.1), color, width: 44, height: 44 }}>
         {icon}
       </Avatar>
+      <Box>
+        <Typography variant="h5" fontWeight="bold" lineHeight={1}>
+          {value}
+        </Typography>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ textTransform: "uppercase", fontSize: "0.65rem", fontWeight: 700 }}
+        >
+          {label}
+        </Typography>
+      </Box>
     </Stack>
   </Paper>
 );
 
-// ─── Order Row (Clean Dashboard List) ──────────────────────────
-const OrderRow = ({ order, isReceived }) => {
+/* =========================
+   ORDER ROW
+========================= */
+const OrderRow = ({ order }) => {
   const navigate = useNavigate();
+
   return (
-    <Paper 
-      variant="outlined" 
-      sx={{ p: 2, mb: 2, borderRadius: 3, "&:hover": { bgcolor: "#fcfcfc" } }}
+    <Paper
+      elevation={0}
+      sx={{
+        p: 1.5,
+        mb: 2,
+        borderRadius: 4,
+        border: "1px solid",
+        borderColor: "divider",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 1,
+      }}
     >
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Box 
-            component="img" 
-            src={order.listing?.images?.[0] || "https://placehold.co/100"} 
-            sx={{ width: 50, height: 50, borderRadius: 2, objectFit: "cover" }}
-          />
-          <Box>
-            <Typography fontWeight="bold">{order.listing?.title || "Product"}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {isReceived ? `Buyer: ${order.buyer?.name}` : `Price: ₹${order.listing?.price}`}
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
+        <Box
+          component="img"
+          src={order.listing?.images?.[0] || "https://via.placeholder.com/60"}
+          sx={{
+            width: { xs: 48, sm: 60 },
+            height: { xs: 48, sm: 60 },
+            borderRadius: 3,
+            objectFit: "cover",
+            bgcolor: "grey.100",
+            flexShrink: 0,
+          }}
+        />
+        <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Typography
+            variant="subtitle2"
+            fontWeight="bold"
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: { xs: 140, sm: 260, md: "100%" },
+            }}
+          >
+            {order.listing?.title}
+          </Typography>
+          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+            <Typography variant="body2" fontWeight="bold" color="primary.main">
+              ₹{order.listing?.price}
             </Typography>
-          </Box>
-        </Stack>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Chip 
-            label={order.status} 
-            size="small" 
-            color={order.status === "completed" ? "success" : "warning"}
-            sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.6rem" }}
-          />
-          <IconButton onClick={() => navigate(`/order/${order._id}`)}>
-            <ChevronRightIcon />
-          </IconButton>
-        </Stack>
+            <Chip
+              label={order.status || "In Progress"}
+              size="small"
+              sx={{
+                bgcolor: "#FFF59D",
+                color: "#827717",
+                fontWeight: "bold",
+                fontSize: "0.7rem",
+                height: 20,
+              }}
+            />
+          </Stack>
+        </Box>
       </Stack>
+      <IconButton onClick={() => navigate(`/order/${order._id}`)} size="small" sx={{ flexShrink: 0 }}>
+        <ChevronRightIcon />
+      </IconButton>
     </Paper>
   );
 };
 
+/* =========================
+   EMPTY STATE
+========================= */
+const EmptyState = () => (
+  <Typography variant="body2" color="text.secondary" textAlign="center" py={4}>
+    No data found.
+  </Typography>
+);
+
+/* =========================
+   MAIN PAGE
+========================= */
 const ProfilePage = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
-  const { user } = useSelector((state) => state.auth); // Changed from .user to match common auth pattern
+
+  const { user } = useSelector((state) => state.auth);
   const { myOrders, receivedOrders, loading } = useSelector((state) => state.order);
+
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
@@ -94,150 +151,186 @@ const ProfilePage = () => {
     dispatch(getReceivedOrders());
   }, [dispatch]);
 
-  // Design Colors
-  const colors = {
-    primary: "#0A2647",
-    accent: "#E86A33",
-    verified: "#2ECC71",
-    bg: "#F4F7F9"
-  };
-
-  if (loading) return <LinearProgress sx={{ bgcolor: colors.accent }} />;
+  if (loading) return <Typography p={5}>Loading...</Typography>;
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: colors.bg, pt: 10, pb: 8 }}>
-      <Container maxWidth="xl">
-        
-        {/* 🔥 DASHBOARD HEADER */}
-        <Paper elevation={0} sx={{ p: 4, borderRadius: 5, mb: 4, bgcolor: "white" }}>
-          <Grid container spacing={3} alignItems="center">
-            <Grid item>
-              <Avatar 
-                sx={{ 
-                  width: 90, height: 90, 
-                  bgcolor: colors.primary, 
-                  fontSize: "2.5rem",
-                  border: `4px solid ${alpha(colors.primary, 0.1)}`
+    <Box sx={{ minHeight: "100vh", bgcolor: "#F4F7FA", pt: { xs: 3, md: 8 }, pb: 6, mt:5 }}>
+      <Container maxWidth="lg">
+
+        {/* ── HEADER ── */}
+        <Paper
+          sx={{
+            p: { xs: 2.5, md: 5 },
+            borderRadius: { xs: 6, md: 10 },
+            bgcolor: "#0D2344",
+            color: "white",
+            mb: 2,
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            alignItems={{ xs: "flex-start", sm: "center" }}
+            justifyContent="space-between"
+            flexWrap="wrap"
+            useFlexGap
+          >
+            {/* User info */}
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
+              <Avatar
+                sx={{
+                  width: { xs: 54, md: 76 },
+                  height: { xs: 54, md: 76 },
+                  bgcolor: "white",
+                  color: "#0D2344",
+                  fontSize: { xs: "1.2rem", md: "1.6rem" },
+                  fontWeight: "bold",
+                  flexShrink: 0,
                 }}
               >
-                {user?.name?.charAt(0)}
+                {user?.fullName?.charAt(0)}
               </Avatar>
-            </Grid>
-            <Grid item xs>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Typography variant="h4" fontWeight="900" color={colors.primary}>
-                  Hey, {user?.name?.split(" ")[0]}!
-                </Typography>
-                <CheckCircleIcon sx={{ color: colors.verified }} />
-              </Stack>
-              <Typography variant="body1" color="text.secondary">
-                {user?.campusId || "Chandigarh University"} | Verified Student
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Button 
-                variant="contained" 
+              <Box sx={{ minWidth: 0 }}>
+                <Stack direction="row" spacing={0.75} alignItems="center">
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    sx={{
+                      fontSize: { xs: "1rem", md: "1.25rem" },
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {user?.fullName || "Rohit Kumar"}
+                  </Typography>
+                  <VerifiedIcon sx={{ fontSize: 17, color: "#00C8FF", flexShrink: 0 }} />
+                </Stack>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  flexWrap="wrap"
+                  useFlexGap
+                  sx={{ opacity: 0.75, mt: 0.25 }}
+                >
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <SchoolIcon sx={{ fontSize: 13 }} />
+                    <Typography variant="caption">{user?.campusId || "LPU"}</Typography>
+                  </Stack>
+                  <Typography variant="caption" sx={{ display: { xs: "none", sm: "block" } }}>•</Typography>
+                  <Typography variant="caption" noWrap>{user?.email || "student@email.com"}</Typography>
+                </Stack>
+              </Box>
+            </Stack>
+
+            {/* Actions */}
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexShrink: 0 }}>
+              <Button
+                variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => navigate("/add-product")}
-                sx={{ 
-                  bgcolor: colors.accent, 
-                  borderRadius: 2, py: 1.5, px: 4, 
+                size="small"
+                sx={{
+                  borderRadius: 5,
+                  bgcolor: "white",
+                  color: "#0D2344",
+                  textTransform: "none",
                   fontWeight: "bold",
-                  "&:hover": { bgcolor: "#d15b28" }
+                  whiteSpace: "nowrap",
+                  "&:hover": { bgcolor: "#e0e0e0" },
                 }}
               >
-                LIST NEW PRODUCT
+                Post an Ad
               </Button>
-            </Grid>
-          </Grid>
+              <IconButton sx={{ color: "white", bgcolor: alpha("#fff", 0.1) }}>
+                <SettingsIcon />
+              </IconButton>
+            </Stack>
+          </Stack>
         </Paper>
 
-        <Grid container spacing={3}>
-          {/* 🔥 STATS SECTION */}
-          <Grid item xs={12} md={3}>
-            <Stack spacing={2}>
-              <DashboardStat 
-                label="Total Purchases" 
-                value={myOrders?.length || 0} 
-                icon={<ShoppingBagIcon />} 
-                color={colors.primary} 
-              />
-              <DashboardStat 
-                label="Items Sold" 
-                value={receivedOrders?.filter(o => o.status === "completed").length || 0} 
-                icon={<TrendingUpIcon />} 
-                color={colors.verified} 
-              />
-              <DashboardStat 
-                label="Pending Sales" 
-                value={receivedOrders?.filter(o => o.status === "pending").length || 0} 
-                icon={<SellIcon />} 
-                color={colors.accent} 
-              />
-            </Stack>
-          </Grid>
+        {/* ── STATS GRID ── */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+            },
+            gap: 2,
+            mb: 3,
+          }}
+        >
+          <DashboardStat
+            label="Items Bought"
+            value={myOrders.length || 0}
+            icon={<ShoppingBagIcon />}
+            color="#3F51B5"
+          />
+          <DashboardStat
+            label="Successful Sales"
+            value={receivedOrders.filter((o) => o.status === "completed").length || 0}
+            icon={<TrendingUpIcon />}
+            color="#4CAF50"
+          />
+          <DashboardStat
+            label="Active Requests"
+            value={receivedOrders.filter((o) => o.status === "pending").length || 0}
+            icon={<SellIcon />}
+            color="#FF9800"
+          />
+        </Box>
 
-          {/* 🔥 ORDERS & ACTIVITY SECTION */}
-          <Grid item xs={12} md={9}>
-            <Paper elevation={0} sx={{ borderRadius: 4, overflow: "hidden" }}>
-              <Tabs 
-                value={tab} 
-                onChange={(_, v) => setTab(v)} 
-                sx={{ 
-                  bgcolor: "white", px: 2, pt: 1,
-                  "& .MuiTab-root": { fontWeight: "bold", fontSize: "0.9rem" }
-                }}
-              >
-                <Tab label="My Purchases" />
-                <Tab label="Sales Received" />
-              </Tabs>
-              <Divider />
-              
-              <Box p={3} sx={{ bgcolor: "white", minHeight: 400 }}>
-                {tab === 0 ? (
-                  <Box>
-                    {!myOrders?.length ? (
-                      <EmptyState message="You haven't bought anything yet" icon="🛍️" />
-                    ) : (
-                      myOrders.map(o => <OrderRow key={o._id} order={o} />)
-                    )}
-                  </Box>
-                ) : (
-                  <Box>
-                    {!receivedOrders?.length ? (
-                      <EmptyState message="No one has ordered your items yet" icon="📦" />
-                    ) : (
-                      receivedOrders.map(o => <OrderRow key={o._id} order={o} isReceived />)
-                    )}
-                  </Box>
-                )}
+        {/* ── ORDERS / SALES TABS ── */}
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Paper
+              sx={{
+                borderRadius: 2,
+                overflow: "hidden",
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              <Box sx={{ borderBottom: 1, borderColor: "divider", px: 2 }}>
+                <Tabs
+                  value={tab}
+                  onChange={(_, v) => setTab(v)}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                >
+                  <Tab
+                    label="MY PURCHASES"
+                    sx={{ fontWeight: "bold", fontSize: "0.75rem" }}
+                  />
+                  <Tab
+                    label="SALES MANAGER"
+                    sx={{ fontWeight: "bold", fontSize: "0.75rem" }}
+                  />
+                </Tabs>
+              </Box>
+
+              <Box p={{ xs: 2, md: 4 }}>
+                <Typography variant="h6" fontWeight="bold" mb={2}>
+                  {tab === 0 ? "Recent Orders" : "Sales History"}
+                </Typography>
+
+                {tab === 0
+                  ? myOrders.length
+                    ? myOrders.map((o) => <OrderRow key={o._id} order={o} />)
+                    : <EmptyState />
+                  : receivedOrders.length
+                    ? receivedOrders.map((o) => <OrderRow key={o._id} order={o} />)
+                    : <EmptyState />}
               </Box>
             </Paper>
           </Grid>
         </Grid>
+
       </Container>
     </Box>
   );
 };
-
-// Internal Helper Components
-const Chip = ({ label, color, sx }) => (
-  <Box sx={{ 
-    px: 1.5, py: 0.5, borderRadius: "5px", 
-    bgcolor: color === "success" ? "#e8f5e9" : "#fff3e0",
-    color: color === "success" ? "#2e7d32" : "#ed6c02",
-    ...sx 
-  }}>
-    <Typography variant="caption" fontWeight="bold">{label}</Typography>
-  </Box>
-);
-
-const EmptyState = ({ message, icon }) => (
-  <Box textAlign="center" py={10}>
-    <Typography sx={{ fontSize: "4rem", mb: 2 }}>{icon}</Typography>
-    <Typography variant="h6" fontWeight="bold" color="text.secondary">{message}</Typography>
-    <Button sx={{ mt: 2 }} onClick={() => window.location.href="/"}>Browse Marketplace</Button>
-  </Box>
-);
 
 export default ProfilePage;
