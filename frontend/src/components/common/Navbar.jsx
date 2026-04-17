@@ -81,29 +81,6 @@ const Navbar = () => {
       <Container maxWidth="xl">
         <Toolbar sx={{ justifyContent: "space-between", py: 0.5 }}>
           
-          {/* LEFT: LOGO & MOBILE MENU */}
-          {/* <Stack direction="row" alignItems="center" spacing={1}>
-            <IconButton
-              sx={{ display: { xs: "flex", md: "none" }, color: colors.primary }}
-              onClick={() => setDrawer(true)}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              variant="h6"
-              fontWeight="900"
-              sx={{ 
-                cursor: "pointer", 
-                display: "flex", 
-                alignItems: "center", 
-                letterSpacing: "-0.5px",
-                color: colors.primary 
-              }}
-              onClick={() => navigate("/")}
-            >
-              <Box component="span" sx={{ mr: 1 }}>📦</Box> COLLEX
-            </Typography>
-          </Stack> */}
           <Box
         sx={{
           px: 2.5,
@@ -192,11 +169,11 @@ const Navbar = () => {
                   sx={{ cursor: "pointer", ml: 1 }}
                 >
                   <Avatar sx={{ width: 35, height: 35, bgcolor: colors.primary }}>
-                    {user?.name?.charAt(0)}
+                    {user?.fullName?.charAt(0)}
                   </Avatar>
                   <Box sx={{ display: { xs: "none", lg: "block" } }}>
                     <Typography variant="subtitle2" fontWeight="bold" lineHeight={1.2}>
-                      {user?.name || "User"} <CheckCircleIcon sx={{ fontSize: 14, color: colors.verified, ml: 0.5 }} />
+                      {user?.fullName || "User"} <CheckCircleIcon sx={{ fontSize: 14, color: colors.verified, ml: 0.5 }} />
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       LPU University

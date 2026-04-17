@@ -12,13 +12,11 @@ export const createOrdersFromCart = createAsyncThunk(
   "order/createMultiple",
   async ({ items, meetType }, { rejectWithValue }) => {
     try {
-      // ✅ Parallel execution (faster than loop)
       const results = await Promise.all(
         items.map((item) =>
           createOrderAPI(item._id, meetType)
         )
       );
-
       return results;
     } catch (error) {
       return rejectWithValue(
@@ -74,7 +72,6 @@ const orderSlice = createSlice({
   },
 
   reducers: {
-    // ✅ Reset after success (important for UI)
     resetOrderState: (state) => {
       state.success = false;
       state.error = null;
@@ -90,10 +87,15 @@ const orderSlice = createSlice({
         state.error = null;
         state.success = false;
       })
+
       .addCase(createOrdersFromCart.fulfilled, (state) => {
         state.loading = false;
         state.success = true;
+
+        // ❌ DO NOT manually push orders
+        // ✅ Let API refetch handle fresh data
       })
+
       .addCase(createOrdersFromCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
@@ -103,10 +105,12 @@ const orderSlice = createSlice({
       .addCase(getMyOrders.pending, (state) => {
         state.loading = true;
       })
+
       .addCase(getMyOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.myOrders = action.payload;
+        state.myOrders = action.payload; // ✅ clean replace
       })
+
       .addCase(getMyOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
@@ -116,10 +120,12 @@ const orderSlice = createSlice({
       .addCase(getReceivedOrders.pending, (state) => {
         state.loading = true;
       })
+
       .addCase(getReceivedOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.receivedOrders = action.payload;
+        state.receivedOrders = action.payload; // ✅ clean replace
       })
+
       .addCase(getReceivedOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

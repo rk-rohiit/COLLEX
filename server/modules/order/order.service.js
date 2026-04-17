@@ -50,12 +50,17 @@ export const createOrderService = async (listingId, user, meetType) => {
 /* =========================
    Get My Orders (Buyer)
 ========================= */
+// export const getMyOrdersService = async (userId) => {
+//   return await Order.find({ buyer: userId })
+//     .populate("listing")
+//     .sort({ createdAt: -1 });
+// };
 export const getMyOrdersService = async (userId) => {
   return await Order.find({ buyer: userId })
     .populate("listing")
+    .populate("seller", "fullName campusId") // ✅ FIX
     .sort({ createdAt: -1 });
 };
-
 /* =========================
    Get Received Orders (Seller)
 ========================= */
