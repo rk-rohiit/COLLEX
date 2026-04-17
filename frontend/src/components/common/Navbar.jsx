@@ -32,11 +32,13 @@ import MessageIcon from "@mui/icons-material/Message";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SchoolIcon from "@mui/icons-material/School";
+import WarningIcon from '@mui/icons-material/Warning';
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../features/auth/authSlice";
+import { toast } from "react-toastify";
 
 const categories = [
   { name: "Books", icon: "📚" },
@@ -60,6 +62,10 @@ const Navbar = () => {
     dispatch(logout());
     navigate("/login");
   };
+
+  const warnMessage = () =>{
+   toast("Under Construction");
+  }
 
   // Theme Colors from Prototype
   const colors = {
@@ -141,6 +147,7 @@ const Navbar = () => {
               <>
                 <Button
                   variant="contained"
+                  onClick={warnMessage}
                   startIcon={<AddIcon />}
                   sx={{
                     display: { xs: "none", sm: "flex" },
