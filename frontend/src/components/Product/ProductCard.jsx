@@ -170,10 +170,10 @@ const ProductCard = ({ product }) => {
           </Stack>
         </Box>
 
-        {/* SELLER */}
+        {/* postedBy */}
         <Stack direction="row" alignItems="center" spacing={1}>
           <Avatar
-            src={product.seller?.avatar}
+            src={product.postedBy?.avatar}
             sx={{
               width: 22, height: 22,
               fontSize: "0.65rem",
@@ -182,7 +182,7 @@ const ProductCard = ({ product }) => {
               color: "primary.main",
             }}
           >
-            {product.seller?.fullName?.charAt(0)}
+            {product.postedBy?.fullName?.charAt(0)}
           </Avatar>
           <Box flex={1} minWidth={0}>
             <Stack direction="row" alignItems="center" spacing={0.4}>
@@ -193,14 +193,14 @@ const ProductCard = ({ product }) => {
                 noWrap
                 color="text.primary"
               >
-                {product.seller?.fullName || "Student"}
+                {product.postedBy?.fullName || "Student"}
               </Typography>
               <CheckCircleIcon sx={{ fontSize: 10, color: "success.main" }} />
             </Stack>
             <Stack direction="row" alignItems="center" spacing={0.3}>
               <LocationOnIcon sx={{ fontSize: 10, color: "text.disabled" }} />
               <Typography variant="caption" color="text.secondary" fontSize="0.68rem" noWrap>
-                {product.location || product.seller?.university || "Campus"}
+                {product.location || product.postedBy?.university || "Campus"}
               </Typography>
             </Stack>
           </Box>

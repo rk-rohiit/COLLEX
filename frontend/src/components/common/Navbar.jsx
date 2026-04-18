@@ -33,6 +33,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SchoolIcon from "@mui/icons-material/School";
 import WarningIcon from '@mui/icons-material/Warning';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -163,12 +164,12 @@ const Navbar = () => {
                 >
                   LIST AN ITEM
                 </Button>
-
+{/* 
                 <IconButton sx={{ color: colors.primary }}>
                   <Badge badgeContent={3} color="error">
                     <NotificationsIcon />
                   </Badge>
-                </IconButton>
+                </IconButton> */}
 
                 {/* USER PROFILE BOX */}
                 <Stack
@@ -204,9 +205,9 @@ const Navbar = () => {
                     <ListItemIcon><AccountCircleIcon fontSize="small" /></ListItemIcon>
                     Profile
                   </MenuItem>
-                  <MenuItem onClick={() => navigate("/messages")}>
-                    <ListItemIcon><MessageIcon fontSize="small" /></ListItemIcon>
-                    Messages
+                  <MenuItem onClick={() => navigate("/profile/cart")}>
+                    <ListItemIcon><ShoppingCartIcon fontSize="small" /></ListItemIcon>
+                    Cart
                   </MenuItem>
                   <Divider />
                   <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>

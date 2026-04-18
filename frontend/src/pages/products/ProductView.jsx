@@ -279,57 +279,71 @@ const ProductView = () => {
 
               <Divider />
 
-              {/* Seller card */}
+              {/* postedBy card */}
               <Paper
-                variant="outlined"
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  bgcolor: "background.default",
-                  borderColor: "divider",
-                }}
-              >
-                <Typography variant="caption" fontWeight={700} color="text.secondary" letterSpacing={0.8}>
-                  LISTED BY
-                </Typography>
+  variant="outlined"
+  sx={{
+    p: 2,
+    borderRadius: 3,
+    bgcolor: "background.default",
+    borderColor: "divider",
+  }}
+>
+  <Typography
+    variant="caption"
+    fontWeight={700}
+    color="text.secondary"
+    letterSpacing={0.8}
+  >
+    LISTED BY
+  </Typography>
 
-                <Stack direction="row" spacing={1.5} alignItems="center" mt={1}>
-                  <Avatar
-                    sx={{
-                      width: 42,
-                      height: 42,
-                      bgcolor: "primary.main",
-                      fontWeight: 700,
-                      fontSize: 16,
-                    }}
-                  >
-                    {product?.seller?.fullName?.charAt(0)}
-                  </Avatar>
+  <Stack direction="row" spacing={1.5} alignItems="center" mt={1}>
+    
+    {/* AVATAR */}
+    <Avatar
+      src={product?.postedBy?.avatar}
+      sx={{
+        width: 42,
+        height: 42,
+        bgcolor: "primary.main",
+        fontWeight: 700,
+        fontSize: 16,
+      }}
+    >
+      {product?.postedBy?.fullName?.charAt(0) || "U"}
+    </Avatar>
 
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                      <Typography fontWeight={700} fontSize={15} noWrap>
-                        {product?.seller?.name}
-                      </Typography>
-                      {product?.seller?.verified && (
-                        <CheckCircleIcon sx={{ fontSize: 15, color: "success.main" }} />
-                      )}
-                    </Stack>
+    <Box sx={{ flex: 1, minWidth: 0 }}>
+      
+      {/* NAME + VERIFIED */}
+      <Stack direction="row" alignItems="center" spacing={0.5}>
+        <Typography fontWeight={700} fontSize={15} noWrap>
+          {product?.postedBy?.fullName || "Student"}
+        </Typography>
 
-                    <Stack direction="row" alignItems="center" spacing={0.3}>
-                      <LocationOnIcon sx={{ fontSize: 13, color: "text.disabled" }} />
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        noWrap
-                        sx={{ maxWidth: { xs: 180, sm: "none" } }}
-                      >
-                        {product?.seller?.university}
-                      </Typography>
-                    </Stack>
-                  </Box>
-                </Stack>
-              </Paper>
+        {/* ✅ Only show if exists */}
+        {product?.postedBy?.verified && (
+          <CheckCircleIcon sx={{ fontSize: 15, color: "success.main" }} />
+        )}
+      </Stack>
+
+      {/* LOCATION / CAMPUS */}
+      <Stack direction="row" alignItems="center" spacing={0.3}>
+        <LocationOnIcon sx={{ fontSize: 13, color: "text.disabled" }} />
+
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          noWrap
+          sx={{ maxWidth: { xs: 180, sm: "none" } }}
+        >
+          {product?.location || product?.postedBy?.campusId || "Campus"}
+        </Typography>
+      </Stack>
+    </Box>
+  </Stack>
+</Paper>
 
               {/* Description */}
               <Box>
@@ -366,7 +380,7 @@ const ProductView = () => {
                     "&:hover": { boxShadow: "none" },
                   }}
                 >
-                  Chat with seller
+                  Chat with postedBy
                 </Button>
 
                 <Button

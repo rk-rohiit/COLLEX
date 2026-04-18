@@ -70,7 +70,7 @@ const AppRoutes = () => {
       />
 
       <Route
-        path="/cart"
+        path="/profile/cart"
         element={
           <ProtectedRoute>
             <Cart />

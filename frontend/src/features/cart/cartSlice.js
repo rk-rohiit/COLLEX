@@ -32,24 +32,25 @@ const cartSlice = createSlice({
        ✅ ADD TO CART
     ========================= */
     addToCart: (state, action) => {
-      const item = {
-        _id: action.payload._id,
-        title: action.payload.title,
-        price: Number(action.payload.price) || 0,
-        image: action.payload.images?.[0] || "",
-      };
+  const item = {
+    _id: action.payload._id,
+    title: action.payload.title,
+    price: Number(action.payload.price) || 0,
+    images: action.payload.images || [],
+    postedBy: action.payload.postedBy, // ✅ FIX
+    location: action.payload.location,
+  };
 
-      const exist = state.items.find((i) => i._id === item._id);
+  const exist = state.items.find((i) => i._id === item._id);
 
-      if (exist) {
-        exist.qty += 1;
-      } else {
-        state.items.push({ ...item, qty: 1 });
-      }
+  if (exist) {
+    exist.qty += 1;
+  } else {
+    state.items.push({ ...item, qty: 1 });
+  }
 
-      saveCart(state.items);
-    },
-
+  saveCart(state.items);
+},
     /* =========================
        ❌ REMOVE ITEM
     ========================= */
