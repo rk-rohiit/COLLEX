@@ -17,31 +17,108 @@ import {
 /* =========================
    Create Listing
 ========================= */
+// export const createListing = async (req, res, next) => {
+//   try {
+//     validateCreateListing(req.body);
+
+//     const listing = await createListingService(
+//       req.body,
+//       req.user
+//     );
+
+//     res.status(201).json({
+//       success: true,
+//       message: "Listing created successfully",
+//       data: listing,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 export const createListing = async (req, res, next) => {
   try {
-    validateCreateListing(req.body);
+    let images = [];
+
+    // ✅ Handle uploaded files
+    if (req.files && req.files.length > 0) {
+      for (let file of req.files) {
+        images.push({
+          data: file.buffer.toString("base64"),
+          contentType: file.mimetype,
+        });
+      }
+    }
+
+    // ❗ Optional: handle URL images
+    if (req.body.images) {
+      const urls = [].concat(req.body.images);
+
+      urls.forEach((url) => {
+        images.push({
+          data: url, // store URL as string
+          contentType: "url",
+        });
+      });
+    }
+
+    if (images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one image required",
+      });
+    }
 
     const listing = await createListingService(
-      req.body,
+      {
+        ...req.body,
+        images,
+      },
       req.user
     );
 
     res.status(201).json({
       success: true,
-      message: "Listing created successfully",
       data: listing,
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
   }
 };
-
 /* =========================
    Get All Listings
 ========================= */
+// export const getAllListings = async (req, res, next) => {
+//   try {
+//     const listings = await getAllListingsService();
+
+//     res.status(200).json({
+//       success: true,
+//       count: listings.length,
+//       data: listings,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 export const getAllListings = async (req, res, next) => {
   try {
-    const listings = await getAllListingsService();
+    const { search, category, type } = req.query;
+
+    let filter = { status: "available" };
+
+    if (search) {
+      filter.$text = { $search: search };
+    }
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (type) {
+      filter.type = type;
+    }
+
+    const listings = await getAllListingsService(filter);
 
     res.status(200).json({
       success: true,
@@ -52,7 +129,6 @@ export const getAllListings = async (req, res, next) => {
     next(error);
   }
 };
-
 /* =========================
    Get Single Listing
 ========================= */

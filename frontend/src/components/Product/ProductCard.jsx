@@ -35,6 +35,27 @@ const timeAgo = (date) => {
   return `${Math.floor(seconds / 86400)}d ago`;
 };
 
+const getImageSrc = (img) => {
+  if (!img) return "https://placehold.co/600x400?text=No+Image";
+
+  // ✅ Old data (string URL)
+  if (typeof img === "string") {
+    return img;
+  }
+
+  // ✅ URL stored in object
+  if (img.contentType === "url") {
+    return img.data;
+  }
+
+  // ✅ Uploaded image (base64)
+  if (img.data && img.contentType) {
+    return `data:${img.contentType};base64,${img.data}`;
+  }
+
+  return "https://placehold.co/600x400?text=No+Image";
+};
+
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
@@ -61,12 +82,21 @@ const ProductCard = ({ product }) => {
     >
       {/* IMAGE */}
       <Box sx={{ position: "relative", height: 186, bgcolor: "grey.100" }}>
-        <CardMedia
+        {/* <CardMedia
           component="img"
           image={product.images?.[0] || "https://placehold.co/600x400?text=No+Image"}
           alt={product.title}
           sx={{ height: "100%", objectFit: "cover" }}
-        />
+        /> */}
+        <CardMedia
+  component="img"
+  image={getImageSrc(product.images?.[0])}
+  alt={product.title}
+  sx={{ height: "100%", objectFit: "cover" }}
+  onError={(e) => {
+    e.target.src = "https://placehold.co/600x400?text=No+Image";
+  }}
+/>
 
         {/* WISHLIST */}
         <IconButton

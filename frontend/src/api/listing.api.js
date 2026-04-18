@@ -10,3 +10,9 @@ export const fetchListingByIdAPI = async (id) => {
   const res = await api.get(`/listings/${id}`);
   return res.data.data;
 };
+
+// ✅ CREATE LISTING
+export const createListingAPI = async (data) => {
+  const res = await api.post("/listings", data);
+  return res.data.data;
+};

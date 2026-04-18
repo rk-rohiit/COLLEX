@@ -63,8 +63,9 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const warnMessage = () =>{
-   toast("Under Construction");
+  const handleCreateList = () =>{
+    navigate("/create-listing")
+  //  toast("Under Construction");
   }
 
   // Theme Colors from Prototype
@@ -147,7 +148,7 @@ const Navbar = () => {
               <>
                 <Button
                   variant="contained"
-                  onClick={warnMessage}
+                  onClick={handleCreateList}
                   startIcon={<AddIcon />}
                   sx={{
                     display: { xs: "none", sm: "flex" },

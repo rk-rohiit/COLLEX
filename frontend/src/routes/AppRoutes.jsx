@@ -25,6 +25,7 @@ import HowItWorks from "../pages/home/HowItWorks";
 import FeatureSection from "../pages/home/FeatureSection";
 import Testimonials from "../pages/home/Testimonials";
 import NotFound from "../components/ui/NotFound";
+import CreateListingPage from "../pages/listing/CreateListingPage";
 
 // Landing page
 const LandingPage = () => (
@@ -112,6 +113,12 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/create-listing" element={
+        <ProtectedRoute>
+          <CreateListingPage />
+        </ProtectedRoute>
+      } />
 
     </Route>
 

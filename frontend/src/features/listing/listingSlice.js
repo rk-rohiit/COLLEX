@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   fetchListingsAPI,
   fetchListingByIdAPI,
+  createListingAPI,
 } from "@/api/listing.api";
 
 /* =========================
@@ -15,7 +16,9 @@ export const fetchListings = createAsyncThunk(
     try {
       return await fetchListingsAPI();
     } catch (err) {
-      return rejectWithValue(err.response?.data || "Error fetching listings");
+      return rejectWithValue(
+        err.response?.data?.message || "Error fetching listings"
+      );
     }
   }
 );
@@ -27,7 +30,23 @@ export const fetchListingById = createAsyncThunk(
     try {
       return await fetchListingByIdAPI(id);
     } catch (err) {
-      return rejectWithValue(err.response?.data || "Error fetching listing");
+      return rejectWithValue(
+        err.response?.data?.message || "Error fetching listing"
+      );
+    }
+  }
+);
+
+// ✅ Create listing
+export const createListing = createAsyncThunk(
+  "listing/createListing",
+  async (data, { rejectWithValue }) => {
+    try {
+      return await createListingAPI(data);
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Error creating listing"
+      );
     }
   }
 );
@@ -40,15 +59,29 @@ const listingSlice = createSlice({
   name: "listing",
   initialState: {
     listings: [],
-    selectedListing: null, // 🔥 NEW
+    selectedListing: null,
+
     loading: false,
-    singleLoading: false, // 🔥 NEW
+    singleLoading: false,
+    createLoading: false,
+
+    createSuccess: false,
     error: null,
   },
 
   reducers: {
     clearSelectedListing: (state) => {
       state.selectedListing = null;
+    },
+
+    clearCreateState: (state) => {
+      state.createSuccess = false;
+      state.createLoading = false;
+      state.error = null;
+    },
+
+    clearError: (state) => {
+      state.error = null;
     },
   },
 
@@ -64,7 +97,7 @@ const listingSlice = createSlice({
       })
       .addCase(fetchListings.fulfilled, (state, action) => {
         state.loading = false;
-        state.listings = action.payload;
+        state.listings = action.payload || [];
       })
       .addCase(fetchListings.rejected, (state, action) => {
         state.loading = false;
@@ -85,6 +118,38 @@ const listingSlice = createSlice({
       .addCase(fetchListingById.rejected, (state, action) => {
         state.singleLoading = false;
         state.error = action.payload;
+      })
+
+      /* =========================
+         🔥 CREATE LISTING
+      ========================= */
+      .addCase(createListing.pending, (state) => {
+        state.createLoading = true;
+        state.createSuccess = false;
+        state.error = null;
+      })
+      .addCase(createListing.fulfilled, (state, action) => {
+        state.createLoading = false;
+        state.createSuccess = true;
+        state.error = null;
+
+        const newListing = action.payload?.data;
+
+        // ✅ Prevent duplicates
+        if (newListing) {
+          const exists = state.listings.find(
+            (item) => item._id === newListing._id
+          );
+
+          if (!exists) {
+            state.listings.unshift(newListing);
+          }
+        }
+      })
+      .addCase(createListing.rejected, (state, action) => {
+        state.createLoading = false;
+        state.createSuccess = false;
+        state.error = action.payload;
       });
   },
 });
@@ -93,6 +158,10 @@ const listingSlice = createSlice({
    🔥 EXPORTS
 ========================= */
 
-export const { clearSelectedListing } = listingSlice.actions;
+export const {
+  clearSelectedListing,
+  clearCreateState,
+  clearError,
+} = listingSlice.actions;
 
 export default listingSlice.reducer;

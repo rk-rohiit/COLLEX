@@ -15,14 +15,22 @@ const listingSchema = new mongoose.Schema(
       required: true,
     },
 
+    // images: {
+    //   type: [String],
+    //   required: true,
+    //   validate: {
+    //     validator: (val) => val.length <= 5,
+    //     message: "Maximum 5 images allowed",
+    //   },
+    // },
     images: {
-      type: [String],
-      required: true,
-      validate: {
-        validator: (val) => val.length <= 5,
-        message: "Maximum 5 images allowed",
-      },
+    type: [mongoose.Schema.Types.Mixed], // 🔥 KEY FIX
+    required: true,
+    validate: {
+      validator: (val) => val.length <= 5,
+      message: "Maximum 5 images allowed",
     },
+  },
 
     category: {
       type: String,
