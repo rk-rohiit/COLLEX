@@ -26,6 +26,7 @@ import FeatureSection from "../pages/home/FeatureSection";
 import Testimonials from "../pages/home/Testimonials";
 import NotFound from "../components/ui/NotFound";
 import CreateListingPage from "../pages/listing/CreateListingPage";
+import AdminRoute from "./AdminRoute";
 
 // Landing page
 const LandingPage = () => (
@@ -43,105 +44,105 @@ const LandingPage = () => (
 
 const AppRoutes = () => {
   return (
-  <BrowserRouter>
-  <Routes>
+    <BrowserRouter>
+      <Routes>
 
-    {/* 🔥 PUBLIC + USER PAGES (WITH NAVBAR) */}
-    <Route element={<MainLayout />}>
+        {/* 🔥 PUBLIC + USER PAGES (WITH NAVBAR) */}
+        <Route element={<MainLayout />}>
 
-      <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<LandingPage />} />
 
-      <Route
-        path="/products"
-        element={
-          <ProtectedRoute>
-            <ProductList />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <ProductList />
+              </ProtectedRoute>
+            }
+          />
 
-      <Route
-        path="product/:id"
-        element={
-          <ProtectedRoute>
-            <ProductView />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="product/:id"
+            element={
+              <ProtectedRoute>
+                <ProductView />
+              </ProtectedRoute>
+            }
+          />
 
-      <Route
-        path="/profile/cart"
-        element={
-          <ProtectedRoute>
-            <Cart />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/profile/cart"
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            }
+          />
 
-      <Route
-        path="/checkout"
-        element={
-          <ProtectedRoute>
-            <CheckoutPage />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
 
-      <Route
-        path="/order-success"
-        element={
-          <ProtectedRoute>
-            <OrderSuccess />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/order-success"
+            element={
+              <ProtectedRoute>
+                <OrderSuccess />
+              </ProtectedRoute>
+            }
+          />
 
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
 
-      <Route
-        path="/order/:id"
-        element={
-          <ProtectedRoute>
-            <OrderDetail />
-          </ProtectedRoute>
-        }
-      />
+          <Route
+            path="/order/:id"
+            element={
+              <ProtectedRoute>
+                <OrderDetail />
+              </ProtectedRoute>
+            }
+          />
 
-      <Route path="/create-listing" element={
-        <ProtectedRoute>
-          <CreateListingPage />
-        </ProtectedRoute>
-      } />
+          <Route path="/create-listing" element={
+            <ProtectedRoute>
+              <CreateListingPage />
+            </ProtectedRoute>
+          } />
 
-    </Route>
+        </Route>
 
-    {/* 🔥 ADMIN PANEL (NO NAVBAR) */}
-    <Route
-  path="/admin/dashboard"
-  element={
-    <ProtectedRoute>
-      <AdminLayout />
-    </ProtectedRoute>
-  }
->
-  <Route index element={<Dashboard />} />
-</Route>
+        {/* 🔥 ADMIN PANEL (NO NAVBAR) */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<Dashboard />} />
+        </Route>
 
-    {/* 🔥 AUTH (NO NAVBAR) */}
-    <Route path="/login" element={<Login />} />
-    <Route path="/register" element={<Register />} />
-     {/* Not Found page */}
-  <Route path="*" element={<NotFound />} />
+        {/* 🔥 AUTH (NO NAVBAR) */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        {/* Not Found page */}
+        <Route path="*" element={<NotFound />} />
 
-  </Routes>
-</BrowserRouter>
+      </Routes>
+    </BrowserRouter>
   );
 };
 
