@@ -90,7 +90,8 @@ const ProductCard = ({ product }) => {
         /> */}
         <CardMedia
   component="img"
-  image={getImageSrc(product.images?.[0])}
+  // image={getImageSrc(product.images?.[0])}
+  image={product.images?.[0] || "https://placehold.co/600x400?text=No+Image"}
   alt={product.title}
   sx={{ height: "100%", objectFit: "cover" }}
   onError={(e) => {
@@ -181,7 +182,7 @@ const ProductCard = ({ product }) => {
               color: "primary.main",
             }}
           >
-            {product.seller?.name?.charAt(0)}
+            {product.seller?.fullName?.charAt(0)}
           </Avatar>
           <Box flex={1} minWidth={0}>
             <Stack direction="row" alignItems="center" spacing={0.4}>
@@ -192,7 +193,7 @@ const ProductCard = ({ product }) => {
                 noWrap
                 color="text.primary"
               >
-                {product.seller?.name || "Student"}
+                {product.seller?.fullName || "Student"}
               </Typography>
               <CheckCircleIcon sx={{ fontSize: 10, color: "success.main" }} />
             </Stack>

@@ -24,13 +24,13 @@ const listingSchema = new mongoose.Schema(
     //   },
     // },
     images: {
-    type: [mongoose.Schema.Types.Mixed], // 🔥 KEY FIX
-    required: true,
-    validate: {
-      validator: (val) => val.length <= 5,
-      message: "Maximum 5 images allowed",
-    },
+  type: [String], // ✅ ONLY URLs
+  required: true,
+  validate: {
+    validator: (val) => val.length <= 5,
+    message: "Maximum 5 images allowed",
   },
+},
 
     category: {
       type: String,

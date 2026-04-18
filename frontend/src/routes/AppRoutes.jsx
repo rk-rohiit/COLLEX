@@ -124,7 +124,7 @@ const AppRoutes = () => {
 
     {/* 🔥 ADMIN PANEL (NO NAVBAR) */}
     <Route
-  path="/dashboard"
+  path="/admin/dashboard"
   element={
     <ProtectedRoute>
       <AdminLayout />

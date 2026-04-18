@@ -13,6 +13,7 @@ import {
   validateCreateListing,
   validateUpdateListing,
 } from "./listing.validation.js";
+import cloudinary from "../../utils/cloudinary.js";
 
 /* =========================
    Create Listing
@@ -37,31 +38,32 @@ import {
 // };
 export const createListing = async (req, res, next) => {
   try {
-    let images = [];
+    let imageUrls = [];
 
-    // ✅ Handle uploaded files
+    // ✅ Upload files to Cloudinary
     if (req.files && req.files.length > 0) {
-      for (let file of req.files) {
-        images.push({
-          data: file.buffer.toString("base64"),
-          contentType: file.mimetype,
-        });
-      }
+      const uploads = await Promise.all(
+        req.files.map((file) => {
+          return new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              { folder: "collex" },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            );
+            stream.end(file.buffer);
+          });
+        })
+      );
+
+      imageUrls = uploads.map((img) => img.secure_url);
     }
 
-    // ❗ Optional: handle URL images
-    if (req.body.images) {
-      const urls = [].concat(req.body.images);
+    // ❌ REMOVE THIS BLOCK (VERY IMPORTANT)
+    // if (req.body.images) { ... } ❌
 
-      urls.forEach((url) => {
-        images.push({
-          data: url, // store URL as string
-          contentType: "url",
-        });
-      });
-    }
-
-    if (images.length === 0) {
+    if (imageUrls.length === 0) {
       return res.status(400).json({
         success: false,
         message: "At least one image required",
@@ -71,7 +73,7 @@ export const createListing = async (req, res, next) => {
     const listing = await createListingService(
       {
         ...req.body,
-        images,
+        images: imageUrls, // ✅ ONLY URLS
       },
       req.user
     );

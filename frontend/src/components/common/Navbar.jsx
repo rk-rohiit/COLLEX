@@ -63,9 +63,9 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const handleCreateList = () =>{
+  const handleCreateList = () => {
     navigate("/create-listing")
-  //  toast("Under Construction");
+    //  toast("Under Construction");
   }
 
   // Theme Colors from Prototype
@@ -76,46 +76,48 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar 
-      position="fixed" 
-      sx={{ 
-        bgcolor: "white", 
-        color: colors.primary, 
+    <AppBar
+      position="fixed"
+      sx={{
+        bgcolor: "white",
+        color: colors.primary,
         boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-        borderBottom: `2px solid ${colors.primary}10` 
+        borderBottom: `2px solid ${colors.primary}10`
       }}
     >
       <Container maxWidth="xl">
         <Toolbar sx={{ justifyContent: "space-between", py: 0.5 }}>
-          
+
           <Box
-        sx={{
-          px: 2.5,
-          py: 2,
-          display: "flex",
-          alignItems: "center",
-          gap: 1.25,
-          borderColor: "divider",
-          mb: 1,
-        }}
-      >
-        <Box
-          sx={{
-            width: 32,
-            height: 32,
-            borderRadius: "9px",
-            bgcolor: "primary.main",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <SchoolIcon sx={{ fontSize: 17, color: "white" }} />
-        </Box>
-        <Typography fontWeight={800} fontSize="0.95rem" color="text.primary">
-          COLLEX
-        </Typography>
-      </Box>
+            onClick={() => navigate("/")}
+            sx={{
+              px: 2.5,
+              py: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 1.25,
+              borderColor: "divider",
+              mb: 1,
+              cursor: "pointer"
+            }}
+          >
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: "9px",
+                bgcolor: "primary.main",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <SchoolIcon sx={{ fontSize: 17, color: "white" }} />
+            </Box>
+            <Typography fontWeight={800} fontSize="0.95rem" color="text.primary">
+              COLLEX
+            </Typography>
+          </Box>
 
           {/* CENTER: SEARCH BAR (DESKTOP) */}
           <Box sx={{ flex: 1, display: { xs: "none", md: "flex" }, justifyContent: "center" }}>
@@ -169,10 +171,10 @@ const Navbar = () => {
                 </IconButton>
 
                 {/* USER PROFILE BOX */}
-                <Stack 
-                  direction="row" 
-                  alignItems="center" 
-                  spacing={1} 
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
                   onClick={(e) => setAnchorEl(e.currentTarget)}
                   sx={{ cursor: "pointer", ml: 1 }}
                 >
@@ -218,8 +220,8 @@ const Navbar = () => {
                 <Button sx={{ color: colors.primary, fontWeight: "bold" }} onClick={() => navigate("/login")}>
                   LOGIN
                 </Button>
-                <Button 
-                  variant="outlined" 
+                <Button
+                  variant="outlined"
                   sx={{ borderColor: colors.accent, color: colors.accent, fontWeight: "bold", "&:hover": { borderColor: colors.accent } }}
                   onClick={() => navigate("/register")}
                 >

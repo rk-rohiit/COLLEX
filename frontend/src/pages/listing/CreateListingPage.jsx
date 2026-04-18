@@ -478,6 +478,7 @@ const CreateListingPage = () => {
   const navigate = useNavigate();
 
   const { createLoading, createSuccess, error } = useSelector((state) => state.listing);
+  const [files, setFiles] = useState([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -512,30 +513,80 @@ const CreateListingPage = () => {
     setImageInput("");
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    if (form.images.length + files.length > 5) {
-      toast.error("Max 5 images allowed");
-      return;
-    }
-    const localImages = files.map((f) => URL.createObjectURL(f));
-    setForm({ ...form, images: [...form.images, ...localImages] });
-  };
+  // const handleImageUpload = (e) => {
+  //   const files = Array.from(e.target.files);
+  //   if (form.images.length + files.length > 5) {
+  //     toast.error("Max 5 images allowed");
+  //     return;
+  //   }
+  //   const localImages = files.map((f) => URL.createObjectURL(f));
+  //   setForm({ ...form, images: [...form.images, ...localImages] });
+  // };
+const handleImageUpload = (e) => {
+  const selectedFiles = Array.from(e.target.files);
 
-  const removeImage = (index) =>
-    setForm({ ...form, images: form.images.filter((_, i) => i !== index) });
+  if (form.images.length + selectedFiles.length > 5) {
+    toast.error("Max 5 images allowed");
+    return;
+  }
+
+  // ✅ Store real files
+  setFiles((prev) => [...prev, ...selectedFiles]);
+
+  // ✅ Only for preview
+  const previews = selectedFiles.map((file) =>
+    URL.createObjectURL(file)
+  );
+
+  setForm({
+    ...form,
+    images: [...form.images, ...previews],
+  });
+};
+
+const removeImage = (index) => {
+  setFiles((prev) => prev.filter((_, i) => i !== index));
+
+  setForm({
+    ...form,
+    images: form.images.filter((_, i) => i !== index),
+  });
+};
+
+  // const handleSubmit = () => {
+  //   if (!form.title || !form.description || !form.price || !form.category || !form.location || form.images.length === 0) {
+  //     toast.error("Please fill in all required fields and add at least one image.");
+  //     return;
+  //   }
+  //   dispatch(createListing({
+  //     ...form,
+  //     price: Number(form.price),
+  //     rentDeposit: form.rentDeposit ? Number(form.rentDeposit) : undefined,
+  //   }));
+  // };
 
   const handleSubmit = () => {
-    if (!form.title || !form.description || !form.price || !form.category || !form.location || form.images.length === 0) {
-      toast.error("Please fill in all required fields and add at least one image.");
-      return;
-    }
-    dispatch(createListing({
-      ...form,
-      price: Number(form.price),
-      rentDeposit: form.rentDeposit ? Number(form.rentDeposit) : undefined,
-    }));
-  };
+  if (!form.title || !form.description || !form.price || !form.category || !form.location || files.length === 0) {
+    toast.error("Please fill all fields and add at least one image");
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append("title", form.title);
+  formData.append("description", form.description);
+  formData.append("price", form.price);
+  formData.append("category", form.category);
+  formData.append("type", form.type);
+  formData.append("condition", form.condition);
+  formData.append("location", form.location);
+
+  files.forEach((file) => {
+    formData.append("images", file);
+  });
+
+  dispatch(createListing(formData)); // ✅ IMPORTANT
+};
 
   useEffect(() => {
     if (createSuccess) {

@@ -228,7 +228,7 @@ const ProfilePage = () => {
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
-                onClick={() => navigate("/add-product")}
+                onClick={() => navigate("/create-listing")}
                 size="small"
                 sx={{
                   borderRadius: 5,

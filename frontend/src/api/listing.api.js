@@ -12,7 +12,17 @@ export const fetchListingByIdAPI = async (id) => {
 };
 
 // ✅ CREATE LISTING
-export const createListingAPI = async (data) => {
-  const res = await api.post("/listings", data);
+// export const createListingAPI = async (data) => {
+//   const res = await api.post("/listings", data);
+//   return res.data.data;
+// };
+
+export const createListingAPI = async (formData) => {
+  const res = await api.post("/listings", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   return res.data.data;
 };
