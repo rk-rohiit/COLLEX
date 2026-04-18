@@ -164,12 +164,12 @@ const Navbar = () => {
                 >
                   LIST AN ITEM
                 </Button>
-{/* 
-                <IconButton sx={{ color: colors.primary }}>
+
+                <IconButton sx={{ color: colors.primary }} onClick={() =>navigate("/profile/cart")}>
                   <Badge badgeContent={3} color="error">
-                    <NotificationsIcon />
+                    <ShoppingCartIcon />
                   </Badge>
-                </IconButton> */}
+                </IconButton>
 
                 {/* USER PROFILE BOX */}
                 <Stack
@@ -205,10 +205,10 @@ const Navbar = () => {
                     <ListItemIcon><AccountCircleIcon fontSize="small" /></ListItemIcon>
                     Profile
                   </MenuItem>
-                  <MenuItem onClick={() => navigate("/profile/cart")}>
+                  {/* <MenuItem onClick={() => navigate("/profile/cart")}>
                     <ListItemIcon><ShoppingCartIcon fontSize="small" /></ListItemIcon>
                     Cart
-                  </MenuItem>
+                  </MenuItem> */}
                   <Divider />
                   <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
                     <ListItemIcon><LogoutIcon fontSize="small" color="error" /></ListItemIcon>

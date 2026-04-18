@@ -46,7 +46,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { loading, error, token } = useSelector((state) => state.auth);
+  const { loading, error, accessToken } = useSelector((state) => state.auth);
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [successMsg, setSuccessMsg] = useState("");
@@ -75,12 +75,12 @@ const handleLogin = async () => {
       })
     ).unwrap();
 
-    if (data?.requiresOtp) {
-      setLoginEmail(form.email);
-      setOtpOpen(true);
-      setForm((prev) => ({ ...prev, password: "" }));
-      return;
-    }
+    // if (data?.requiresOtp) {
+    //   setLoginEmail(form.email);
+    //   setOtpOpen(true);
+    //   setForm((prev) => ({ ...prev, password: "" }));
+    //   return;
+    // }
 
     setSuccessMsg("Welcome back! Redirecting...");
     setTimeout(() => navigate("/"), 1200);
@@ -96,8 +96,8 @@ const handleLogin = async () => {
   };
 
   useEffect(() => {
-    if (token) navigate("/");
-  }, [token, navigate]);
+    if (accessToken) navigate("/");
+  }, [accessToken, navigate]);
 
   return (
     <>

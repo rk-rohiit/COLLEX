@@ -90,3 +90,30 @@ export const resendOtp = async (req, res, next) => {
     next(err);
   }
 };
+
+export const refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken: token } = req.body;
+
+    if (!token) {
+      throw new Error("Refresh token required");
+    }
+
+    const decoded = jwt.verify(token, config.refreshSecret);
+
+    const user = await User.findById(decoded.id);
+
+    if (!user || user.refreshToken !== token) {
+      throw new Error("Invalid refresh token");
+    }
+
+    const newAccessToken = generateAccessToken(user);
+
+    res.status(200).json({
+      success: true,
+      accessToken: newAccessToken,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

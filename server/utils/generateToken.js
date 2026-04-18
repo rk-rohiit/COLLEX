@@ -1,12 +1,23 @@
-// src/utils/generateToken.js
-
 import jwt from "jsonwebtoken";
 import config from "../config/index.js";
 
-export const generateToken = (userId) => {
+export const generateAccessToken = (user) => {
   return jwt.sign(
-    { id: userId },
+    {
+      id: user._id,
+      role: user.role,
+    },
     config.jwtSecret,
-    { expiresIn: "7d" } // change if needed
+    { expiresIn: "15m" } // 🔥 short life
+  );
+};
+
+export const generateRefreshToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+    },
+    config.refreshSecret,
+    { expiresIn: "7d" } // 🔥 long life
   );
 };

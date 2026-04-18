@@ -1,8 +1,9 @@
 import User from "../../models/user.model.js";
-import { generateToken } from "../../utils/generateToken.js";
+import { generateAccessToken, generateRefreshToken, } from "../../utils/generateToken.js";
 import { generateOtp } from "../../utils/generateOtp.js";
-import { sendEmail,sendVerificationSuccessEmail } from "../../utils/sendEmail.js";
+import { sendEmail, sendVerificationSuccessEmail } from "../../utils/sendEmail.js";
 import Otp from "../../models/otp.model.js";
+
 
 /* =========================
    SEND OTP (STEP 1)
@@ -252,11 +253,16 @@ export const verifyOtpAndRegisterService = async (data) => {
     console.log("Welcome email failed:", err.message);
   });
 
-  const token = generateToken(user._id);
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+
+  user.refreshToken = refreshToken;
+  await user.save();
 
   return {
     success: true,
-    token,
+    accessToken,
+    refreshToken,
     user: {
       id: user._id,
       email: user.email,
@@ -269,6 +275,40 @@ export const verifyOtpAndRegisterService = async (data) => {
 /* =========================
    LOGIN USER
 ========================= */
+// export const loginUserService = async (data) => {
+//   // ✅ SAFETY CHECK
+//   if (!data) {
+//     throw new Error("Request body is missing");
+//   }
+
+//   const { email, password } = data;
+
+//   if (!email || !password) {
+//     throw new Error("Email and password are required");
+//   }
+
+//   const user = await User.findOne({ email }).select("+password");
+
+//   if (!user) throw new Error("Invalid credentials");
+
+//   const isMatch = await user.comparePassword(password);
+
+//   if (!isMatch) throw new Error("Invalid credentials");
+
+//   const token = generateToken(user._id);
+
+//   return {
+//     success: true,
+//     token,
+//     user: {
+//       id: user._id,
+//       email: user.email,
+//       fullName: user.fullName,
+//       role: user.role,
+//       campusId: user.campusId,
+//     },
+//   };
+// };
 export const loginUserService = async (data) => {
   // ✅ SAFETY CHECK
   if (!data) {
@@ -289,11 +329,19 @@ export const loginUserService = async (data) => {
 
   if (!isMatch) throw new Error("Invalid credentials");
 
-  const token = generateToken(user._id);
+  // 🔥 GENERATE TOKENS
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
 
+  // 🔥 SAVE REFRESH TOKEN IN DB
+  user.refreshToken = refreshToken;
+  await user.save();
+
+  // 🔥 RESPONSE
   return {
     success: true,
-    token,
+    accessToken,
+    refreshToken,
     user: {
       id: user._id,
       email: user.email,
@@ -303,7 +351,6 @@ export const loginUserService = async (data) => {
     },
   };
 };
-
 /* =========================
    RESEND OTP (OPTIONAL)
 ========================= */

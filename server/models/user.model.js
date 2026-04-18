@@ -81,6 +81,11 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true, // ✅ always true now (OTP already verified before creation)
     },
+
+    refreshToken: {
+  type: String,
+  default: null,
+},
   },
   { timestamps: true }
 );
