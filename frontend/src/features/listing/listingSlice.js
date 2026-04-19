@@ -12,9 +12,9 @@ import {
 // ✅ Get all listings
 export const fetchListings = createAsyncThunk(
   "listing/fetchListings",
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      return await fetchListingsAPI();
+      return await fetchListingsAPI(params);
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Error fetching listings"
@@ -61,6 +61,9 @@ const listingSlice = createSlice({
     listings: [],
     selectedListing: null,
 
+    totalPages: 1,
+    totalItems: 0,
+
     loading: false,
     singleLoading: false,
     createLoading: false,
@@ -97,7 +100,12 @@ const listingSlice = createSlice({
       })
       .addCase(fetchListings.fulfilled, (state, action) => {
         state.loading = false;
-        state.listings = action.payload || [];
+        // state.listings = action.payload || [];
+        // state.totalPages = action.payload;
+        // state.totalItems = action.payload
+        state.listings = action.payload.data;       // ✅ actual listings
+        state.totalPages = action.payload.pages;    // ✅ total pages
+        state.totalItems = action.payload.total;
       })
       .addCase(fetchListings.rejected, (state, action) => {
         state.loading = false;

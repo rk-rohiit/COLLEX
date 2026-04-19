@@ -15,6 +15,8 @@ import {
 } from "./listing.validation.js";
 import cloudinary from "../../utils/cloudinary.js";
 
+import Listing from '../../models/listing.model.js'
+
 /* =========================
    Create Listing
 ========================= */
@@ -102,29 +104,56 @@ export const createListing = async (req, res, next) => {
 //     next(error);
 //   }
 // };
+// export const getAllListings = async (req, res, next) => {
+//   try {
+//     const { search, category, type } = req.query;
+
+//     let filter = { status: "available" };
+
+//     if (search) {
+//       filter.$text = { $search: search };
+//     }
+
+//     if (category) {
+//       filter.category = category;
+//     }
+
+//     if (type) {
+//       filter.type = type;
+//     }
+
+//     const listings = await getAllListingsService(filter);
+
+//     res.status(200).json({
+//       success: true,
+//       count: listings.length,
+//       data: listings,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
 export const getAllListings = async (req, res, next) => {
   try {
-    const { search, category, type } = req.query;
+    const { search, category, type, page = 1, limit = 10 } = req.query;
 
     let filter = { status: "available" };
 
-    if (search) {
-      filter.$text = { $search: search };
-    }
+    if (search) filter.$text = { $search: search };
+    if (category) filter.category = category;
+    if (type) filter.type = type;
 
-    if (category) {
-      filter.category = category;
-    }
+    const listings = await getAllListingsService(filter, page, limit);
 
-    if (type) {
-      filter.type = type;
-    }
-
-    const listings = await getAllListingsService(filter);
+    const total = await Listing.countDocuments(filter); // ✅ IMPORTANT
 
     res.status(200).json({
       success: true,
-      count: listings.length,
+      total, // ✅ needed
+      page: Number(page),
+      pages: Math.ceil(total / limit), // ✅ needed
       data: listings,
     });
   } catch (error) {

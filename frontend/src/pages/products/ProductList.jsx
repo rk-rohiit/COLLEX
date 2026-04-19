@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchListings } from "@/features/listing/listingSlice";
+import { useSearchParams } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -32,13 +33,13 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AppsIcon from "@mui/icons-material/Apps";
 
 const categories = [
-  { label: "All Items",    value: "all",        icon: <AppsIcon sx={{ fontSize: 17 }} /> },
-  { label: "Textbooks",    value: "books",       icon: <MenuBookIcon sx={{ fontSize: 17 }} /> },
-  { label: "Electronics",  value: "electronics", icon: <LaptopMacIcon sx={{ fontSize: 17 }} /> },
-  { label: "Clothing",     value: "clothing",    icon: <CheckroomIcon sx={{ fontSize: 17 }} /> },
-  { label: "Furniture",    value: "furniture",   icon: <ChairIcon sx={{ fontSize: 17 }} /> },
-  { label: "Sports",       value: "sports",      icon: <SportsSoccerIcon sx={{ fontSize: 17 }} /> },
-  { label: "Other",        value: "other",       icon: <MoreHorizIcon sx={{ fontSize: 17 }} /> },
+  { label: "All Items", value: "all", icon: <AppsIcon sx={{ fontSize: 17 }} /> },
+  { label: "Textbooks", value: "books", icon: <MenuBookIcon sx={{ fontSize: 17 }} /> },
+  { label: "Electronics", value: "electronics", icon: <LaptopMacIcon sx={{ fontSize: 17 }} /> },
+  { label: "Clothing", value: "clothing", icon: <CheckroomIcon sx={{ fontSize: 17 }} /> },
+  { label: "Furniture", value: "furniture", icon: <ChairIcon sx={{ fontSize: 17 }} /> },
+  { label: "Sports", value: "sports", icon: <SportsSoccerIcon sx={{ fontSize: 17 }} /> },
+  { label: "Other", value: "other", icon: <MoreHorizIcon sx={{ fontSize: 17 }} /> },
 ];
 
 const conditions = ["Like New", "Good", "Fair"];
@@ -68,24 +69,36 @@ const SideSection = ({ title, children }) => (
 
 const ProductList = () => {
   const dispatch = useDispatch();
-  const { listings, loading } = useSelector((state) => state.listing);
-
-  const [sortBy, setSortBy]       = useState("newest");
-  const [category, setCategory]   = useState("all");
+  // const { listings, loading } = useSelector((state) => state.listing);
+const { listings, loading, totalPages, totalItems } = useSelector(
+  (state) => state.listing
+);
+  const [sortBy, setSortBy] = useState("newest");
+  const [category, setCategory] = useState("all");
   const [conditions_, setConditions] = useState([]);
-  const [minPrice, setMinPrice]   = useState("");
-  const [maxPrice, setMaxPrice]   = useState("");
-  const [viewMode, setViewMode]   = useState("grid");
-  const [page, setPage]           = useState(1);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [viewMode, setViewMode] = useState("grid");
+  // const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  useEffect(() => { dispatch(fetchListings()); }, [dispatch]);
+const page = Number(searchParams.get("page")) || 1;
+
+  // useEffect(() => { dispatch(fetchListings()); }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchListings({ page, limit: 10 }));
+  // }, [dispatch, page]);
+  // const { totalPages } = useSelector((state) => state.listing);
+  useEffect(() => {
+  dispatch(fetchListings({ page, limit: 10 }));
+}, [dispatch, page]);
 
   const toggleCondition = (val) =>
     setConditions((prev) =>
       prev.includes(val) ? prev.filter((c) => c !== val) : [...prev, val]
     );
 
-  const totalItems = listings.length;
+  // const totalItems = listings.length;
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default", pt: { xs: 10, md: 12 }, pb: 8 }}>
@@ -335,8 +348,8 @@ const ProductList = () => {
               {loading
                 ? Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)
                 : listings.map((item) => (
-                    <ProductCard key={item._id} product={item} />
-                  ))}
+                  <ProductCard key={item._id} product={item} />
+                ))}
             </Box>
 
             {/* EMPTY STATE */}
@@ -364,9 +377,14 @@ const ProductList = () => {
             {!loading && listings.length > 0 && (
               <Box display="flex" justifyContent="center" mt={5}>
                 <Pagination
-                  count={12}
+                  count={totalPages}
                   page={page}
-                  onChange={(_, v) => setPage(v)}
+                  // onChange={(_, v) => setPage(v)}
+                onChange={(_, v) => {
+  const params = new URLSearchParams(searchParams);
+  params.set("page", v);
+  setSearchParams(params);
+}}
                   shape="rounded"
                   sx={{
                     "& .MuiPaginationItem-root": {
