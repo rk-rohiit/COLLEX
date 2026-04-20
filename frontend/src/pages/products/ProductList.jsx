@@ -70,28 +70,73 @@ const SideSection = ({ title, children }) => (
 const ProductList = () => {
   const dispatch = useDispatch();
   // const { listings, loading } = useSelector((state) => state.listing);
-const { listings, loading, totalPages, totalItems } = useSelector(
-  (state) => state.listing
-);
-  const [sortBy, setSortBy] = useState("newest");
-  const [category, setCategory] = useState("all");
-  const [conditions_, setConditions] = useState([]);
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
+  const { listings, loading, totalPages, totalItems } = useSelector(
+    (state) => state.listing
+  );
   const [viewMode, setViewMode] = useState("grid");
   // const [page, setPage] = useState(1);
+  const [minPriceInput, setMinPriceInput] = useState("");
+  const [maxPriceInput, setMaxPriceInput] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sortBy, setSortBy] = useState("newest"); // ✅ FIX
+  const [conditions_, setConditions] = useState([]); // ✅ FIX
 
-const page = Number(searchParams.get("page")) || 1;
-
-  // useEffect(() => { dispatch(fetchListings()); }, [dispatch]);
-  // useEffect(() => {
-  //   dispatch(fetchListings({ page, limit: 10 }));
-  // }, [dispatch, page]);
-  // const { totalPages } = useSelector((state) => state.listing);
+  const page = Number(searchParams.get("page")) || 1;
+  const category = searchParams.get("category") || "all";
+  const search = searchParams.get("search") || "";
+  const minPrice = searchParams.get("minPrice") || "";
+  const maxPrice = searchParams.get("maxPrice") || "";
   useEffect(() => {
-  dispatch(fetchListings({ page, limit: 10 }));
-}, [dispatch, page]);
+  setMinPriceInput(minPrice);
+  setMaxPriceInput(maxPrice);
+}, [minPrice, maxPrice]);
+
+  const [searchInput, setSearchInput] = useState("");
+
+  useEffect(() => {
+  setSearchInput(search);
+}, [search]);
+
+  const handleSearch = () => {
+  const params = new URLSearchParams(searchParams);
+
+  if (searchInput) {
+    params.set("search", searchInput);
+  } else {
+    params.delete("search"); // ✅ FIX
+  }
+
+  params.set("page", 1);
+  setSearchParams(params);
+};
+
+  // useEffect(() => {
+  //   // dispatch(fetchListings({ page, limit: 10 }));
+  //   dispatch(
+  //     fetchListings({
+  //       page,
+  //       limit: 10,
+  //       category: category !== "all" ? category : undefined,
+  //       search,
+  //       minPrice,
+  //       maxPrice,
+  //     })
+  //   );
+  // }, [dispatch, page, category, search, minPrice, maxPrice]);
+
+  useEffect(() => {
+  const params = {
+    page,
+    limit: 10,
+  };
+
+  if (category !== "all") params.category = category;
+  if (search) params.search = search;
+  if (minPrice) params.minPrice = minPrice;
+  if (maxPrice) params.maxPrice = maxPrice;
+
+  dispatch(fetchListings(params));
+}, [dispatch, page, category, search, minPrice, maxPrice]);
 
   const toggleCondition = (val) =>
     setConditions((prev) =>
@@ -130,7 +175,12 @@ const page = Number(searchParams.get("page")) || 1;
                   {categories.map((cat) => (
                     <Box
                       key={cat.value}
-                      onClick={() => setCategory(cat.value)}
+                      onClick={() => {
+                        const params = new URLSearchParams(searchParams);
+                        params.set("category", cat.value);
+                        params.set("page", 1); // reset page
+                        setSearchParams(params);
+                      }}
                       sx={{
                         display: "flex",
                         alignItems: "center",
@@ -179,8 +229,8 @@ const page = Number(searchParams.get("page")) || 1;
                   <TextField
                     placeholder="Min"
                     size="small"
-                    value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
+                    value={minPriceInput}
+                    onChange={(e) => setMinPriceInput(e.target.value)}
                     type="number"
                     sx={{
                       flex: 1,
@@ -190,8 +240,8 @@ const page = Number(searchParams.get("page")) || 1;
                   <TextField
                     placeholder="Max"
                     size="small"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
+                    value={maxPriceInput}
+                    onChange={(e) => setMaxPriceInput(e.target.value)}
                     type="number"
                     sx={{
                       flex: 1,
@@ -203,6 +253,24 @@ const page = Number(searchParams.get("page")) || 1;
                   fullWidth
                   variant="contained"
                   size="small"
+                  onClick={() => {
+  const params = new URLSearchParams(searchParams);
+
+  if (minPriceInput) {
+    params.set("minPrice", minPriceInput);
+  } else {
+    params.delete("minPrice"); // ✅ FIX
+  }
+
+  if (maxPriceInput) {
+    params.set("maxPrice", maxPriceInput);
+  } else {
+    params.delete("maxPrice"); // ✅ FIX
+  }
+
+  params.set("page", 1);
+  setSearchParams(params);
+}}
                   sx={{
                     borderRadius: "10px",
                     fontWeight: 700,
@@ -277,6 +345,11 @@ const page = Number(searchParams.get("page")) || 1;
                 <TextField
                   placeholder="Search items, textbooks..."
                   size="small"
+                  value={searchInput} 
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearch();
+                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -293,6 +366,7 @@ const page = Number(searchParams.get("page")) || 1;
                 {/* SORT */}
                 <Select
                   value={sortBy}
+                  // onChange={(e) => setSortBy(e.target.value)}
                   onChange={(e) => setSortBy(e.target.value)}
                   size="small"
                   sx={{
@@ -380,11 +454,11 @@ const page = Number(searchParams.get("page")) || 1;
                   count={totalPages}
                   page={page}
                   // onChange={(_, v) => setPage(v)}
-                onChange={(_, v) => {
-  const params = new URLSearchParams(searchParams);
-  params.set("page", v);
-  setSearchParams(params);
-}}
+                  onChange={(_, v) => {
+                    const params = new URLSearchParams(searchParams);
+                    params.set("page", v);
+                    setSearchParams(params);
+                  }}
                   shape="rounded"
                   sx={{
                     "& .MuiPaginationItem-root": {

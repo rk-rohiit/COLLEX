@@ -97,15 +97,19 @@ const listingSlice = createSlice({
       .addCase(fetchListings.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.listings = [];
       })
       .addCase(fetchListings.fulfilled, (state, action) => {
+        console.log("API RESPONSE:", action.payload);
         state.loading = false;
-        // state.listings = action.payload || [];
-        // state.totalPages = action.payload;
-        // state.totalItems = action.payload
-        state.listings = action.payload.data;       // ✅ actual listings
-        state.totalPages = action.payload.pages;    // ✅ total pages
-        state.totalItems = action.payload.total;
+
+        state.listings = action.payload.data || [];
+
+        state.totalPages =
+          action.payload.pages || Math.ceil((action.payload.total || 0) / 10);
+
+        state.totalItems =
+          action.payload.total || action.payload.count || 0;
       })
       .addCase(fetchListings.rejected, (state, action) => {
         state.loading = false;
