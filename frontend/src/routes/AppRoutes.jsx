@@ -9,7 +9,6 @@ import MainLayout from "@/layouts/MainLayout";
 
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
-import Dashboard from "@/pages/dashboard/Dashboard";
 
 import ProtectedRoute from "./ProtectedRoute";
 import ProductList from "../pages/products/ProductList";
@@ -27,6 +26,10 @@ import Testimonials from "../pages/home/Testimonials";
 import NotFound from "../components/ui/NotFound";
 import CreateListingPage from "../pages/listing/CreateListingPage";
 import AdminRoute from "./AdminRoute";
+import Dashboard from "@/pages/admin/Dashboard";
+import OrdersPage from "@/pages/admin/OrdersPage";
+import StudentsPage from "@/pages/admin/StudentsPage";
+import CategoriesPage from "@/pages/admin/CategoriesPage";
 
 // Landing page
 const LandingPage = () => (
@@ -123,17 +126,23 @@ const AppRoutes = () => {
 
         </Route>
 
-        {/* 🔥 ADMIN PANEL (NO NAVBAR) */}
-        <Route
-          path="/admin/dashboard"
-          element={
-            <AdminRoute>
-              <AdminLayout />
-            </AdminRoute>
-          }
-        >
-          <Route index element={<Dashboard />} />
-        </Route>
+       {/* 🔥 ADMIN PANEL (NO NAVBAR) */}
+<Route
+  path="/admin"
+  element={
+    <AdminRoute>
+      <AdminLayout />
+    </AdminRoute>
+  }
+>
+  {/* Dashboard */}
+  <Route index element={<Dashboard />} />
+
+  {/* ✅ FIXED PATHS (NO /admin prefix here) */}
+  <Route path="orders" element={<OrdersPage />} />
+  <Route path="students" element={<StudentsPage />} />
+  <Route path="categories" element={<CategoriesPage />} />
+</Route>
 
         {/* 🔥 AUTH (NO NAVBAR) */}
         <Route path="/login" element={<Login />} />

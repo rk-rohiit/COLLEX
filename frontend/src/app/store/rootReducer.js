@@ -1,20 +1,20 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
-// Import feature reducers
+// Feature reducers
 import authReducer from "@/features/auth/authSlice";
 import listingReducer from "@/features/listing/listingSlice";
 import orderReducer from "@/features/order/orderSlice";
-import userReducer from "../../features/auth/authSlice";
 import contactReducer from "@/features/contact/contactSlice";
 import cartReducer from "@/features/cart/cartSlice";
+import adminReducer from "@/features/admin/adminSlice";
 
 const rootReducer = combineReducers({
   auth: authReducer,
   listing: listingReducer,
-  cart:cartReducer,
+  cart: cartReducer,
   order: orderReducer,
-  user: userReducer,
   contact: contactReducer,
+  admin: adminReducer,
 });
 
 export default rootReducer;
