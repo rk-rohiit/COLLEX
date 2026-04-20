@@ -69,6 +69,10 @@ export const getReceivedOrders = async (req, res, next) => {
 ========================= */
 export const updateOrderStatus = async (req, res, next) => {
   try {
+    if (!req.body || !req.body.status) {
+      throw new Error("Status is required");
+    }
+
     const { status } = req.body;
 
     const updated = await updateOrderStatusService(

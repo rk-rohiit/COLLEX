@@ -31,26 +31,51 @@ const cartSlice = createSlice({
     /* =========================
        ✅ ADD TO CART
     ========================= */
-    addToCart: (state, action) => {
-  const item = {
-    _id: action.payload._id,
-    title: action.payload.title,
-    price: Number(action.payload.price) || 0,
-    images: action.payload.images || [],
-    postedBy: action.payload.postedBy, // ✅ FIX
-    location: action.payload.location,
-  };
+    // addToCart: (state, action) => {
+    //   const item = {
+    //     _id: action.payload._id,
+    //     title: action.payload.title,
+    //     price: Number(action.payload.price) || 0,
+    //     images: action.payload.images || [],
+    //     postedBy: action.payload.postedBy,
+    //     location: action.payload.location,
+    //     qty: 1, // ✅ ADD THIS
+    //   };
 
-  const exist = state.items.find((i) => i._id === item._id);
+    //   const exist = state.items.find((i) => i._id === item._id);
+
+    //   if (exist) {
+    //     exist.qty += 1;
+    //   } else {
+    //     state.items.push(item);
+    //   }
+
+    //   saveCart(state.items);
+    // },
+    addToCart: (state, action) => {
+  const payload = action.payload;
+
+  if (!payload || !payload._id) return; // ✅ safety
+
+  const exist = state.items.find((i) => i._id === payload._id);
 
   if (exist) {
     exist.qty += 1;
   } else {
-    state.items.push({ ...item, qty: 1 });
+    state.items.push({
+      _id: payload._id,
+      title: payload.title,
+      price: Number(payload.price) || 0,
+      images: payload.images || [],
+      postedBy: payload.postedBy || null,
+      location: payload.location || "",
+      qty: 1,
+    });
   }
 
   saveCart(state.items);
 },
+    
     /* =========================
        ❌ REMOVE ITEM
     ========================= */

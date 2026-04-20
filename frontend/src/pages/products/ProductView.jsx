@@ -36,7 +36,7 @@ const ProductView = () => {
       icon: "🛒",
       duration: 2500,
     });
-    navigate("/cart");
+    navigate("/profile/cart");
   };
 
   /* ── Wishlist (placeholder) ───────────────────────────────── */

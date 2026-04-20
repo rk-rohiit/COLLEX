@@ -16,6 +16,7 @@ import userRoutes from "./modules/user/user.routes.js";
 import listingRoutes from "./modules/listing/listing.routes.js";
 import orderRoutes from "./modules/order/order.routes.js";
 import contactRoutes from "./modules/contact/contact.routes.js";
+import adminRoutes from "./modules/admin/admin.routes.js";
 
 const app = express();
 
@@ -98,6 +99,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/contact", contactRoutes);
+// 🔥 ADMIN ROUTES (ADD THIS)
+app.use("/api/admin", adminRoutes);
 
 /* ========================================
    404 HANDLER

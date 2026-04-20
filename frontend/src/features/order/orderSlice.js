@@ -8,16 +8,65 @@ import {
 /* =========================
    🔥 CREATE MULTIPLE ORDERS
 ========================= */
+// export const createOrdersFromCart = createAsyncThunk(
+//   "order/createMultiple",
+//   async ({ items, meetType }, { rejectWithValue }) => {
+//     try {
+//       const results = await Promise.all(
+//         items.map((item) =>
+//           // createOrderAPI(item._id, meetType)
+//         createOrderAPI(item.listing?._id || item._id, meetType)
+//         )
+//       );
+//       return results;
+//     } catch (error) {
+//       return rejectWithValue(
+//         error.response?.data?.message || error.message
+//       );
+//     }
+//   }
+// );
 export const createOrdersFromCart = createAsyncThunk(
   "order/createMultiple",
   async ({ items, meetType }, { rejectWithValue }) => {
     try {
-      const results = await Promise.all(
-        items.map((item) =>
-          createOrderAPI(item._id, meetType)
-        )
+      console.log("🛒 CART ITEMS:", items);
+
+      const results = await Promise.allSettled(
+        items.map((item) => {
+          const listingId = item.listing?._id || item._id;
+
+          console.log("➡️ Creating order for:", listingId);
+
+          if (!listingId) {
+            throw new Error("Listing ID missing");
+          }
+
+          return createOrderAPI(listingId, meetType);
+        })
       );
-      return results;
+
+      // ✅ Separate success & failed
+      const successOrders = results
+        .filter((r) => r.status === "fulfilled")
+        .map((r) => r.value);
+
+      const failedOrders = results
+        .filter((r) => r.status === "rejected")
+        .map((r) => r.reason?.response?.data?.message || r.reason.message);
+
+      // 🔥 If ALL failed
+      if (successOrders.length === 0) {
+        throw new Error(failedOrders[0] || "All orders failed");
+      }
+
+      // ⚠️ Partial success
+      if (failedOrders.length > 0) {
+        console.warn("⚠️ Some orders failed:", failedOrders);
+      }
+
+      return successOrders;
+
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || error.message
@@ -25,7 +74,6 @@ export const createOrdersFromCart = createAsyncThunk(
     }
   }
 );
-
 /* =========================
    🔥 GET MY ORDERS
 ========================= */

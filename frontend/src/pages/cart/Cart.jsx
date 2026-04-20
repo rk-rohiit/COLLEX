@@ -1,12 +1,12 @@
 import { useSelector, useDispatch } from "react-redux";
-import { 
-  Container, Typography, Button, Box, Grid, 
-  Paper, Stack, IconButton, Divider, Avatar, Alert, Tooltip 
+import {
+  Container, Typography, Button, Box, Grid,
+  Paper, Stack, IconButton, Divider, Avatar, Alert, Tooltip
 } from "@mui/material";
-import { 
-  removeFromCart, 
-  increaseQty, 
-  decreaseQty 
+import {
+  removeFromCart,
+  increaseQty,
+  decreaseQty
 } from "@/features/cart/cartSlice";
 import { useNavigate } from "react-router-dom";
 
@@ -44,8 +44,8 @@ const Cart = () => {
             <ShoppingBagIcon sx={{ fontSize: 80, color: '#DDD', mb: 2 }} />
             <Typography variant="h4" fontWeight="800" color={colors.primary}>Your Cart is Empty</Typography>
             <Typography color="text.secondary" sx={{ mb: 4, mt: 1 }}>Explore deals from fellow students on campus!</Typography>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               onClick={() => navigate("/")}
               sx={{ bgcolor: colors.primary, px: 4, py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
             >
@@ -67,135 +67,135 @@ const Cart = () => {
         <Grid container spacing={4}>
           {/* 🔥 LEFT: ITEM LIST */}
           <Grid item xs={12} md={8}>
-  <Stack spacing={2}>
-    {items.map((item) => (
-      <Paper
-        key={item._id}
-        elevation={0}
-        sx={{
-          p: 2,
-          borderRadius: 4,
-          border: "1px solid #edf2f7",
-        }}
-      >
-        <Grid container spacing={2} alignItems="center">
-
-          {/* IMAGE */}
-          <Grid item xs={3} sm={2}>
-            <Box
-              component="img"
-              src={item.images?.[0] || "https://placehold.co/200"}
-              sx={{
-                width: "100%",
-                height: 80,
-                borderRadius: 3,
-                objectFit: "cover",
-              }}
-              onError={(e) => {
-                e.target.src = "https://placehold.co/200";
-              }}
-            />
-          </Grid>
-
-          {/* INFO */}
-          <Grid item xs={9} sm={6}>
-            <Typography
-              variant="subtitle1"
-              fontWeight="bold"
-              sx={{ color: colors.primary }}
-              noWrap
-            >
-              {item.title}
-            </Typography>
-
-            {/* SELLER */}
-            <Stack direction="row" alignItems="center" spacing={0.5}>
-              <Typography variant="caption" color="text.secondary">
-                Seller: {item.postedBy?.fullName || "Student"}
-              </Typography>
-
-              {/* optional verified */}
-              {item.postedBy?.verified && (
-                <CheckCircleIcon
-                  sx={{ fontSize: 12, color: colors.verified }}
-                />
-              )}
-            </Stack>
-
-            {/* LOCATION */}
-            <Typography
-              variant="caption"
-              display="block"
-              color="text.secondary"
-            >
-              Location: {item.location || item.postedBy?.campusId || "Campus"}
-            </Typography>
-          </Grid>
-
-          {/* ACTIONS */}
-          <Grid
-            item
-            xs={12}
-            sm={4}
-            sx={{ textAlign: { sm: "right" } }}
-          >
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              justifyContent={{
-                xs: "flex-start",
-                sm: "flex-end",
-              }}
-            >
-              <IconButton
-                size="small"
-                onClick={() => dispatch(decreaseQty(item._id))}
-                sx={{ border: "1px solid #DDD" }}
-              >
-                <RemoveIcon fontSize="small" />
-              </IconButton>
-
-              <Typography
-                fontWeight="bold"
-                sx={{ minWidth: 24, textAlign: "center" }}
-              >
-                {item.qty}
-              </Typography>
-
-              <IconButton
-                size="small"
-                onClick={() => dispatch(increaseQty(item._id))}
-                sx={{ border: "1px solid #DDD" }}
-              >
-                <AddIcon fontSize="small" />
-              </IconButton>
-
-              <Tooltip title="Remove">
-                <IconButton
-                  onClick={() => dispatch(removeFromCart(item._id))}
-                  sx={{ ml: 2, color: "error.light" }}
+            <Stack spacing={2}>
+              {items.map((item) => (
+                <Paper
+                  key={item._id}
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    borderRadius: 4,
+                    border: "1px solid #edf2f7",
+                  }}
                 >
-                  <DeleteOutlineIcon />
-                </IconButton>
-              </Tooltip>
-            </Stack>
+                  <Grid container spacing={2} alignItems="center">
 
-            {/* PRICE */}
-            <Typography
-              variant="h6"
-              fontWeight="900"
-              color={colors.primary}
-              sx={{ mt: 1 }}
-            >
-              ₹ {(item.price * item.qty).toLocaleString()}
-            </Typography>
+                    {/* IMAGE */}
+                    <Grid item xs={3} sm={2}>
+                      <Box
+                        component="img"
+                        src={item.images?.[0] || "https://placehold.co/200"}
+                        sx={{
+                          width: "100%",
+                          height: 80,
+                          borderRadius: 3,
+                          objectFit: "cover",
+                        }}
+                        onError={(e) => {
+                          e.target.src = "https://placehold.co/200";
+                        }}
+                      />
+                    </Grid>
+
+                    {/* INFO */}
+                    <Grid item xs={9} sm={6}>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight="bold"
+                        sx={{ color: colors.primary }}
+                        noWrap
+                      >
+                        {item.title}
+                      </Typography>
+
+                      {/* SELLER */}
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Typography variant="caption" color="text.secondary">
+                          Seller: {item.postedBy?.fullName || "Student"}
+                        </Typography>
+
+                        {/* optional verified */}
+                        {item.postedBy?.verified && (
+                          <CheckCircleIcon
+                            sx={{ fontSize: 12, color: colors.verified }}
+                          />
+                        )}
+                      </Stack>
+
+                      {/* LOCATION */}
+                      <Typography
+                        variant="caption"
+                        display="block"
+                        color="text.secondary"
+                      >
+                        Location: {item.location || item.postedBy?.campusId || "Campus"}
+                      </Typography>
+                    </Grid>
+
+                    {/* ACTIONS */}
+                    <Grid
+                      item
+                      xs={12}
+                      sm={4}
+                      sx={{ textAlign: { sm: "right" } }}
+                    >
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        justifyContent={{
+                          xs: "flex-start",
+                          sm: "flex-end",
+                        }}
+                      >
+                        <IconButton
+                          size="small"
+                          onClick={() => dispatch(decreaseQty(item._id))}
+                          sx={{ border: "1px solid #DDD" }}
+                        >
+                          <RemoveIcon fontSize="small" />
+                        </IconButton>
+
+                        <Typography
+                          fontWeight="bold"
+                          sx={{ minWidth: 24, textAlign: "center" }}
+                        >
+                          {item.qty}
+                        </Typography>
+
+                        <IconButton
+                          size="small"
+                          onClick={() => dispatch(increaseQty(item._id))}
+                          sx={{ border: "1px solid #DDD" }}
+                        >
+                          <AddIcon fontSize="small" />
+                        </IconButton>
+
+                        <Tooltip title="Remove">
+                          <IconButton
+                            onClick={() => dispatch(removeFromCart(item._id))}
+                            sx={{ ml: 2, color: "error.light" }}
+                          >
+                            <DeleteOutlineIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+
+                      {/* PRICE */}
+                      <Typography
+                        variant="h6"
+                        fontWeight="900"
+                        color={colors.primary}
+                        sx={{ mt: 1 }}
+                      >
+                        ₹ {(item.price * item.qty).toLocaleString()}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              ))}
+            </Stack>
           </Grid>
-        </Grid>
-      </Paper>
-    ))}
-  </Stack>
-</Grid>
 
           {/* 🔥 RIGHT: ORDER SUMMARY (STICKY) */}
           <Grid item xs={12} md={4}>
@@ -203,7 +203,7 @@ const Cart = () => {
               <Typography variant="h5" fontWeight="900" color={colors.primary} gutterBottom>
                 Order Summary
               </Typography>
-              
+
               <Stack spacing={2} sx={{ my: 3 }}>
                 <Box display="flex" justifyContent="space-between">
                   <Typography color="text.secondary">Subtotal</Typography>
@@ -224,15 +224,15 @@ const Cart = () => {
                 Meet in a public campus location for the exchange. Stay safe!
               </Alert>
 
-              <Button 
-                fullWidth 
-                variant="contained" 
+              <Button
+                fullWidth
+                variant="contained"
                 size="large"
                 onClick={() => navigate("/checkout")}
-                sx={{ 
-                  bgcolor: colors.accent, 
-                  py: 1.5, 
-                  borderRadius: 2, 
+                sx={{
+                  bgcolor: colors.accent,
+                  py: 1.5,
+                  borderRadius: 2,
                   fontWeight: 'bold',
                   fontSize: '1rem',
                   "&:hover": { bgcolor: "#d15b28" }

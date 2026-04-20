@@ -34,6 +34,12 @@ const orderSchema = new mongoose.Schema(
       default: "campus",
     },
 
+    amount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
     extraFee: {
       type: Number,
       default: 0,
@@ -49,11 +55,21 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    // 🔥 optional but powerful
+    deliveryCode: String,
+    isDelivered: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
+/* Indexes */
 orderSchema.index({ buyer: 1 });
 orderSchema.index({ seller: 1 });
+orderSchema.index({ campusId: 1, status: 1 });
+orderSchema.index({ campusId: 1, createdAt: -1 });
 
 export default mongoose.model("Order", orderSchema);
