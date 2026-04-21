@@ -7,6 +7,7 @@ import orderReducer from "@/features/order/orderSlice";
 import contactReducer from "@/features/contact/contactSlice";
 import cartReducer from "@/features/cart/cartSlice";
 import adminReducer from "@/features/admin/adminSlice";
+import cookieReducer from "../../features/cookie/cookieSlice";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   order: orderReducer,
   contact: contactReducer,
   admin: adminReducer,
+  cookies: cookieReducer,
 });
 
 export default rootReducer;
