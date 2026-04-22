@@ -11,6 +11,14 @@ import {
   validateLoginInput,
 } from "./auth.validation.js";
 
+import jwt from "jsonwebtoken";
+import User from "../../models/user.model.js";
+import config from "../../config/index.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../../utils/generateToken.js";
+
 /* =========================
    SEND OTP
 ========================= */
@@ -90,30 +98,54 @@ export const resendOtp = async (req, res, next) => {
     next(err);
   }
 };
-
-export const refreshToken = async (req, res, next) => {
+export const refreshToken = async (req, res) => {
   try {
     const { refreshToken: token } = req.body;
 
+    // ❌ No token
     if (!token) {
-      throw new Error("Refresh token required");
+      return res.status(401).json({ message: "No refresh token provided" });
     }
 
-    const decoded = jwt.verify(token, config.refreshSecret);
+    // 🔐 Verify refresh token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, config.refreshSecret);
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Refresh token expired" });
+      }
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
 
+    // 👤 Find user
     const user = await User.findById(decoded.id);
-
-    if (!user || user.refreshToken !== token) {
-      throw new Error("Invalid refresh token");
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
     }
 
-    const newAccessToken = generateAccessToken(user);
+    // 🔒 Validate token match (IMPORTANT)
+    if (user.refreshToken !== token) {
+      return res.status(401).json({ message: "Refresh token mismatch" });
+    }
 
-    res.status(200).json({
+    // 🔁 Generate new tokens (rotation)
+    const newAccessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+
+    // 💾 Save new refresh token
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    // ✅ Send response
+    return res.status(200).json({
       success: true,
       accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     });
+
   } catch (err) {
-    next(err);
+    console.error("REFRESH ERROR:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 };

@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// 🔥 Create Axios Instance
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
@@ -9,10 +8,28 @@ const axiosInstance = axios.create({
   },
 });
 
-// 🧠 REQUEST INTERCEPTOR (Attach Token)
+/* =========================
+   REFRESH CONTROL (QUEUE)
+========================= */
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+/* =========================
+   REQUEST INTERCEPTOR
+========================= */
 axiosInstance.interceptors.request.use(
   (config) => {
-    // const token = localStorage.getItem("token");
     const token = localStorage.getItem("accessToken");
 
     if (token) {
@@ -24,31 +41,80 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 🚨 RESPONSE INTERCEPTOR (Handle Errors Globally)
+/* =========================
+   RESPONSE INTERCEPTOR
+========================= */
 axiosInstance.interceptors.response.use(
   (response) => response,
 
-  (error) => {
-    const status = error.response?.status;
-
-    // 🔴 Unauthorized (Token expired / invalid)
-    if (status === 401) {
-      console.warn("Unauthorized! Logging out...");
-
-      localStorage.removeItem("token");
-
-      // Optional: redirect to login
-      window.location.href = "/login";
-    }
-
-    // 🔴 Server Error
-    if (status === 500) {
-      console.error("Server Error! Please try again later.");
-    }
-
-    // 🔴 Network Error
+  async (error) => {
     if (!error.response) {
-      console.error("Network Error! Check your internet.");
+      return Promise.reject(error);
+    }
+
+    const originalRequest = error.config;
+
+    // 🔥 HANDLE 401
+    if (
+      error.response.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/refresh-token")
+    ) {
+      // 🟡 If refresh already running → queue requests
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return axiosInstance(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      if (!refreshToken) {
+        localStorage.clear();
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
+
+      try {
+        console.log("🔄 Refreshing token...");
+
+        const res = await axiosInstance.post("/auth/refresh-token", {
+          refreshToken,
+        });
+
+        const { accessToken, refreshToken: newRefreshToken } = res.data;
+
+        // ✅ Save new tokens
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", newRefreshToken);
+
+        // ✅ Update queued requests
+        processQueue(null, accessToken);
+
+        // ✅ Retry original request
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return axiosInstance(originalRequest);
+
+      } catch (err) {
+        console.log("❌ Refresh failed");
+
+        processQueue(err, null);
+
+        localStorage.clear();
+        window.location.href = "/login";
+
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
     }
 
     return Promise.reject(error);

@@ -8,7 +8,7 @@ export const generateAccessToken = (user) => {
       role: user.role,
     },
     config.jwtSecret,
-    { expiresIn: "15m" } // 🔥 short life
+    { expiresIn: config.jwtExpiresIn || "15m" } // 🔥 short life
   );
 };
 

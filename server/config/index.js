@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const requiredEnvVars = ["MONGO_URI", "JWT_SECRET"];
+const requiredEnvVars = ["MONGO_URI", "JWT_SECRET","JWT_REFRESH_SECRET",];
 
 requiredEnvVars.forEach((key) => {
   if (!process.env[key]) {
@@ -18,6 +18,7 @@ const config = {
   mongoURI: process.env.MONGO_URI,
   jwtSecret: process.env.JWT_SECRET,
    refreshSecret: process.env.JWT_REFRESH_SECRET,
+   jwtExpiresIn: process.env.JWT_EXPIRES_IN,
 };
 
 export default config;

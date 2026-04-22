@@ -23,3 +23,6 @@ export const resendOtpAPI = (data) =>
 // 👤 GET CURRENT USER
 export const getMeAPI = () =>
   api.get("/auth/me");
+
+export const refreshTokenAPI = (refreshToken) =>
+  api.post("/auth/refresh-token", { refreshToken });

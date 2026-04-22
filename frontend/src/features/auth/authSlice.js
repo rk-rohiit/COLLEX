@@ -86,27 +86,12 @@ const getStoredUser = () => {
   }
 };
 
-// const initialState = {
-//   user: getStoredUser(),
-//   token: localStorage.getItem("token") || null,
-//   loading: false,
-//   error: null,
-//   otpSent: false, // 🔥 important
-//   email: null,    // 🔥 store email for OTP
-// };
-// const initialState = {
-//   user: JSON.parse(localStorage.getItem("user")) || null,
-//   accessToken: localStorage.getItem("accessToken") || null,
-//   refreshToken: localStorage.getItem("refreshToken") || null,
-//   isAuthenticated: !!localStorage.getItem("accessToken"),
-//   loading: false,
-//   error: null,
-// };
 const initialState = {
-  user: JSON.parse(localStorage.getItem("user")) || null,
+  // user: JSON.parse(localStorage.getItem("user")) || null,
+  user: getStoredUser(),
   accessToken: localStorage.getItem("accessToken") || null,
   refreshToken: localStorage.getItem("refreshToken") || null,
-  isAuthenticated: !!localStorage.getItem("accessToken"),
+  isAuthenticated: !!localStorage.getItem("refreshToken"),
   loading: false,
   error: null,
   otpSent: false,   // 🔥 add
@@ -142,21 +127,6 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      // .addCase(loginUser.fulfilled, (state, action) => {
-      //   state.loading = false;
-
-      //   if (action.payload?.requiresOtp) {
-      //     state.otpSent = true;
-      //     state.email = action.payload.email;
-      //     return;
-      //   }
-
-      //   state.token = action.payload.token;
-      //   state.user = action.payload.user;
-
-      //   localStorage.setItem("token", action.payload.token);
-      //   localStorage.setItem("user", JSON.stringify(action.payload.user));
-      // })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
 
@@ -196,32 +166,22 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      // .addCase(verifyOtp.fulfilled, (state, action) => {
-      //   state.loading = false;
 
-      //   state.token = action.payload.token;
-      //   state.user = action.payload.user;
-
-      //   localStorage.setItem("token", action.payload.token);
-      //   localStorage.setItem("user", JSON.stringify(action.payload.user));
-
-      //   state.otpSent = false;
-      // })
 
       .addCase(verifyOtp.fulfilled, (state, action) => {
-  state.loading = false;
+        state.loading = false;
 
-  const { user, accessToken, refreshToken } = action.payload;
+        const { user, accessToken, refreshToken } = action.payload;
 
-  state.user = user;
-  state.accessToken = accessToken;
-  state.refreshToken = refreshToken;
-  state.isAuthenticated = true;
-  state.otpSent = false;
-  localStorage.setItem("accessToken", accessToken);
-  localStorage.setItem("refreshToken", refreshToken);
-  localStorage.setItem("user", JSON.stringify(user));
-})
+        state.user = user;
+        state.accessToken = accessToken;
+        state.refreshToken = refreshToken;
+        state.isAuthenticated = true;
+        state.otpSent = false;
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("user", JSON.stringify(user));
+      })
 
       .addCase(verifyOtp.rejected, (state, action) => {
         state.loading = false;
@@ -238,8 +198,8 @@ const authSlice = createSlice({
       .addCase(resendOtp.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
-  },
+      })
+},
 });
 
 export const { logout, clearError } = authSlice.actions;
