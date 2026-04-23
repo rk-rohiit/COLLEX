@@ -1,5 +1,3 @@
-// src/models/order.model.js
-
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
@@ -56,12 +54,17 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
-    // 🔥 optional but powerful
-    deliveryCode: String,
+    deliveryCode: {
+      type: String,
+      select: false, // 🔐 secure
+    },
+
     isDelivered: {
       type: Boolean,
       default: false,
     },
+
+    deliveredAt: Date,
   },
   { timestamps: true }
 );
@@ -69,7 +72,11 @@ const orderSchema = new mongoose.Schema(
 /* Indexes */
 orderSchema.index({ buyer: 1 });
 orderSchema.index({ seller: 1 });
+orderSchema.index({ listing: 1 });
 orderSchema.index({ campusId: 1, status: 1 });
 orderSchema.index({ campusId: 1, createdAt: -1 });
+
+// 🔥 Prevent duplicate orders
+orderSchema.index({ buyer: 1, listing: 1 }, { unique: true });
 
 export default mongoose.model("Order", orderSchema);

@@ -19,8 +19,8 @@ const listingSchema = new mongoose.Schema(
       type: [String],
       required: true,
       validate: {
-        validator: (val) => val.length <= 5,
-        message: "Maximum 5 images allowed",
+        validator: (val) => val.length > 0 && val.length <= 5,
+        message: "1 to 5 images required",
       },
     },
 
@@ -47,12 +47,22 @@ const listingSchema = new mongoose.Schema(
       required: true,
     },
 
+    // 🔥 FIX: required only if rent
     rentPeriod: {
       type: String,
       enum: ["daily", "weekly", "monthly", "yearly"],
+      required: function () {
+        return this.type === "rent";
+      },
     },
 
-    rentDeposit: Number,
+    rentDeposit: {
+      type: Number,
+      min: 0,
+      required: function () {
+        return this.type === "rent";
+      },
+    },
 
     location: {
       type: String,
@@ -76,10 +86,10 @@ const listingSchema = new mongoose.Schema(
       required: true,
     },
 
-    // 🔥 PRO ADDITIONS
     reservedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      default: null, // ✅ FIX
     },
 
     views: {
@@ -97,8 +107,14 @@ const listingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-/* Indexes */
+/* =========================
+   INDEXES
+========================= */
+
+// 🔍 Search
 listingSchema.index({ title: "text", description: "text" });
-listingSchema.index({ campusId: 1, status: 1 });
+
+// 🚀 Filtering optimization
+listingSchema.index({ campusId: 1, status: 1, isDeleted: 1 });
 
 export default mongoose.model("Listing", listingSchema);

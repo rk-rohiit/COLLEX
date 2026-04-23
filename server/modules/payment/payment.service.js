@@ -5,12 +5,15 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// Create Order
 export const createPaymentOrder = async (amount) => {
+  if (!amount || amount <= 0) {
+    throw new Error("Invalid amount");
+  }
+
   const options = {
-    amount: amount * 100, // convert to paise
+    amount: Math.round(amount * 100), // paise
     currency: "INR",
-    receipt: "receipt_" + Date.now(),
+    receipt: "rcpt_" + Date.now(),
   };
 
   const order = await razorpay.orders.create(options);

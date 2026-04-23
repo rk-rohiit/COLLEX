@@ -5,6 +5,8 @@ import {
   getMyOrdersService,
   getReceivedOrdersService,
   updateOrderStatusService,
+  confirmDeliveryService,
+  cancelOrderService,
 } from "./order.service.js";
 
 /* =========================
@@ -85,6 +87,46 @@ export const updateOrderStatus = async (req, res, next) => {
       success: true,
       message: "Order updated successfully",
       data: updated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const confirmDelivery = async (req, res, next) => {
+  try {
+    const { code } = req.body;
+
+    const order = await confirmDeliveryService(
+      req.params.id,
+      code,
+      req.user
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Order completed successfully",
+      data: order,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* =========================
+   Cancel Order
+========================= */
+export const cancelOrder = async (req, res, next) => {
+  try {
+    const order = await cancelOrderService(
+      req.params.id,
+      req.user
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Order cancelled",
+      data: order,
     });
   } catch (error) {
     next(error);

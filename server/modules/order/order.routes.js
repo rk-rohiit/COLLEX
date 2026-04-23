@@ -1,11 +1,11 @@
-// src/modules/order/order.routes.js
-
 import express from "express";
 import {
   createOrder,
   getMyOrders,
   getReceivedOrders,
   updateOrderStatus,
+  confirmDelivery,
+  cancelOrder,
 } from "./order.controller.js";
 
 import { protect } from "../../middlewares/auth.middleware.js";
@@ -17,8 +17,17 @@ const router = express.Router();
 ========================= */
 
 router.post("/", protect, createOrder);
+
 router.get("/my", protect, getMyOrders);
 router.get("/received", protect, getReceivedOrders);
-router.put("/:id", protect, updateOrderStatus);
+
+// 🔐 DELIVERY CONFIRMATION
+router.patch("/:id/confirm", protect, confirmDelivery);
+
+// ❌ CANCEL ORDER
+router.patch("/:id/cancel", protect, cancelOrder);
+
+// 🔄 UPDATE STATUS (seller only)
+router.patch("/:id/status", protect, updateOrderStatus);
 
 export default router;
