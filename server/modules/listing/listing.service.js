@@ -22,6 +22,8 @@ export const createListingService = async (data, user) => {
     throw new Error("At least one image is required");
   }
 
+  console.log("DATA:", data);
+
   const newListing = await Listing.create({
     title: data.title.trim(),
     description: data.description.trim(),
@@ -32,10 +34,12 @@ export const createListingService = async (data, user) => {
 
     // ✅ FIX TYPES
     price: Number(data.price),
-    rentPeriod: data.type === "rent" ? data.rentPeriod : undefined,
+    rentPeriod:
+      data.type === "rent" ? data.rentPeriod || "weekly" : undefined,
+
     rentDeposit:
-      data.type === "rent" && data.rentDeposit
-        ? Number(data.rentDeposit)
+      data.type === "rent"
+        ? Number(data.rentDeposit ?? 0)
         : undefined,
 
     images: data.images,

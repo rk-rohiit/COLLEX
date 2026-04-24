@@ -1,5 +1,3 @@
-// src/modules/listing/listing.validation.js
-
 export const validateCreateListing = (data) => {
   const {
     title,
@@ -9,6 +7,8 @@ export const validateCreateListing = (data) => {
     type,
     location,
     images,
+    rentPeriod,
+    rentDeposit,
   } = data;
 
   if (
@@ -26,6 +26,13 @@ export const validateCreateListing = (data) => {
 
   if (!["sell", "rent"].includes(type)) {
     throw new Error("Invalid listing type");
+  }
+
+  // 🔥 ADD THIS
+  if (type === "rent") {
+    if (!rentPeriod || !rentDeposit) {
+      throw new Error("Rent period and deposit are required for rental");
+    }
   }
 };
 
