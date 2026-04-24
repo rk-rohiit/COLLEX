@@ -97,7 +97,10 @@ const listingSchema = new mongoose.Schema(
       default: 0,
     },
 
-    soldAt: Date,
+    soldAt: {
+      type: Date,
+      default: null,
+    },
 
     isDeleted: {
       type: Boolean,

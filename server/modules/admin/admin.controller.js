@@ -8,6 +8,8 @@ import {
   updateOrderStatusAdminService,
 } from "./admin.service.js";
 
+import { getAllListingsAdminService } from "./admin.service.js";
+
 /* =========================
    DASHBOARD
 ========================= */
@@ -90,6 +92,29 @@ export const updateOrderStatusAdmin = async (req, res, next) => {
       success: true,
       message: "Order updated",
       data: updated,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getAllListingsAdmin = async (req, res, next) => {
+  try {
+    let { page = 1, limit = 10, status } = req.query;
+
+    page = Number(page);
+    limit = Number(limit);
+
+    const data = await getAllListingsAdminService(
+      req.user,
+      page,
+      limit,
+      status
+    );
+
+    res.status(200).json({
+      success: true,
+      ...data,
     });
   } catch (err) {
     next(err);

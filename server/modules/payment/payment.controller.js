@@ -2,6 +2,7 @@ import crypto from "crypto";
 import Payment from "../../models/payment.model.js";
 import Order from "../../models/order.model.js";
 import { createPaymentOrder } from "./payment.service.js";
+import { verifyPaymentService } from "../order/order.service.js";
 
 /* =========================
    Create Payment Order
@@ -108,9 +109,17 @@ export const verifyPayment = async (req, res) => {
       await payment.save();
 
       // 🔗 update order as paid (add field in Order model if needed)
-      await Order.findByIdAndUpdate(payment.orderId, {
-        isPaid: true,
-      });
+      //   await Order.findByIdAndUpdate(payment.orderId, {
+      //     isPaid: true,
+      //   });
+
+      // await Order.findByIdAndUpdate(payment.orderId, {
+      //   paymentStatus: "paid",
+      //   paymentId: razorpay_payment_id,
+      //   paidAt: new Date(),
+      //   paidAmount: payment.amount,
+      // });
+      await verifyPaymentService(payment.orderId, razorpay_payment_id);
     }
 
     res.status(200).json({

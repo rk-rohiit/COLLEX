@@ -7,20 +7,52 @@ import Listing from "../../models/listing.model.js";
    Create Order
 ========================= */
 
+// export const createOrderService = async (listingId, user, meetType) => {
+//   const listing = await Listing.findById(listingId);
+
+//   if (!listing) throw new Error("Listing not found");
+
+//   if (listing.postedBy.toString() === user._id.toString()) {
+//     throw new Error("You cannot order your own listing");
+//   }
+
+//   // ✅ ONLY CHECK (DO NOT RESERVE HERE)
+//   if (listing.status !== "available") {
+//     throw new Error("Item already reserved or sold");
+//   }
+
+//   const extraFee = meetType === "protected" ? 10 : 0;
+//   const amount = listing.price + extraFee;
+
+//   const order = await Order.create({
+//     listing: listing._id,
+//     buyer: user._id,
+//     seller: listing.postedBy,
+//     type: listing.type,
+//     meetType,
+//     extraFee,
+//     amount,
+//     campusId: user.campusId,
+//     paymentStatus: "pending",
+//     deliveryCode: Math.floor(100000 + Math.random() * 900000).toString(),
+//   });
+
+//   return order;
+// };
 export const createOrderService = async (listingId, user, meetType) => {
   const listing = await Listing.findById(listingId);
 
   if (!listing) throw new Error("Listing not found");
 
-  if (listing.status !== "available") {
-    throw new Error(`Listing is ${listing.status}`);
-  }
-
   if (listing.postedBy.toString() === user._id.toString()) {
     throw new Error("You cannot order your own listing");
   }
 
-  // ✅ Prevent duplicate order
+  if (listing.status !== "available") {
+    throw new Error("Item already reserved or sold");
+  }
+
+  // 🔥 FIX: prevent duplicate pending order
   const existingOrder = await Order.findOne({
     listing: listing._id,
     buyer: user._id,
@@ -28,12 +60,11 @@ export const createOrderService = async (listingId, user, meetType) => {
   });
 
   if (existingOrder) {
-    throw new Error("You already placed an order");
+    throw new Error("You already have a pending order for this item");
+    // OR: return existingOrder;
   }
 
   const extraFee = meetType === "protected" ? 10 : 0;
-
-  // 🔥 FIX: ADD AMOUNT
   const amount = listing.price + extraFee;
 
   const order = await Order.create({
@@ -43,26 +74,18 @@ export const createOrderService = async (listingId, user, meetType) => {
     type: listing.type,
     meetType,
     extraFee,
-    amount, // ✅ FIXED
+    amount,
     campusId: user.campusId,
+    paymentStatus: "pending",
+    deliveryCode: Math.floor(100000 + Math.random() * 900000).toString(),
   });
-
-  // 🔥 UPDATE LISTING
-  // listing.status = listing.type === "sell" ? "reserved" : "rented";
-  // listing.reservedBy = user._id; // if added in schema
-
-  // await listing.save();
 
   return order;
 };
+
 /* =========================
    Get My Orders (Buyer)
 ========================= */
-// export const getMyOrdersService = async (userId) => {
-//   return await Order.find({ buyer: userId })
-//     .populate("listing")
-//     .sort({ createdAt: -1 });
-// };
 export const getMyOrdersService = async (userId) => {
   return await Order.find({ buyer: userId })
     .populate("listing")
@@ -81,6 +104,7 @@ export const getReceivedOrdersService = async (userId) => {
 /* =========================
    Update Order Status
 ========================= */
+
 // export const updateOrderStatusService = async (orderId, user, status) => {
 //   const order = await Order.findById(orderId);
 
@@ -90,17 +114,30 @@ export const getReceivedOrdersService = async (userId) => {
 //     throw new Error("Not authorized");
 //   }
 
-//   order.status = status;
-
-//   if (status === "completed") {
-//     const listing = await Listing.findById(order.listing);
-
-//     listing.status =
-//       listing.type === "sell" ? "sold" : "available";
-
-//     await listing.save();
+//   // ❌ Prevent updating finalized orders
+//   if (order.status === "completed") {
+//     throw new Error("Order already completed");
 //   }
 
+//   if (order.status === "cancelled") {
+//     throw new Error("Cannot update cancelled order");
+//   }
+
+//   // 🔥 ONLY allow cancel
+//   if (status !== "cancelled") {
+//     throw new Error("Only cancellation allowed");
+//   }
+
+//   const listing = await Listing.findById(order.listing);
+//   if (!listing) throw new Error("Listing not found");
+
+//   // ✅ restore listing
+//   listing.status = "available";
+//   listing.reservedBy = null;
+
+//   order.status = "cancelled";
+
+//   await listing.save();
 //   await order.save();
 
 //   return order;
@@ -111,7 +148,11 @@ export const updateOrderStatusService = async (orderId, user, status) => {
 
   if (!order) throw new Error("Order not found");
 
-  if (order.seller.toString() !== user._id.toString()) {
+  // 🔥 FIX: allow buyer OR seller
+  if (
+    order.seller.toString() !== user._id.toString() &&
+    order.buyer.toString() !== user._id.toString()
+  ) {
     throw new Error("Not authorized");
   }
 
@@ -124,7 +165,7 @@ export const updateOrderStatusService = async (orderId, user, status) => {
     throw new Error("Cannot update cancelled order");
   }
 
-  // 🔥 ONLY allow cancel
+  // 🔥 Only cancellation allowed
   if (status !== "cancelled") {
     throw new Error("Only cancellation allowed");
   }
@@ -132,17 +173,19 @@ export const updateOrderStatusService = async (orderId, user, status) => {
   const listing = await Listing.findById(order.listing);
   if (!listing) throw new Error("Listing not found");
 
-  // ✅ restore listing
-  listing.status = "available";
-  listing.reservedBy = null;
+  // ✅ restore listing ONLY if it was reserved
+  if (listing.status === "reserved") {
+    listing.status = "available";
+    listing.reservedBy = null;
+    await listing.save();
+  }
 
   order.status = "cancelled";
-
-  await listing.save();
   await order.save();
 
   return order;
 };
+
 
 export const confirmDeliveryService = async (orderId, code, user) => {
   const order = await Order.findById(orderId);
@@ -156,6 +199,9 @@ export const confirmDeliveryService = async (orderId, code, user) => {
   if (order.status !== "pending") {
     throw new Error("Order already processed");
   }
+  if (order.paymentStatus !== "paid") {
+  throw new Error("Payment not completed");
+}
 
   if (order.deliveryCode !== code) {
     throw new Error("Invalid delivery code");
@@ -201,3 +247,64 @@ export const cancelOrderService = async (orderId, user) => {
 
   return order;
 };
+
+export const verifyPaymentService = async (orderId, paymentId) => {
+  const order = await Order.findById(orderId);
+  if (!order) throw new Error("Order not found");
+
+  if (order.paymentStatus === "paid") {
+    throw new Error("Payment already processed");
+  }
+
+  const listing = await Listing.findById(order.listing);
+  if (!listing) throw new Error("Listing not found");
+
+  // 🔥 update listing FIRST
+  listing.status = "reserved";
+  listing.reservedBy = order.buyer;
+  await listing.save();
+
+  // ✅ update order
+  order.paymentStatus = "paid";
+  order.paymentId = paymentId;
+  order.paidAt = new Date();
+  order.paidAmount = order.amount;
+
+  await order.save();
+
+  return order;
+};
+
+// export const verifyPaymentService = async (orderId, paymentId) => {
+//   const order = await Order.findById(orderId);
+//   if (!order) throw new Error("Order not found");
+
+//   // ❗ prevent double payment
+//   if (order.paymentStatus === "paid") {
+//     throw new Error("Payment already processed");
+//   }
+
+//   // ✅ update order
+//   order.paymentStatus = "paid";
+//   order.paymentId = paymentId;
+//   order.paidAt = new Date();
+//   order.paidAmount = order.amount;
+
+//   await order.save();
+
+//   // ✅ atomic reserve
+//   const listing = await Listing.findOneAndUpdate(
+//     { _id: order.listing, status: "available" },
+//     {
+//       status: "reserved",
+//       reservedBy: order.buyer,
+//     },
+//     { new: true }
+//   );
+
+//   if (!listing) {
+//     throw new Error("Item already reserved or sold");
+//   }
+
+//   return order;
+// };

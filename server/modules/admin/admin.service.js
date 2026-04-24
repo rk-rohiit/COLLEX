@@ -130,3 +130,40 @@ export const deleteUserService = async (userId) => {
 
   return { message: "User deleted successfully" };
 };
+
+/* =========================
+   ALL LISTINGS (ADMIN)
+========================= */
+export const getAllListingsAdminService = async (
+  user,
+  page,
+  limit,
+  status
+) => {
+  const skip = (page - 1) * limit;
+
+  let filter = {
+    campusId: user.campusId, // 🔥 important
+  };
+
+  // optional status filter
+  if (status) {
+    const statuses = status.split(",");
+    filter.status = { $in: statuses };
+  }
+
+  const listings = await Listing.find(filter)
+    .populate("postedBy", "fullName email")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Listing.countDocuments(filter);
+
+  return {
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+    data: listings,
+  };
+};

@@ -65,6 +65,22 @@ const orderSchema = new mongoose.Schema(
     },
 
     deliveredAt: Date,
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed"],
+      default: "pending",
+    },
+    paidAmount: {
+      type: Number,
+    },
+
+    paymentId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    paidAt: Date,
   },
   { timestamps: true }
 );
@@ -77,6 +93,10 @@ orderSchema.index({ campusId: 1, status: 1 });
 orderSchema.index({ campusId: 1, createdAt: -1 });
 
 // 🔥 Prevent duplicate orders
-orderSchema.index({ buyer: 1, listing: 1 }, { unique: true });
+// orderSchema.index({ buyer: 1, listing: 1 }, { unique: true });
+orderSchema.index(
+  { buyer: 1, listing: 1, status: 1 },
+  { unique: true, partialFilterExpression: { status: "pending" } }
+);
 
 export default mongoose.model("Order", orderSchema);

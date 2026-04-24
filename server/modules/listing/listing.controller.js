@@ -135,25 +135,98 @@ export const createListing = async (req, res, next) => {
 // };
 
 
+// export const getAllListings = async (req, res, next) => {
+//   try {
+//     const { search, category, type, page = 1, limit = 10 } = req.query;
+
+//     let filter = { status: "available" };
+
+//     if (search) filter.$text = { $search: search };
+//     if (category) filter.category = category;
+//     if (type) filter.type = type;
+
+//     const listings = await getAllListingsService(filter, page, limit);
+
+//     const total = await Listing.countDocuments(filter); // ✅ IMPORTANT
+
+//     res.status(200).json({
+//       success: true,
+//       total, // ✅ needed
+//       page: Number(page),
+//       pages: Math.ceil(total / limit), // ✅ needed
+//       data: listings,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 export const getAllListings = async (req, res, next) => {
   try {
-    const { search, category, type, page = 1, limit = 10 } = req.query;
+    let {
+      search,
+      category,
+      type,
+      status,
+      page = 1,
+      limit = 12,
+      sort = "latest",
+    } = req.query;
 
-    let filter = { status: "available" };
+    // ✅ sanitize numbers
+    page = Math.max(1, Number(page));
+    limit = Math.min(50, Number(limit)); // max limit protection
 
-    if (search) filter.$text = { $search: search };
-    if (category) filter.category = category;
-    if (type) filter.type = type;
+    const skip = (page - 1) * limit;
 
-    const listings = await getAllListingsService(filter, page, limit);
+    // 🔒 BASE FILTER (USER MARKETPLACE)
+    const filter = {
+      status: "available",
+      reservedBy: null,
+      isDeleted: false,
+    };
 
-    const total = await Listing.countDocuments(filter); // ✅ IMPORTANT
+    // 🏫 campus restriction
+    if (req.user?.campusId) {
+      filter.campusId = req.user.campusId;
+    }
+
+    // 🔍 search (text index)
+    if (search) {
+      filter.$text = { $search: search.trim() };
+    }
+
+    // 🧩 filters
+    if (category) filter.category = category.trim();
+    if (type) filter.type = type.trim();
+
+    // 🧠 optional override (for future flexibility)
+    if (status && req.user?.role === "admin") {
+      filter.status = status;
+    }
+
+    // 📊 sorting logic
+    let sortOption = { createdAt: -1 };
+
+    if (sort === "price_low") sortOption = { price: 1 };
+    if (sort === "price_high") sortOption = { price: -1 };
+    if (sort === "oldest") sortOption = { createdAt: 1 };
+
+    // 🔥 query
+    const [listings, total] = await Promise.all([
+      Listing.find(filter)
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .populate("postedBy", "fullName"),
+      Listing.countDocuments(filter),
+    ]);
 
     res.status(200).json({
       success: true,
-      total, // ✅ needed
-      page: Number(page),
-      pages: Math.ceil(total / limit), // ✅ needed
+      total,
+      page,
+      pages: Math.ceil(total / limit),
       data: listings,
     });
   } catch (error) {

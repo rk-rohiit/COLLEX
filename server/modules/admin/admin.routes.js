@@ -7,6 +7,7 @@ import {
   deleteUser,
   getAllOrders,
   updateOrderStatusAdmin,
+  getAllListingsAdmin,
 } from "./admin.controller.js";
 
 import { protect } from "../../middlewares/auth.middleware.js";
@@ -32,5 +33,16 @@ router.delete("/users/:id", protect, authorizeRoles("admin"), deleteUser);
 ========================= */
 router.get("/orders", protect, authorizeRoles("admin"), getAllOrders);
 router.put("/orders/:id", protect, authorizeRoles("admin"), updateOrderStatusAdmin);
+
+// listing
+/* =========================
+   LISTINGS
+========================= */
+router.get(
+  "/listings",
+  protect,
+  authorizeRoles("admin"),
+  getAllListingsAdmin
+);
 
 export default router;
