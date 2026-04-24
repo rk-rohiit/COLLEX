@@ -6,6 +6,7 @@ import {
   updateOrderStatus,
   confirmDelivery,
   cancelOrder,
+  verifyDeliveryController
 } from "./order.controller.js";
 
 import { protect } from "../../middlewares/auth.middleware.js";
@@ -29,5 +30,8 @@ router.patch("/:id/cancel", protect, cancelOrder);
 
 // 🔄 UPDATE STATUS (seller only)
 router.patch("/:id/status", protect, updateOrderStatus);
+
+// verify-delivery
+router.post("/verify-delivery",protect,verifyDeliveryController);
 
 export default router;

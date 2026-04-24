@@ -274,37 +274,50 @@ export const verifyPaymentService = async (orderId, paymentId) => {
 
   return order;
 };
+export const verifyDeliveryService = async (orderId, enteredCode, userId) => {
+  // 🔥 include hidden field
+  const order = await Order.findById(orderId).select("+deliveryCode");
 
-// export const verifyPaymentService = async (orderId, paymentId) => {
-//   const order = await Order.findById(orderId);
-//   if (!order) throw new Error("Order not found");
+  if (!order) throw new Error("Order not found");
 
-//   // ❗ prevent double payment
-//   if (order.paymentStatus === "paid") {
-//     throw new Error("Payment already processed");
-//   }
+  if (order.isDelivered) {
+    throw new Error("Already delivered");
+  }
 
-//   // ✅ update order
-//   order.paymentStatus = "paid";
-//   order.paymentId = paymentId;
-//   order.paidAt = new Date();
-//   order.paidAmount = order.amount;
+  if (order.buyer.toString() !== userId.toString()) {
+    throw new Error("Unauthorized");
+  }
 
-//   await order.save();
+  if (!enteredCode) {
+    throw new Error("Delivery code is required");
+  }
 
-//   // ✅ atomic reserve
-//   const listing = await Listing.findOneAndUpdate(
-//     { _id: order.listing, status: "available" },
-//     {
-//       status: "reserved",
-//       reservedBy: order.buyer,
-//     },
-//     { new: true }
-//   );
+  const dbCode = order.deliveryCode?.toString().trim();
+  const inputCode = enteredCode?.toString().trim();
 
-//   if (!listing) {
-//     throw new Error("Item already reserved or sold");
-//   }
+  if (!dbCode) {
+    throw new Error("Delivery code not generated yet");
+  }
 
-//   return order;
-// };
+  if (dbCode !== inputCode) {
+    throw new Error("Invalid delivery code");
+  }
+
+  //  Mark delivered
+  order.isDelivered = true;
+  order.status = "completed";
+  order.deliveredAt = new Date();
+
+  await order.save();
+
+  console.log(`Product delivered successfully. Order ID: ${order._id}`);
+
+  // Update listing
+  const listing = await Listing.findById(order.listing);
+  listing.status = "sold";
+  listing.soldAt = new Date();
+
+  await listing.save();
+
+  return order;
+};

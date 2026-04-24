@@ -7,6 +7,7 @@ import {
   updateOrderStatusService,
   confirmDeliveryService,
   cancelOrderService,
+  verifyDeliveryService
 } from "./order.service.js";
 
 /* =========================
@@ -130,5 +131,29 @@ export const cancelOrder = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+
+export const verifyDeliveryController = async (req, res) => {
+  try {
+    const { orderId, code } = req.body;
+
+    const order = await verifyDeliveryService(
+      orderId,
+      code,
+      req.user._id
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Delivery verified successfully",
+      data: order,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
