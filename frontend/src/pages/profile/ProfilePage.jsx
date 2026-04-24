@@ -17,6 +17,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import SchoolIcon from "@mui/icons-material/School";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import SettingsIcon from "@mui/icons-material/Settings";
+import DeliveryPanel from "../../components/ui/DeliveryPanel";
 
 /* =========================
    STAT CARD
@@ -55,75 +56,87 @@ const DashboardStat = ({ label, value, icon, color }) => (
 /* =========================
    ORDER ROW
 ========================= */
-const OrderRow = ({ order }) => {
+const OrderRow = ({ order, onSelect }) => {
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+
+  const isBuyer = user?._id === (order.buyer?._id || order.buyer);
 
   return (
     <Paper
       elevation={0}
+      onClick={() => onSelect && onSelect(order)} // ✅ SAFE CALL
       sx={{
-        p: 1.5,
+        p: 2,
         mb: 2,
         borderRadius: 4,
         border: "1px solid",
         borderColor: "divider",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        gap: 1,
+        cursor: "pointer",
+        transition: "0.2s",
+        "&:hover": {
+          bgcolor: "grey.50",
+        },
       }}
     >
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
+      {/* 🔹 TOP SECTION */}
+      <Stack direction="row" spacing={2} alignItems="center">
+
+        {/* IMAGE */}
         <Box
           component="img"
           src={order.listing?.images?.[0] || "https://via.placeholder.com/60"}
           sx={{
-            width: { xs: 48, sm: 60 },
-            height: { xs: 48, sm: 60 },
+            width: 60,
+            height: 60,
             borderRadius: 3,
             objectFit: "cover",
             bgcolor: "grey.100",
-            flexShrink: 0,
           }}
         />
-        <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Typography
-            variant="subtitle2"
-            fontWeight="bold"
-            sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              maxWidth: { xs: 140, sm: 260, md: "100%" },
-            }}
-          >
+
+        {/* DETAILS */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="subtitle2" fontWeight="bold" noWrap>
             {order.listing?.title}
           </Typography>
-          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+
+          <Stack direction="row" spacing={1} alignItems="center" mt={0.5}>
             <Typography variant="body2" fontWeight="bold" color="primary.main">
               ₹{order.listing?.price}
             </Typography>
+
             <Chip
-              label={order.status || "In Progress"}
+              label={order.status}
               size="small"
-              sx={{
-                bgcolor: "#FFF59D",
-                color: "#827717",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-                height: 20,
-              }}
+              color={
+                order.status === "completed"
+                  ? "success"
+                  : order.status === "cancelled"
+                    ? "error"
+                    : "warning"
+              }
             />
           </Stack>
+
+          <Typography variant="caption" color="text.secondary">
+            ID: #{order._id.slice(-6).toUpperCase()}
+          </Typography>
         </Box>
+
+        {/* NAV BUTTON */}
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation(); // ✅ IMPORTANT: prevent triggering onSelect
+            navigate(`/order/${order._id}`);
+          }}
+        >
+          <ChevronRightIcon />
+        </IconButton>
       </Stack>
-      <IconButton onClick={() => navigate(`/order/${order._id}`)} size="small" sx={{ flexShrink: 0 }}>
-        <ChevronRightIcon />
-      </IconButton>
     </Paper>
   );
 };
-
 /* =========================
    EMPTY STATE
 ========================= */
@@ -145,6 +158,7 @@ const ProfilePage = () => {
   const { myOrders, receivedOrders, loading } = useSelector((state) => state.order);
 
   const [tab, setTab] = useState(0);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     dispatch(getMyOrders());
@@ -154,7 +168,7 @@ const ProfilePage = () => {
   if (loading) return <Typography p={5}>Loading...</Typography>;
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#F4F7FA", pt: { xs: 3, md: 8 }, pb: 6, mt:5 }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#F4F7FA", pt: { xs: 3, md: 8 }, pb: 6, mt: 5 }}>
       <Container maxWidth="lg">
 
         {/* ── HEADER ── */}
@@ -318,7 +332,13 @@ const ProfilePage = () => {
 
                 {tab === 0
                   ? myOrders.length
-                    ? myOrders.map((o) => <OrderRow key={o._id} order={o} />)
+                    ? myOrders.map((o) => (
+                      <OrderRow
+                        key={o._id}
+                        order={o}
+                        onSelect={setSelectedOrder}
+                      />
+                    ))
                     : <EmptyState />
                   : receivedOrders.length
                     ? receivedOrders.map((o) => <OrderRow key={o._id} order={o} />)
@@ -326,6 +346,19 @@ const ProfilePage = () => {
               </Box>
             </Paper>
           </Grid>
+        </Grid>
+        <Grid container spacing={3}>
+
+          {/* LEFT SIDE (ORDERS) */}
+          <Grid item xs={12} md={6}>
+            {/* your existing orders UI */}
+          </Grid>
+
+          {/* RIGHT SIDE (DELIVERY PANEL) */}
+          <Grid item xs={12} md={6}>
+            <DeliveryPanel order={selectedOrder} />
+          </Grid>
+
         </Grid>
 
       </Container>

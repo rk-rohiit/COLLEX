@@ -21,15 +21,11 @@ export const getReceivedOrdersAPI = async () => {
   return res.data.data;
 };
 
-const verifyDelivery = async () => {
-  try {
-    const res = await axios.post("/order/verify-delivery", {
-      orderId,
-      code,
-    });
+export const verifyDeliveryAPI = async (orderId, code) => {
+  const res = await api.post("/orders/verify-delivery", {
+    orderId,
+    code,
+  });
 
-    toast.success("Delivery completed ✅");
-  } catch (err) {
-    toast.error(err.response?.data?.message);
-  }
+  return res.data.data; // return order
 };

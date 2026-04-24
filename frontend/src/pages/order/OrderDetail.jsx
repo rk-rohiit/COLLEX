@@ -13,6 +13,13 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import MessageIcon from "@mui/icons-material/Message";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
+import LockIcon from "@mui/icons-material/Lock";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+import { TextField } from "@mui/material";
+import { useState } from "react";
+import { verifyDelivery } from "@/features/order/orderSlice";
+import { toast } from "react-toastify";
+
 import {
   getMyOrders,
   getReceivedOrders
@@ -23,7 +30,8 @@ const OrderDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
-
+  const [code, setCode] = useState("");
+const { verifyLoading } = useSelector((state) => state.order);
   const { myOrders, receivedOrders, loading } = useSelector((state) => state.order);
   const { user } = useSelector((state) => state.auth);
 
@@ -76,6 +84,18 @@ const OrderDetail = () => {
     if (status === "cancelled") return "error";
     return "warning";
   };
+
+  const handleVerify = async () => {
+  if (!code) return toast.error("Enter delivery code");
+
+  const res = await dispatch(verifyDelivery({ orderId: order._id, code }));
+
+  if (verifyDelivery.fulfilled.match(res)) {
+    toast.success("Delivery completed ✅");
+  } else {
+    toast.error(res.payload);
+  }
+};
 
   /* =========================
      UI
@@ -228,6 +248,87 @@ const OrderDetail = () => {
               </Stack>
             </Paper>
           </Grid>
+          {/* DELIVERY SECTION */}
+<Grid item xs={12}>
+  <Paper sx={{ p: 3, borderRadius: 4 }}>
+
+    <Typography variant="h6" fontWeight="bold" mb={2}>
+      Delivery Verification
+    </Typography>
+
+    {/* ✅ IF COMPLETED */}
+    {order.isDelivered && (
+      <Stack alignItems="center" spacing={2}>
+        <DoneAllIcon sx={{ fontSize: 40, color: "success.main" }} />
+        <Typography color="success.main" fontWeight="bold">
+          Product Delivered Successfully
+        </Typography>
+      </Stack>
+    )}
+
+    {/* 👤 BUYER VIEW */}
+    {!order.isDelivered && !isSeller && (
+      <Stack spacing={2}>
+        <Box
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Share this code with seller at the time of delivery
+          </Typography>
+
+          {/* 🔐 DELIVERY CODE DISPLAY */}
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            sx={{ letterSpacing: 4 }}
+          >
+            ••••••
+          </Typography>
+        </Box>
+
+        <TextField
+          label="Enter Delivery Code"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          fullWidth
+        />
+
+        <Button
+          variant="contained"
+          onClick={handleVerify}
+          disabled={verifyLoading}
+        >
+          {verifyLoading ? "Verifying..." : "Verify Delivery"}
+        </Button>
+      </Stack>
+    )}
+
+    {/* 🧑‍💼 SELLER VIEW */}
+    {!order.isDelivered && isSeller && (
+      <Stack spacing={2}>
+        <Box
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.warning.main, 0.1),
+          }}
+        >
+          <Stack direction="row" spacing={1} alignItems="center">
+            <LockIcon color="warning" />
+            <Typography>
+              Ask buyer for delivery code to complete the order
+            </Typography>
+          </Stack>
+        </Box>
+      </Stack>
+    )}
+
+  </Paper>
+</Grid>
 
         </Grid>
       </Container>

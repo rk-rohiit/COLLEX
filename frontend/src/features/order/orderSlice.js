@@ -3,6 +3,7 @@ import {
   createOrderAPI,
   getMyOrdersAPI,
   getReceivedOrdersAPI,
+  verifyDeliveryAPI,
 } from "@/api/order.api";
 
 /* =========================
@@ -106,6 +107,21 @@ export const getReceivedOrders = createAsyncThunk(
   }
 );
 
+// verify delivery
+
+export const verifyDelivery = createAsyncThunk(
+  "order/verifyDelivery",
+  async ({ orderId, code }, { rejectWithValue }) => {
+    try {
+      return await verifyDeliveryAPI(orderId, code);
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+);
+
 /* =========================
    🔥 SLICE
 ========================= */
@@ -114,6 +130,8 @@ const orderSlice = createSlice({
   initialState: {
     loading: false,
     success: false,
+    verifyLoading: false,
+    verifySuccess: false,
     myOrders: [],
     receivedOrders: [],
     error: null,
@@ -177,7 +195,41 @@ const orderSlice = createSlice({
       .addCase(getReceivedOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      /* 🔥 VERIFY DELIVERY */
+      .addCase(verifyDelivery.pending, (state) => {
+        state.verifyLoading = true;
+        state.verifySuccess = false;
+        state.error = null;
+      })
+
+      .addCase(verifyDelivery.fulfilled, (state, action) => {
+        state.verifyLoading = false;
+        state.verifySuccess = true;
+
+        const updatedOrder = action.payload;
+
+        // 🔥 Update myOrders (SAFE MERGE)
+        state.myOrders = state.myOrders.map((order) =>
+          order._id === updatedOrder._id
+            ? { ...order, ...updatedOrder }
+            : order
+        );
+
+        // 🔥 Update receivedOrders (FIXED - ALSO MERGE)
+        state.receivedOrders = state.receivedOrders.map((order) =>
+          order._id === updatedOrder._id
+            ? { ...order, ...updatedOrder }
+            : order
+        );
+      })
+
+      .addCase(verifyDelivery.rejected, (state, action) => {
+        state.verifyLoading = false;
+        state.verifySuccess = false;
+        state.error = action.payload || "Verification failed";
       });
+
   },
 });
 

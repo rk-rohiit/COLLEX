@@ -86,11 +86,22 @@ export const createOrderService = async (listingId, user, meetType) => {
 /* =========================
    Get My Orders (Buyer)
 ========================= */
+// export const getMyOrdersService = async (userId) => {
+//   return await Order.find({ buyer: userId })
+//     .select("+deliveryCode")
+//     .populate("listing")
+//     .populate("seller", "fullName campusId") // ✅ FIX
+//     .sort({ createdAt: -1 });
+// };
 export const getMyOrdersService = async (userId) => {
-  return await Order.find({ buyer: userId })
+  const orders = await Order.find({ buyer: userId })
+    .select("+deliveryCode")
     .populate("listing")
-    .populate("seller", "fullName campusId") // ✅ FIX
-    .sort({ createdAt: -1 });
+    .populate("seller", "fullName campusId")
+    .sort({ createdAt: -1 })
+    .lean(); // ✅ IMPORTANT FIX
+
+  return orders;
 };
 /* =========================
    Get Received Orders (Seller)
@@ -200,8 +211,8 @@ export const confirmDeliveryService = async (orderId, code, user) => {
     throw new Error("Order already processed");
   }
   if (order.paymentStatus !== "paid") {
-  throw new Error("Payment not completed");
-}
+    throw new Error("Payment not completed");
+  }
 
   if (order.deliveryCode !== code) {
     throw new Error("Invalid delivery code");

@@ -30,6 +30,7 @@ import Dashboard from "@/pages/admin/Dashboard";
 import OrdersPage from "@/pages/admin/OrdersPage";
 import StudentsPage from "@/pages/admin/StudentsPage";
 import CategoriesPage from "@/pages/admin/CategoriesPage";
+import VerifyDeliveryPage from "../pages/order/VerifyDeliveryPage";
 
 // Landing page
 const LandingPage = () => (
@@ -117,6 +118,12 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/verify-delivery/:id"
+            element={
+              <ProtectedRoute>
+                <VerifyDeliveryPage />
+              </ProtectedRoute>
+            } />
 
           <Route path="/create-listing" element={
             <ProtectedRoute>
@@ -126,23 +133,23 @@ const AppRoutes = () => {
 
         </Route>
 
-       {/* 🔥 ADMIN PANEL (NO NAVBAR) */}
-<Route
-  path="/admin"
-  element={
-    <AdminRoute>
-      <AdminLayout />
-    </AdminRoute>
-  }
->
-  {/* Dashboard */}
-  <Route index element={<Dashboard />} />
+        {/* 🔥 ADMIN PANEL (NO NAVBAR) */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          {/* Dashboard */}
+          <Route index element={<Dashboard />} />
 
-  {/* ✅ FIXED PATHS (NO /admin prefix here) */}
-  <Route path="orders" element={<OrdersPage />} />
-  <Route path="students" element={<StudentsPage />} />
-  <Route path="categories" element={<CategoriesPage />} />
-</Route>
+          {/* ✅ FIXED PATHS (NO /admin prefix here) */}
+          <Route path="orders" element={<OrdersPage />} />
+          <Route path="students" element={<StudentsPage />} />
+          <Route path="categories" element={<CategoriesPage />} />
+        </Route>
 
         {/* 🔥 AUTH (NO NAVBAR) */}
         <Route path="/login" element={<Login />} />
