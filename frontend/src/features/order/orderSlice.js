@@ -129,6 +129,8 @@ const orderSlice = createSlice({
   name: "order",
   initialState: {
     loading: false,
+    myOrdersLoading: false,
+    receivedOrdersLoading: false,
     success: false,
     verifyLoading: false,
     verifySuccess: false,
@@ -140,6 +142,8 @@ const orderSlice = createSlice({
   reducers: {
     resetOrderState: (state) => {
       state.success = false;
+      state.verifySuccess = false;
+      state.verifyLoading = false;
       state.error = null;
     },
   },
@@ -157,44 +161,42 @@ const orderSlice = createSlice({
       .addCase(createOrdersFromCart.fulfilled, (state) => {
         state.loading = false;
         state.success = true;
-
-        // ❌ DO NOT manually push orders
-        // ✅ Let API refetch handle fresh data
+        state.error = null;
       })
 
       .addCase(createOrdersFromCart.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Something went wrong";
       })
 
       /* 🔥 MY ORDERS */
       .addCase(getMyOrders.pending, (state) => {
-        state.loading = true;
+        state.myOrdersLoading = true;
       })
 
       .addCase(getMyOrders.fulfilled, (state, action) => {
-        state.loading = false;
+        state.myOrdersLoading = false;
         state.myOrders = action.payload; // ✅ clean replace
       })
 
       .addCase(getMyOrders.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.myOrdersLoading = false;
+        state.error = action.payload || "Failed to load orders";
       })
 
       /* 🔥 RECEIVED ORDERS */
       .addCase(getReceivedOrders.pending, (state) => {
-        state.loading = true;
+        state.receivedOrdersLoading = true;
       })
 
       .addCase(getReceivedOrders.fulfilled, (state, action) => {
-        state.loading = false;
+        state.receivedOrdersLoading = false;
         state.receivedOrders = action.payload; // ✅ clean replace
       })
 
       .addCase(getReceivedOrders.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.receivedOrdersLoading = false;
+        state.error = action.payload || "Failed to load orders";
       })
       /* 🔥 VERIFY DELIVERY */
       .addCase(verifyDelivery.pending, (state) => {
@@ -212,7 +214,7 @@ const orderSlice = createSlice({
         // 🔥 Update myOrders (SAFE MERGE)
         state.myOrders = state.myOrders.map((order) =>
           order._id === updatedOrder._id
-            ? { ...order, ...updatedOrder }
+            ? { ...order, ...updatedOrder,deliveryCode: order.deliveryCode ?? updatedOrder.deliveryCode }
             : order
         );
 

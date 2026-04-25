@@ -248,7 +248,7 @@ const { verifyLoading } = useSelector((state) => state.order);
               </Stack>
             </Paper>
           </Grid>
-          {/* DELIVERY SECTION */}
+        {/* DELIVERY SECTION */}
 <Grid item xs={12}>
   <Paper sx={{ p: 3, borderRadius: 4 }}>
 
@@ -256,7 +256,7 @@ const { verifyLoading } = useSelector((state) => state.order);
       Delivery Verification
     </Typography>
 
-    {/* ✅ IF COMPLETED */}
+    {/* ✅ COMPLETED */}
     {order.isDelivered && (
       <Stack alignItems="center" spacing={2}>
         <DoneAllIcon sx={{ fontSize: 40, color: "success.main" }} />
@@ -266,7 +266,7 @@ const { verifyLoading } = useSelector((state) => state.order);
       </Stack>
     )}
 
-    {/* 👤 BUYER VIEW */}
+    {/* 👤 BUYER VIEW → SHOW CODE ONLY */}
     {!order.isDelivered && !isSeller && (
       <Stack spacing={2}>
         <Box
@@ -277,17 +277,37 @@ const { verifyLoading } = useSelector((state) => state.order);
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            Share this code with seller at the time of delivery
+            Share this code with seller at delivery time
           </Typography>
 
-          {/* 🔐 DELIVERY CODE DISPLAY */}
           <Typography
             variant="h4"
             fontWeight="bold"
             sx={{ letterSpacing: 4 }}
           >
-            ••••••
+            {order.deliveryCode || "------"}
           </Typography>
+        </Box>
+      </Stack>
+    )}
+
+    {/* 🧑‍💼 SELLER VIEW → ENTER CODE */}
+    {!order.isDelivered && isSeller && (
+      <Stack spacing={2}>
+
+        <Box
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.warning.main, 0.1),
+          }}
+        >
+          <Stack direction="row" spacing={1} alignItems="center">
+            <LockIcon color="warning" />
+            <Typography>
+              Enter delivery code from buyer to complete order
+            </Typography>
+          </Stack>
         </Box>
 
         <TextField
@@ -304,26 +324,7 @@ const { verifyLoading } = useSelector((state) => state.order);
         >
           {verifyLoading ? "Verifying..." : "Verify Delivery"}
         </Button>
-      </Stack>
-    )}
 
-    {/* 🧑‍💼 SELLER VIEW */}
-    {!order.isDelivered && isSeller && (
-      <Stack spacing={2}>
-        <Box
-          sx={{
-            p: 2,
-            borderRadius: 2,
-            bgcolor: alpha(theme.palette.warning.main, 0.1),
-          }}
-        >
-          <Stack direction="row" spacing={1} alignItems="center">
-            <LockIcon color="warning" />
-            <Typography>
-              Ask buyer for delivery code to complete the order
-            </Typography>
-          </Stack>
-        </Box>
       </Stack>
     )}
 

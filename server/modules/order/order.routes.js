@@ -4,7 +4,7 @@ import {
   getMyOrders,
   getReceivedOrders,
   updateOrderStatus,
-  confirmDelivery,
+  // confirmDelivery,
   cancelOrder,
   verifyDeliveryController
 } from "./order.controller.js";
@@ -22,8 +22,8 @@ router.post("/", protect, createOrder);
 router.get("/my", protect, getMyOrders);
 router.get("/received", protect, getReceivedOrders);
 
-// 🔐 DELIVERY CONFIRMATION
-router.patch("/:id/confirm", protect, confirmDelivery);
+// // 🔐 DELIVERY CONFIRMATION
+// router.patch("/:id/confirm", protect, confirmDelivery);
 
 // ❌ CANCEL ORDER
 router.patch("/:id/cancel", protect, cancelOrder);

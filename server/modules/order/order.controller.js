@@ -5,7 +5,6 @@ import {
   getMyOrdersService,
   getReceivedOrdersService,
   updateOrderStatusService,
-  confirmDeliveryService,
   cancelOrderService,
   verifyDeliveryService
 } from "./order.service.js";
@@ -94,25 +93,25 @@ export const updateOrderStatus = async (req, res, next) => {
   }
 };
 
-export const confirmDelivery = async (req, res, next) => {
-  try {
-    const { code } = req.body;
+// export const confirmDelivery = async (req, res, next) => {
+//   try {
+//     const { code } = req.body;
 
-    const order = await confirmDeliveryService(
-      req.params.id,
-      code,
-      req.user
-    );
+//     const order = await confirmDeliveryService(
+//       req.params.id,
+//       code,
+//       req.user
+//     );
 
-    res.status(200).json({
-      success: true,
-      message: "Order completed successfully",
-      data: order,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       message: "Order completed successfully",
+//       data: order,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 /* =========================
    Cancel Order

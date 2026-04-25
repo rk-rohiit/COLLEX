@@ -7,38 +7,6 @@ import Listing from "../../models/listing.model.js";
    Create Order
 ========================= */
 
-// export const createOrderService = async (listingId, user, meetType) => {
-//   const listing = await Listing.findById(listingId);
-
-//   if (!listing) throw new Error("Listing not found");
-
-//   if (listing.postedBy.toString() === user._id.toString()) {
-//     throw new Error("You cannot order your own listing");
-//   }
-
-//   // ✅ ONLY CHECK (DO NOT RESERVE HERE)
-//   if (listing.status !== "available") {
-//     throw new Error("Item already reserved or sold");
-//   }
-
-//   const extraFee = meetType === "protected" ? 10 : 0;
-//   const amount = listing.price + extraFee;
-
-//   const order = await Order.create({
-//     listing: listing._id,
-//     buyer: user._id,
-//     seller: listing.postedBy,
-//     type: listing.type,
-//     meetType,
-//     extraFee,
-//     amount,
-//     campusId: user.campusId,
-//     paymentStatus: "pending",
-//     deliveryCode: Math.floor(100000 + Math.random() * 900000).toString(),
-//   });
-
-//   return order;
-// };
 export const createOrderService = async (listingId, user, meetType) => {
   const listing = await Listing.findById(listingId);
 
@@ -86,13 +54,6 @@ export const createOrderService = async (listingId, user, meetType) => {
 /* =========================
    Get My Orders (Buyer)
 ========================= */
-// export const getMyOrdersService = async (userId) => {
-//   return await Order.find({ buyer: userId })
-//     .select("+deliveryCode")
-//     .populate("listing")
-//     .populate("seller", "fullName campusId") // ✅ FIX
-//     .sort({ createdAt: -1 });
-// };
 export const getMyOrdersService = async (userId) => {
   const orders = await Order.find({ buyer: userId })
     .select("+deliveryCode")
@@ -106,10 +67,23 @@ export const getMyOrdersService = async (userId) => {
 /* =========================
    Get Received Orders (Seller)
 ========================= */
+// export const getReceivedOrdersService = async (userId) => {
+//   return await Order.find({ seller: userId })
+//     .populate("listing")
+//     .sort({ createdAt: -1 });
+// };
 export const getReceivedOrdersService = async (userId) => {
-  return await Order.find({ seller: userId })
+  const orders = await Order.find({ seller: userId })
     .populate("listing")
-    .sort({ createdAt: -1 });
+    .populate("buyer", "fullName campusId") // ✅ ADD THIS
+    .sort({ createdAt: -1 })
+    .lean();
+
+  // 🔐 NEVER send delivery code to seller
+  return orders.map((o) => {
+    delete o.deliveryCode;
+    return o;
+  });
 };
 
 /* =========================
@@ -198,44 +172,44 @@ export const updateOrderStatusService = async (orderId, user, status) => {
 };
 
 
-export const confirmDeliveryService = async (orderId, code, user) => {
-  const order = await Order.findById(orderId);
+// export const confirmDeliveryService = async (orderId, code, user) => {
+//   const order = await Order.findById(orderId);
 
-  if (!order) throw new Error("Order not found");
+//   if (!order) throw new Error("Order not found");
 
-  if (order.buyer.toString() !== user._id.toString()) {
-    throw new Error("Only buyer can confirm delivery");
-  }
+//   if (order.buyer.toString() !== user._id.toString()) {
+//     throw new Error("Only buyer can confirm delivery");
+//   }
 
-  if (order.status !== "pending") {
-    throw new Error("Order already processed");
-  }
-  if (order.paymentStatus !== "paid") {
-    throw new Error("Payment not completed");
-  }
+//   if (order.status !== "pending") {
+//     throw new Error("Order already processed");
+//   }
+//   if (order.paymentStatus !== "paid") {
+//     throw new Error("Payment not completed");
+//   }
 
-  if (order.deliveryCode !== code) {
-    throw new Error("Invalid delivery code");
-  }
+//   if (order.deliveryCode !== code) {
+//     throw new Error("Invalid delivery code");
+//   }
 
-  const listing = await Listing.findById(order.listing);
-  if (!listing) throw new Error("Listing not found");
+//   const listing = await Listing.findById(order.listing);
+//   if (!listing) throw new Error("Listing not found");
 
-  // ✅ COMPLETE ORDER
-  order.status = "completed";
-  order.isDelivered = true;
-  order.deliveredAt = new Date();
+//   // ✅ COMPLETE ORDER
+//   order.status = "completed";
+//   order.isDelivered = true;
+//   order.deliveredAt = new Date();
 
-  // ✅ UPDATE LISTING HERE ONLY
-  listing.status = listing.type === "sell" ? "sold" : "available";
-  listing.reservedBy = null;
-  listing.soldAt = new Date();
+//   // ✅ UPDATE LISTING HERE ONLY
+//   listing.status = listing.type === "sell" ? "sold" : "available";
+//   listing.reservedBy = null;
+//   listing.soldAt = new Date();
 
-  await listing.save();
-  await order.save();
+//   await listing.save();
+//   await order.save();
 
-  return order;
-};
+//   return order;
+// };
 
 export const cancelOrderService = async (orderId, user) => {
   const order = await Order.findById(orderId);
@@ -285,8 +259,56 @@ export const verifyPaymentService = async (orderId, paymentId) => {
 
   return order;
 };
+
+// export const verifyDeliveryService = async (orderId, enteredCode, userId) => {
+//   // 🔥 include hidden field
+//   const order = await Order.findById(orderId).select("+deliveryCode");
+
+//   if (!order) throw new Error("Order not found");
+
+//   if (order.isDelivered) {
+//     throw new Error("Already delivered");
+//   }
+
+//   if (order.buyer.toString() !== userId.toString()) {
+//     throw new Error("Unauthorized");
+//   }
+
+//   if (!enteredCode) {
+//     throw new Error("Delivery code is required");
+//   }
+
+//   const dbCode = order.deliveryCode?.toString().trim();
+//   const inputCode = enteredCode?.toString().trim();
+
+//   if (!dbCode) {
+//     throw new Error("Delivery code not generated yet");
+//   }
+
+//   if (dbCode !== inputCode) {
+//     throw new Error("Invalid delivery code");
+//   }
+
+//   //  Mark delivered
+//   order.isDelivered = true;
+//   order.status = "completed";
+//   order.deliveredAt = new Date();
+
+//   await order.save();
+
+//   console.log(`Product delivered successfully. Order ID: ${order._id}`);
+
+//   // Update listing
+//   const listing = await Listing.findById(order.listing);
+//   listing.status = "sold";
+//   listing.soldAt = new Date();
+
+//   await listing.save();
+
+//   return order;
+// };
+
 export const verifyDeliveryService = async (orderId, enteredCode, userId) => {
-  // 🔥 include hidden field
   const order = await Order.findById(orderId).select("+deliveryCode");
 
   if (!order) throw new Error("Order not found");
@@ -295,8 +317,14 @@ export const verifyDeliveryService = async (orderId, enteredCode, userId) => {
     throw new Error("Already delivered");
   }
 
-  if (order.buyer.toString() !== userId.toString()) {
-    throw new Error("Unauthorized");
+  // 🔥 SELLER ONLY
+  if (order.seller.toString() !== userId.toString()) {
+    throw new Error("Only seller can verify delivery");
+  }
+
+  // 🔥 PAYMENT CHECK
+  if (order.paymentStatus !== "paid") {
+    throw new Error("Payment not completed");
   }
 
   if (!enteredCode) {
@@ -307,24 +335,24 @@ export const verifyDeliveryService = async (orderId, enteredCode, userId) => {
   const inputCode = enteredCode?.toString().trim();
 
   if (!dbCode) {
-    throw new Error("Delivery code not generated yet");
+    throw new Error("Delivery code not generated");
   }
 
   if (dbCode !== inputCode) {
     throw new Error("Invalid delivery code");
   }
 
-  //  Mark delivered
+  // ✅ COMPLETE ORDER
   order.isDelivered = true;
   order.status = "completed";
   order.deliveredAt = new Date();
 
   await order.save();
 
-  console.log(`Product delivered successfully. Order ID: ${order._id}`);
-
-  // Update listing
+  // ✅ UPDATE LISTING
   const listing = await Listing.findById(order.listing);
+  if (!listing) throw new Error("Listing not found");
+
   listing.status = "sold";
   listing.soldAt = new Date();
 
