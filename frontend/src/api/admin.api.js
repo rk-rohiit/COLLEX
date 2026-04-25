@@ -29,3 +29,7 @@ export const getAllOrdersAPI = () =>
 
 export const updateOrderStatusAPI = (id, status) =>
   api.put(`/admin/orders/${id}`, { status });
+
+export const getAllListingAPI = () =>{
+  api.get("listings");
+}

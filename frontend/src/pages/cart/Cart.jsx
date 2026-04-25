@@ -1,8 +1,11 @@
+// components/cart/Cart.jsx
+
 import { useSelector, useDispatch } from "react-redux";
 import {
   Container, Typography, Button, Box, Grid,
-  Paper, Stack, IconButton, Divider, Avatar, Alert, Tooltip
+  Paper, Stack, IconButton, Divider
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import {
   removeFromCart,
   increaseQty,
@@ -14,237 +17,183 @@ import { useNavigate } from "react-router-dom";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import SecurityIcon from "@mui/icons-material/Security";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 const Cart = () => {
-  const { items } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { items } = useSelector((state) => state.cart);
 
   const total = items.reduce(
     (acc, item) => acc + Number(item.price) * (item.qty || 1),
     0
   );
 
-  // Prototype Palette
-  const colors = {
-    primary: "#0A2647", // Deep Blue
-    accent: "#E86A33",  // Orange Action
-    verified: "#2ECC71", // Green
-    bg: "#F4F7F9"
-  };
-
-  if (items.length === 0) {
+  /* ================= EMPTY STATE ================= */
+  if (!items.length) {
     return (
-      <Box sx={{ minHeight: "80vh", display: 'flex', alignItems: 'center', bgcolor: colors.bg, pt: 10 }}>
-        <Container maxWidth="sm">
-          <Paper elevation={0} sx={{ p: 6, textAlign: 'center', borderRadius: 5 }}>
-            <ShoppingBagIcon sx={{ fontSize: 80, color: '#DDD', mb: 2 }} />
-            <Typography variant="h4" fontWeight="800" color={colors.primary}>Your Cart is Empty</Typography>
-            <Typography color="text.secondary" sx={{ mb: 4, mt: 1 }}>Explore deals from fellow students on campus!</Typography>
-            <Button
-              variant="contained"
-              onClick={() => navigate("/")}
-              sx={{ bgcolor: colors.primary, px: 4, py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
-            >
-              Back to Marketplace
-            </Button>
-          </Paper>
-        </Container>
+      <Box sx={{ textAlign: "center", mt: 15 }}>
+        <Typography variant="h5" fontWeight={800}>
+          Your cart is empty 🛒
+        </Typography>
+        <Button
+          variant="contained"
+          sx={{ mt: 3 }}
+          onClick={() => navigate("/")}
+        >
+          Go Shopping
+        </Button>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ bgcolor: colors.bg, minHeight: "100vh", pt: 12, pb: 8 }}>
-      <Container maxWidth="xl">
-        <Typography variant="h3" fontWeight="900" color={colors.primary} sx={{ mb: 4, letterSpacing: '-1px' }}>
-          Your Campus Cart
-        </Typography>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pt: { xs: 10, md: 14 }, pb: 10 }}>
+      <Container maxWidth="lg">
+
+        {/* HEADER */}
+        <Box sx={{ mb: 5 }}>
+          <Button
+            startIcon={<ChevronLeftIcon />}
+            onClick={() => navigate("/")}
+            sx={{ textTransform: "none", mb: 1 }}
+          >
+            Back to Marketplace
+          </Button>
+
+          <Typography variant="h4" fontWeight={900}>
+            My Cart ({items.length})
+          </Typography>
+        </Box>
 
         <Grid container spacing={4}>
-          {/* 🔥 LEFT: ITEM LIST */}
+
+          {/* ================= LEFT: PRODUCTS ================= */}
           <Grid item xs={12} md={8}>
-            <Stack spacing={2}>
+            <Stack spacing={3}>
               {items.map((item) => (
                 <Paper
                   key={item._id}
-                  elevation={0}
                   sx={{
-                    p: 2,
+                    p: 2.5,
                     borderRadius: 4,
-                    border: "1px solid #edf2f7",
+                    border: "1px solid",
+                    borderColor: "divider",
                   }}
                 >
-                  <Grid container spacing={2} alignItems="center">
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={2}
+                    alignItems="center"
+                  >
+                    {/* ✅ IMAGE FIX */}
+                    <Box
+                      component="img"
+                      src={item.images?.[0]}
+                      sx={{
+                        width: 90,
+                        height: 90,
+                        borderRadius: 2,
+                        objectFit: "cover",
+                        flexShrink: 0,
+                      }}
+                    />
 
-                    {/* IMAGE */}
-                    <Grid item xs={3} sm={2}>
-                      <Box
-                        component="img"
-                        src={item.images?.[0] || "https://placehold.co/200"}
-                        sx={{
-                          width: "100%",
-                          height: 80,
-                          borderRadius: 3,
-                          objectFit: "cover",
-                        }}
-                        onError={(e) => {
-                          e.target.src = "https://placehold.co/200";
-                        }}
-                      />
-                    </Grid>
-
-                    {/* INFO */}
-                    <Grid item xs={9} sm={6}>
-                      <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        sx={{ color: colors.primary }}
-                        noWrap
-                      >
+                    {/* CONTENT */}
+                    <Box sx={{ flex: 1, width: "100%" }}>
+                      <Typography fontWeight={800}>
                         {item.title}
                       </Typography>
 
-                      {/* SELLER */}
-                      <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <Typography variant="caption" color="text.secondary">
-                          Seller: {item.postedBy?.fullName || "Student"}
-                        </Typography>
-
-                        {/* optional verified */}
-                        {item.postedBy?.verified && (
-                          <CheckCircleIcon
-                            sx={{ fontSize: 12, color: colors.verified }}
-                          />
-                        )}
-                      </Stack>
-
-                      {/* LOCATION */}
-                      <Typography
-                        variant="caption"
-                        display="block"
-                        color="text.secondary"
-                      >
-                        Location: {item.location || item.postedBy?.campusId || "Campus"}
+                      <Typography variant="body2" color="text.secondary">
+                        Seller: {item.postedBy?.fullName}
                       </Typography>
-                    </Grid>
+
+                      <Typography fontWeight={700} mt={1}>
+                        ₹{item.price}
+                      </Typography>
+                    </Box>
 
                     {/* ACTIONS */}
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      sx={{ textAlign: { sm: "right" } }}
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
                     >
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        alignItems="center"
-                        justifyContent={{
-                          xs: "flex-start",
-                          sm: "flex-end",
-                        }}
-                      >
-                        <IconButton
-                          size="small"
-                          onClick={() => dispatch(decreaseQty(item._id))}
-                          sx={{ border: "1px solid #DDD" }}
-                        >
-                          <RemoveIcon fontSize="small" />
-                        </IconButton>
+                      <IconButton onClick={() => dispatch(decreaseQty(item._id))}>
+                        <RemoveIcon />
+                      </IconButton>
 
-                        <Typography
-                          fontWeight="bold"
-                          sx={{ minWidth: 24, textAlign: "center" }}
-                        >
-                          {item.qty}
-                        </Typography>
-
-                        <IconButton
-                          size="small"
-                          onClick={() => dispatch(increaseQty(item._id))}
-                          sx={{ border: "1px solid #DDD" }}
-                        >
-                          <AddIcon fontSize="small" />
-                        </IconButton>
-
-                        <Tooltip title="Remove">
-                          <IconButton
-                            onClick={() => dispatch(removeFromCart(item._id))}
-                            sx={{ ml: 2, color: "error.light" }}
-                          >
-                            <DeleteOutlineIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Stack>
-
-                      {/* PRICE */}
-                      <Typography
-                        variant="h6"
-                        fontWeight="900"
-                        color={colors.primary}
-                        sx={{ mt: 1 }}
-                      >
-                        ₹ {(item.price * item.qty).toLocaleString()}
+                      <Typography fontWeight={700}>
+                        {item.qty}
                       </Typography>
-                    </Grid>
-                  </Grid>
+
+                      <IconButton onClick={() => dispatch(increaseQty(item._id))}>
+                        <AddIcon />
+                      </IconButton>
+
+                      <IconButton
+                        color="error"
+                        onClick={() => dispatch(removeFromCart(item._id))}
+                      >
+                        <DeleteOutlineIcon />
+                      </IconButton>
+                    </Stack>
+                  </Stack>
                 </Paper>
               ))}
             </Stack>
           </Grid>
 
-          {/* 🔥 RIGHT: ORDER SUMMARY (STICKY) */}
+          {/* ================= RIGHT: SUMMARY ================= */}
           <Grid item xs={12} md={4}>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 4, position: 'sticky', top: 100, border: '1px solid #edf2f7' }}>
-              <Typography variant="h5" fontWeight="900" color={colors.primary} gutterBottom>
+            <Paper
+              sx={{
+                p: 3,
+                borderRadius: 4,
+                border: "1px solid",
+                borderColor: "divider",
+                bgcolor: (theme) =>
+                  alpha(theme.palette.primary.main, 0.04),
+                position: "sticky",
+                top: 100,
+              }}
+            >
+              <Typography variant="h6" fontWeight={800} mb={2}>
                 Order Summary
               </Typography>
 
-              <Stack spacing={2} sx={{ my: 3 }}>
-                <Box display="flex" justifyContent="space-between">
-                  <Typography color="text.secondary">Subtotal</Typography>
-                  <Typography fontWeight="bold">₹ {total}</Typography>
-                </Box>
-                <Box display="flex" justifyContent="space-between">
-                  <Typography color="text.secondary">Campus Pickup</Typography>
-                  <Typography fontWeight="bold" color={colors.verified}>FREE</Typography>
-                </Box>
-                <Divider />
-                <Box display="flex" justifyContent="space-between">
-                  <Typography variant="h6" fontWeight="bold">Total</Typography>
-                  <Typography variant="h5" fontWeight="900" color={colors.accent}>₹ {total}</Typography>
-                </Box>
-              </Stack>
+              <Stack spacing={2}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography>Subtotal</Typography>
+                  <Typography fontWeight={700}>
+                    ₹{total}
+                  </Typography>
+                </Stack>
 
-              <Alert severity="info" sx={{ mb: 3, borderRadius: 2, fontSize: '0.8rem' }}>
-                Meet in a public campus location for the exchange. Stay safe!
-              </Alert>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography>Delivery</Typography>
+                  <Typography color="success.main">FREE</Typography>
+                </Stack>
+
+                <Divider />
+
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography fontWeight={800}>Total</Typography>
+                  <Typography fontWeight={900}>
+                    ₹{total}
+                  </Typography>
+                </Stack>
+              </Stack>
 
               <Button
                 fullWidth
                 variant="contained"
                 size="large"
-                onClick={() => navigate("/checkout")}
-                sx={{
-                  bgcolor: colors.accent,
-                  py: 1.5,
-                  borderRadius: 2,
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  "&:hover": { bgcolor: "#d15b28" }
-                }}
+                sx={{ mt: 3, borderRadius: 3 }}
               >
                 Checkout
               </Button>
-
-              <Stack direction="row" justifyContent="center" alignItems="center" spacing={1} sx={{ mt: 2, color: colors.verified }}>
-                <SecurityIcon sx={{ fontSize: 16 }} />
-                <Typography variant="caption" fontWeight="bold">Secure Student Transaction</Typography>
-              </Stack>
             </Paper>
           </Grid>
         </Grid>

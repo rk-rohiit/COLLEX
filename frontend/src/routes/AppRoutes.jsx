@@ -31,6 +31,9 @@ import OrdersPage from "@/pages/admin/OrdersPage";
 import StudentsPage from "@/pages/admin/StudentsPage";
 import CategoriesPage from "@/pages/admin/CategoriesPage";
 import VerifyDeliveryPage from "../pages/order/VerifyDeliveryPage";
+import ProductsPage from "../pages/admin/ProductsPage";
+import ReportPage from "../pages/admin/ReportPage";
+import SupportPage from "../pages/admin/SupportPage";
 
 // Landing page
 const LandingPage = () => (
@@ -146,9 +149,12 @@ const AppRoutes = () => {
           <Route index element={<Dashboard />} />
 
           {/* ✅ FIXED PATHS (NO /admin prefix here) */}
+          <Route path="products" element={<ProductsPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="students" element={<StudentsPage />} />
           <Route path="categories" element={<CategoriesPage />} />
+          <Route path="reports" element={<ReportPage />} />
+          <Route path="support" element={<SupportPage />} />
         </Route>
 
         {/* 🔥 AUTH (NO NAVBAR) */}
