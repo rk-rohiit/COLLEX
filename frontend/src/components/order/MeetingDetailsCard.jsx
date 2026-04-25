@@ -1,24 +1,29 @@
 // components/order/MeetingDetailsCard.jsx
 
-import { Paper, Box, Typography, Stack } from "@mui/material";
+import { Paper, Box, Typography, Stack, useTheme } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import SwapHorizOutlinedIcon from "@mui/icons-material/SwapHorizOutlined";
 
 /* ─── Reusable key-value row ─────────────────────────────────── */
-const KVRow = ({ label, value, mono }) => (
+const KVRow = ({ label, value, mono, isLast }) => (
   <Stack
     direction="row"
     justifyContent="space-between"
     alignItems="center"
-    sx={{ py: 0.625, borderBottom: "0.5px solid", borderColor: "divider" }}
+    sx={{ 
+      py: 1, 
+      borderBottom: isLast ? "none" : "1px solid", 
+      borderColor: "divider" 
+    }}
   >
-    <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
+    <Typography sx={{ fontSize: "11px", color: "text.secondary", fontWeight: 500 }}>
       {label}
     </Typography>
     <Typography
       sx={{
         fontSize: "11px",
-        fontWeight: 500,
+        fontWeight: 600,
         color: "text.primary",
         fontFamily: mono ? "'JetBrains Mono', monospace" : "inherit",
       }}
@@ -29,6 +34,8 @@ const KVRow = ({ label, value, mono }) => (
 );
 
 const MeetingDetailsCard = ({ order }) => {
+  const theme = useTheme();
+
   const formattedDate = order?.createdAt
     ? new Date(order.createdAt).toLocaleDateString("en-IN", {
         day: "numeric",
@@ -44,8 +51,8 @@ const MeetingDetailsCard = ({ order }) => {
     <Paper
       elevation={0}
       sx={{
-        borderRadius: 3,
-        border: "0.5px solid",
+        borderRadius: `${theme.shape.borderRadius}px`,
+        border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
         overflow: "hidden",
@@ -55,53 +62,59 @@ const MeetingDetailsCard = ({ order }) => {
       {/* Section label */}
       <Box
         sx={{
-          px: 1.75,
-          py: 1.25,
-          borderBottom: "0.5px solid",
+          px: 2,
+          py: 1.5,
+          borderBottom: "1px solid",
           borderColor: "divider",
+          bgcolor: alpha(theme.palette.primary.main, 0.02),
         }}
       >
         <Typography
           sx={{
             fontSize: "10px",
-            fontWeight: 600,
-            color: "text.secondary",
+            fontWeight: 800,
+            color: theme.palette.primary.main,
             textTransform: "uppercase",
-            letterSpacing: "0.7px",
+            letterSpacing: "1px",
           }}
         >
           Meeting details
         </Typography>
       </Box>
 
-      <Box sx={{ p: 1.75 }}>
-        {/* Meet type banner */}
+      <Box sx={{ p: 2 }}>
+        {/* Meet type banner - Using Secondary (Action Orange) for visibility */}
         <Stack
           direction="row"
           alignItems="center"
-          spacing={1}
+          spacing={1.25}
           sx={{
-            bgcolor: "#E1F5EE",
+            bgcolor: alpha(theme.palette.secondary.main, 0.08),
             borderRadius: 2,
-            px: 1.25,
-            py: 0.875,
-            mb: 1.5,
+            px: 1.5,
+            py: 1.25,
+            mb: 2,
+            border: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}`,
           }}
         >
           {order?.meetType === "campus" ? (
-            <SwapHorizOutlinedIcon sx={{ fontSize: 15, color: "#0F6E56" }} />
+            <SwapHorizOutlinedIcon sx={{ fontSize: 18, color: theme.palette.secondary.main }} />
           ) : (
-            <LocationOnOutlinedIcon sx={{ fontSize: 15, color: "#0F6E56" }} />
+            <LocationOnOutlinedIcon sx={{ fontSize: 18, color: theme.palette.secondary.main }} />
           )}
           <Typography
-            sx={{ fontSize: "12px", fontWeight: 500, color: "#0F6E56" }}
+            sx={{ 
+                fontSize: "12px", 
+                fontWeight: 700, 
+                color: theme.palette.secondary.main 
+            }}
           >
             {meetLabel}
           </Typography>
         </Stack>
 
         {/* Key-value rows */}
-        <KVRow label="Location" value={order?.listing?.location || "Campus Block C"} />
+        <KVRow label="Location" value={order?.listing?.location || "Central Library"} />
         <KVRow label="Date placed" value={formattedDate} mono />
         <KVRow label="Payment" value={order?.paymentMethod || "UPI · Confirmed"} />
         <KVRow
@@ -110,21 +123,21 @@ const MeetingDetailsCard = ({ order }) => {
           mono
         />
 
-        {/* Last row — no bottom border */}
+        {/* Last row — highlighted with Trust Blue */}
         <Stack
           direction="row"
           justifyContent="space-between"
           alignItems="center"
-          sx={{ pt: 0.625 }}
+          sx={{ pt: 1.5 }}
         >
-          <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
-            Amount
+          <Typography sx={{ fontSize: "11px", color: "text.secondary", fontWeight: 700 }}>
+            Total Amount
           </Typography>
           <Typography
             sx={{
-              fontSize: "11px",
-              fontWeight: 600,
-              color: "#1D9E75",
+              fontSize: "13px",
+              fontWeight: 700,
+              color: theme.palette.primary.main,
               fontFamily: "'JetBrains Mono', monospace",
             }}
           >

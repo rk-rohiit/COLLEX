@@ -1,6 +1,7 @@
 // components/order/OrderStatusCard.jsx
 
-import { Paper, Box, Stack, Typography, Chip } from "@mui/material";
+import { Paper, Box, Stack, Typography, Chip, useTheme } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 
 const STEPS = ["Placed", "Payment", "Pickup", "Done"];
 
@@ -10,16 +11,15 @@ const getActiveStep = (status) => {
   return 2;
 };
 
-const STATUS_CHIP = {
-  completed: { bgcolor: "#EAF3DE", color: "#3B6D11" },
-  cancelled:  { bgcolor: "#FCEBEB", color: "#A32D2D" },
-  pending:    { bgcolor: "#FAEEDA", color: "#854F0B" },
-};
-
 /* ─── Dot ────────────────────────────────────────────────────── */
 const Dot = ({ state }) => {
-  const isDone   = state === "done";
+  const theme = useTheme();
+  const isDone = state === "done";
   const isActive = state === "active";
+
+  // Using Action Orange for active, Trust Blue for done
+  const activeColor = theme.palette.secondary.main;
+  const doneColor = theme.palette.primary.main;
 
   return (
     <Box
@@ -31,15 +31,15 @@ const Dot = ({ state }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: isDone ? "primary.main" : isActive ? "#EF9F27" : "background.paper",
+        bgcolor: isDone ? doneColor : isActive ? activeColor : "background.paper",
         border: isDone
           ? "none"
           : isActive
-          ? "3px solid #FAEEDA"
+          ? `3px solid ${alpha(activeColor, 0.2)}`
           : "1.5px solid",
         borderColor: isDone || isActive ? "transparent" : "divider",
-        boxShadow: isActive ? "0 0 0 1.5px #EF9F27" : "none",
-        transition: "background 0.2s",
+        boxShadow: isActive ? `0 0 0 1.5px ${activeColor}` : "none",
+        transition: "all 0.2s ease",
         zIndex: 1,
       }}
     >
@@ -49,57 +49,72 @@ const Dot = ({ state }) => {
             points="2,6 5,9 10,3"
             fill="none"
             stroke="white"
-            strokeWidth="2.2"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
         </Box>
       )}
       {isActive && (
-        <Box sx={{ width: 9, height: 9, borderRadius: "50%", bgcolor: "white" }} />
+        <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "white" }} />
       )}
     </Box>
   );
 };
 
 /* ─── Connector line ─────────────────────────────────────────── */
-const Line = ({ done }) => (
-  <Box
-    sx={{
-      flex: 1,
-      height: "1.5px",
-      bgcolor: done ? "primary.main" : "divider",
-      alignSelf: "center",
-      mb: "20px",           // nudge up to align with dot centre
-      mx: { xs: 0.5, sm: 1 },
-    }}
-  />
-);
+const Line = ({ done }) => {
+  const theme = useTheme();
+  return (
+    <Box
+      sx={{
+        flex: 1,
+        height: "2px",
+        bgcolor: done ? theme.palette.primary.main : "divider",
+        alignSelf: "center",
+        mb: "22px", // Aligned with larger dots
+        mx: 0.5,
+      }}
+    />
+  );
+};
 
 /* ─── Full card ──────────────────────────────────────────────── */
 const OrderStatusCard = ({ order, isSeller }) => {
+  const theme = useTheme();
   const activeStep = getActiveStep(order?.status);
-  const chipStyle  = STATUS_CHIP[order?.status] || STATUS_CHIP.pending;
+
+  // Status mapping using theme palette
+  const getStatusConfig = (status) => {
+    switch (status) {
+      case "completed":
+        return { bgcolor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main };
+      case "cancelled":
+        return { bgcolor: alpha(theme.palette.error.main, 0.1), color: theme.palette.error.main };
+      default:
+        return { bgcolor: alpha(theme.palette.secondary.main, 0.1), color: theme.palette.secondary.main };
+    }
+  };
+
+  const statusStyle = getStatusConfig(order?.status);
 
   return (
     <Paper
       elevation={0}
       sx={{
         width: "100%",
-        borderRadius: 3,
-        border: "0.5px solid",
+        borderRadius: `${theme.shape.borderRadius}px`,
+        border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
         overflow: "hidden",
         position: "relative",
-        // left accent bar
         "&::before": {
           content: '""',
           position: "absolute",
           left: 0, top: 0, bottom: 0,
           width: "4px",
-          background: "linear-gradient(180deg, #0A2647 0%, #1E3A8A 100%)",
-          borderRadius: "3px 0 0 3px",
+          background: `linear-gradient(180deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
         },
       }}
     >
@@ -109,34 +124,28 @@ const OrderStatusCard = ({ order, isSeller }) => {
         justifyContent="space-between"
         alignItems="center"
         sx={{
-          pl: { xs: 3, md: 3.5 },
-          pr: { xs: 2, md: 2.5 },
-          py: 1.75,
-          borderBottom: "0.5px solid",
+          pl: 3.5,
+          pr: 2.5,
+          py: 2,
+          borderBottom: "1px solid",
           borderColor: "divider",
+          bgcolor: alpha(theme.palette.primary.main, 0.01),
         }}
       >
         <Box>
           <Typography
             sx={{
               fontSize: "10px",
+              fontWeight: 700,
               fontFamily: "'JetBrains Mono', monospace",
               color: "text.secondary",
-              letterSpacing: "0.5px",
+              textTransform: "uppercase",
             }}
           >
-            ORDER · #{order?._id?.slice(-6)?.toUpperCase() || "N/A"}
+            Ref: #{order?._id?.slice(-6)?.toUpperCase() || "000000"}
           </Typography>
-          <Typography
-            sx={{
-              fontSize: "16px",
-              fontWeight: 600,
-              color: "text.primary",
-              letterSpacing: "-0.3px",
-              mt: 0.25,
-            }}
-          >
-            {isSeller ? "Sales tracker" : "Order status"}
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary", mt: 0.25 }}>
+            {isSeller ? "Sales Progression" : "Order Journey"}
           </Typography>
         </Box>
 
@@ -144,34 +153,30 @@ const OrderStatusCard = ({ order, isSeller }) => {
           label={order?.status || "pending"}
           size="small"
           sx={{
-            height: 22,
+            height: 24,
             fontSize: "11px",
-            fontWeight: 500,
-            bgcolor: chipStyle.bgcolor,
-            color: chipStyle.color,
-            border: "none",
+            fontWeight: 700,
+            bgcolor: statusStyle.bgcolor,
+            color: statusStyle.color,
+            textTransform: "uppercase",
             "& .MuiChip-label": { px: 1.5 },
           }}
         />
       </Stack>
 
-      {/* Stepper — dots + explicit connector lines, spaced with px padding */}
+      {/* Stepper Area */}
       <Box
         sx={{
           display: "flex",
           alignItems: "flex-end",
-          // push steps toward centre, don't let them hit edges
-          px: { xs: 3, sm: 6, md: 12, lg: 18 },
-          pt: 2.25,
-          pb: 1,
+          px: { xs: 2, sm: 6, md: 8 },
+          pt: 3,
+          pb: 2,
         }}
       >
         {STEPS.map((label, i) => {
-          const state =
-            i < activeStep ? "done" : i === activeStep ? "active" : "todo";
-          const isDone   = state === "done";
-          const isActive = state === "active";
-
+          const state = i < activeStep ? "done" : i === activeStep ? "active" : "todo";
+          
           return (
             <Box
               key={label}
@@ -181,34 +186,25 @@ const OrderStatusCard = ({ order, isSeller }) => {
                 flex: i < STEPS.length - 1 ? 1 : "none",
               }}
             >
-              {/* Step column: dot + label stacked */}
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 0.75,
-                  // fixed min-width prevents label squeeze
-                  minWidth: { xs: 52, sm: 64 },
-                }}
-              >
+              <Stack alignItems="center" spacing={1} sx={{ minWidth: 60 }}>
                 <Dot state={state} />
                 <Typography
                   sx={{
-                    fontSize: { xs: "9px", sm: "10px" },
-                    fontWeight: 600,
+                    fontSize: "10px",
+                    fontWeight: 800,
                     textTransform: "uppercase",
-                    letterSpacing: "0.4px",
-                    whiteSpace: "nowrap",
-                    color: isDone ? "#3B6D11" : isActive ? "#854F0B" : "text.secondary",
-                    mb: 0.5,
+                    letterSpacing: "0.5px",
+                    color: state === "done" 
+                      ? theme.palette.primary.main 
+                      : state === "active" 
+                      ? theme.palette.secondary.main 
+                      : "text.disabled",
                   }}
                 >
                   {label}
                 </Typography>
-              </Box>
+              </Stack>
 
-              {/* Connector to next step */}
               {i < STEPS.length - 1 && <Line done={i < activeStep} />}
             </Box>
           );

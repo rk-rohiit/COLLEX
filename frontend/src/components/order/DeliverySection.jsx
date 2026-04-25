@@ -10,7 +10,9 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
@@ -19,28 +21,35 @@ import { verifyDelivery } from "@/features/order/orderSlice";
 import { toast } from "react-toastify";
 
 /* ─── Info banner ────────────────────────────────────────────── */
-const InfoBanner = ({ message, color, bg, icon }) => (
-  <Stack
-    direction="row"
-    spacing={1}
-    alignItems="flex-start"
-    sx={{
-      bgcolor: bg,
-      borderRadius: 2,
-      px: 1.5,
-      py: 1,
-      mb: 1.75,
-    }}
-  >
-    <Box sx={{ pt: "1px", flexShrink: 0 }}>{icon}</Box>
-    <Typography sx={{ fontSize: "11px", color, lineHeight: 1.6 }}>
-      {message}
-    </Typography>
-  </Stack>
-);
+const InfoBanner = ({ message, paletteKey, icon }) => {
+  const theme = useTheme();
+  const color = theme.palette[paletteKey].main;
+  
+  return (
+    <Stack
+      direction="row"
+      spacing={1.5}
+      alignItems="flex-start"
+      sx={{
+        bgcolor: alpha(color, 0.1),
+        borderRadius: 2,
+        px: 2,
+        py: 1.5,
+        mb: 2,
+        border: `1px solid ${alpha(color, 0.1)}`,
+      }}
+    >
+      <Box sx={{ pt: "2px", flexShrink: 0, color: color }}>{icon}</Box>
+      <Typography sx={{ fontSize: "12px", color: "text.primary", fontWeight: 500, lineHeight: 1.5 }}>
+        {message}
+      </Typography>
+    </Stack>
+  );
+};
 
 /* ─── Main component ─────────────────────────────────────────── */
 const DeliverySection = ({ order, isSeller }) => {
+  const theme = useTheme();
   const dispatch = useDispatch();
   const { verifyLoading } = useSelector((s) => s.order);
   const [code, setCode] = useState("");
@@ -62,48 +71,41 @@ const DeliverySection = ({ order, isSeller }) => {
     <Paper
       elevation={0}
       sx={{
-        borderRadius: 3,
-        border: "0.5px solid",
+        borderRadius: `${theme.shape.borderRadius}px`,
+        border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
         overflow: "hidden",
       }}
     >
       {/* Section header */}
-      <Box
-        sx={{
-          px: 1.75,
-          py: 1.25,
-          borderBottom: "0.5px solid",
-          borderColor: "divider",
-        }}
-      >
+      <Box sx={{ px: 2, py: 1.5, borderBottom: "1px solid", borderColor: "divider", bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
         <Typography
           sx={{
             fontSize: "10px",
-            fontWeight: 600,
-            color: "text.secondary",
+            fontWeight: 800,
+            color: theme.palette.primary.main,
             textTransform: "uppercase",
-            letterSpacing: "0.7px",
+            letterSpacing: "1px",
           }}
         >
           Delivery verification
         </Typography>
       </Box>
 
-      <Box sx={{ p: 1.75 }}>
+      <Box sx={{ p: 2 }}>
         {/* ── Completed state ── */}
         {order?.isDelivered && (
-          <Stack alignItems="center" spacing={1.25} py={2}>
-            <TaskAltIcon sx={{ fontSize: 38, color: "#1D9E75" }} />
-            <Typography
-              sx={{ fontSize: "14px", fontWeight: 600, color: "#3B6D11" }}
-            >
-              Product delivered successfully
-            </Typography>
-            <Typography sx={{ fontSize: "12px", color: "text.secondary" }}>
-              This order has been completed and closed.
-            </Typography>
+          <Stack alignItems="center" spacing={1.5} py={3}>
+            <TaskAltIcon sx={{ fontSize: 48, color: theme.palette.success.main }} />
+            <Box textAlign="center">
+              <Typography sx={{ fontSize: "16px", fontWeight: 700, color: theme.palette.success.main }}>
+                Handover Complete
+              </Typography>
+              <Typography sx={{ fontSize: "13px", color: "text.secondary", mt: 0.5 }}>
+                This order has been verified and closed.
+              </Typography>
+            </Box>
           </Stack>
         )}
 
@@ -111,45 +113,42 @@ const DeliverySection = ({ order, isSeller }) => {
         {!order?.isDelivered && !isSeller && (
           <>
             <InfoBanner
-              bg="#E1F5EE"
-              color="#0F6E56"
-              message="Show this code to the seller at the time of handoff to confirm delivery."
-              icon={
-                <InfoOutlinedIcon sx={{ fontSize: 14, color: "#0F6E56" }} />
-              }
+              paletteKey="primary"
+              message="Show this code to the seller at the time of handoff to confirm you've received the item."
+              icon={<InfoOutlinedIcon fontSize="small" />}
             />
             <Box
               sx={{
                 bgcolor: "background.default",
-                border: "0.5px solid",
-                borderColor: "divider",
-                borderRadius: 2,
-                px: 2,
-                py: 1.5,
+                border: "1px dashed",
+                borderColor: theme.palette.primary.main,
+                borderRadius: 3,
+                textAlign: "center",
+                py: 3,
               }}
             >
               <Typography
                 sx={{
-                  fontSize: "10px",
-                  fontWeight: 600,
+                  fontSize: "11px",
+                  fontWeight: 700,
                   color: "text.secondary",
                   textTransform: "uppercase",
-                  letterSpacing: "0.7px",
-                  mb: 0.75,
+                  mb: 1,
                 }}
               >
-                Your delivery code
+                Your Secret Code
               </Typography>
               <Typography
                 sx={{
-                  fontSize: "28px",
-                  fontWeight: 600,
+                  fontSize: "32px",
+                  fontWeight: 800,
                   fontFamily: "'JetBrains Mono', monospace",
-                  letterSpacing: "8px",
-                  color: "text.primary",
+                  letterSpacing: "10px",
+                  color: theme.palette.primary.main,
+                  ml: "10px", // Visual centering for letter spacing
                 }}
               >
-                {order?.deliveryCode || "— — — —"}
+                {order?.deliveryCode || "••••"}
               </Typography>
             </Box>
           </>
@@ -159,50 +158,39 @@ const DeliverySection = ({ order, isSeller }) => {
         {!order?.isDelivered && isSeller && (
           <>
             <InfoBanner
-              bg="#FAEEDA"
-              color="#854F0B"
-              message="Ask the buyer for their 4-digit code. Enter it below to confirm delivery and complete the order."
-              icon={
-                <LockOutlinedIcon sx={{ fontSize: 14, color: "#854F0B" }} />
-              }
+              paletteKey="secondary"
+              message="Ask the buyer for their 4-digit code after they inspect the item. Entering it completes the transaction."
+              icon={<LockOutlinedIcon fontSize="small" />}
             />
             <TextField
               fullWidth
-              placeholder="Enter 4-digit delivery code"
+              placeholder="Enter 4-digit code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleVerify()}
               inputProps={{
-                maxLength: 6,
+                maxLength: 4,
                 style: {
                   fontFamily: "'JetBrains Mono', monospace",
-                  letterSpacing: "3px",
-                  fontSize: "15px",
+                  letterSpacing: "4px",
+                  fontSize: "16px",
+                  textAlign: "center"
                 },
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <LockOutlinedIcon
-                      sx={{ fontSize: 16, color: "text.disabled" }}
-                    />
+                    <LockOutlinedIcon sx={{ fontSize: 18, color: "text.disabled" }} />
                   </InputAdornment>
                 ),
               }}
               sx={{
-                mb: 1.25,
+                mb: 2,
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
-                  fontSize: "13px",
-                  "& fieldset": {
-                    borderWidth: "0.5px",
-                    borderColor: "divider",
-                  },
-                  "&:hover fieldset": { borderColor: "text.secondary" },
                   "&.Mui-focused fieldset": {
-                    borderColor: "#1D9E75",
-                    borderWidth: "1.5px",
-                    boxShadow: "0 0 0 3px #E1F5EE",
+                    borderColor: theme.palette.secondary.main,
+                    boxShadow: `0 0 0 4px ${alpha(theme.palette.secondary.main, 0.1)}`,
                   },
                 },
               }}
@@ -211,25 +199,19 @@ const DeliverySection = ({ order, isSeller }) => {
             <Button
               fullWidth
               variant="contained"
+              color="secondary" // Action Orange for seller's final action
               onClick={handleVerify}
-              disabled={verifyLoading || !code.trim()}
+              disabled={verifyLoading || code.length < 4}
               sx={{
-                bgcolor: "#1D9E75",
-                color: "#fff",
-                fontSize: "12px",
-                fontWeight: 600,
-                textTransform: "none",
-                py: 1,
-                borderRadius: 2,
-                boxShadow: "none",
-                "&:hover": { bgcolor: "#17876A", boxShadow: "none" },
-                "&:disabled": { bgcolor: "action.disabledBackground" },
+                py: 1.25,
+                fontWeight: 700,
+                fontSize: "13px",
               }}
             >
               {verifyLoading ? (
-                <CircularProgress size={16} sx={{ color: "white" }} />
+                <CircularProgress size={20} sx={{ color: "white" }} />
               ) : (
-                "Confirm delivery"
+                "Confirm & Complete Order"
               )}
             </Button>
           </>
