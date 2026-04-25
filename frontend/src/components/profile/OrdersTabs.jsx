@@ -1,12 +1,14 @@
 // components/profile/OrdersTabs.jsx
 
 import { useState } from "react";
-import { Paper, Tabs, Tab, Box, Typography } from "@mui/material";
+import { Paper, Tabs, Tab, Box, useTheme } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import OrderRow from "./OrderRow";
 import EmptyState from "./EmptyState";
 
 const OrdersTabs = ({ myOrders = [], receivedOrders = [], onSelectOrder, selectedOrder }) => {
   const [tab, setTab] = useState(0);
+  const theme = useTheme();
 
   const data = tab === 0 ? myOrders : receivedOrders;
 
@@ -14,8 +16,8 @@ const OrdersTabs = ({ myOrders = [], receivedOrders = [], onSelectOrder, selecte
     <Paper
       elevation={0}
       sx={{
-        borderRadius: 3,
-        border: "0.5px solid",
+        borderRadius: `${theme.shape.borderRadius}px`,
+        border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
         overflow: "hidden",
@@ -24,33 +26,38 @@ const OrdersTabs = ({ myOrders = [], receivedOrders = [], onSelectOrder, selecte
       {/* Tab header */}
       <Box
         sx={{
-          px: 1.5,
-          pt: 1.25,
-          pb: 0,
-          borderBottom: "0.5px solid",
+          px: 2,
+          pt: 1,
+          borderBottom: "1px solid",
           borderColor: "divider",
+          bgcolor: alpha(theme.palette.primary.main, 0.01), // Very subtle tint
         }}
       >
         <Tabs
           value={tab}
           onChange={(_, v) => setTab(v)}
           sx={{
-            minHeight: 36,
+            minHeight: 44,
             "& .MuiTabs-indicator": {
-              height: "2px",
-              bgcolor: "#1D9E75",
-              borderRadius: "2px 2px 0 0",
+              height: 3,
+              bgcolor: theme.palette.primary.main, // Trust Blue
+              borderRadius: "3px 3px 0 0",
             },
             "& .MuiTab-root": {
-              minHeight: 36,
-              py: 0,
-              px: 1,
-              fontSize: "11px",
-              fontWeight: 600,
+              minHeight: 44,
+              fontSize: "12px",
+              fontWeight: 700,
               textTransform: "uppercase",
-              letterSpacing: "0.6px",
+              letterSpacing: "0.8px",
               color: "text.secondary",
-              "&.Mui-selected": { color: "#1D9E75" },
+              transition: "color 0.2s",
+              "&:hover": {
+                color: theme.palette.primary.main,
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
+              },
+              "&.Mui-selected": { 
+                color: theme.palette.primary.main 
+              },
             },
           }}
         >
@@ -59,8 +66,19 @@ const OrdersTabs = ({ myOrders = [], receivedOrders = [], onSelectOrder, selecte
         </Tabs>
       </Box>
 
-      {/* List */}
-      <Box>
+      {/* List Container */}
+      <Box 
+        sx={{ 
+          maxHeight: 500, 
+          overflowY: "auto",
+          // Custom scrollbar to match the theme
+          "&::-webkit-scrollbar": { width: "6px" },
+          "&::-webkit-scrollbar-thumb": { 
+            bgcolor: alpha(theme.palette.text.disabled, 0.2),
+            borderRadius: "10px" 
+          }
+        }}
+      >
         {data.length > 0 ? (
           data.map((order) => (
             <OrderRow
@@ -71,18 +89,16 @@ const OrdersTabs = ({ myOrders = [], receivedOrders = [], onSelectOrder, selecte
             />
           ))
         ) : (
-          <EmptyState
-            message={
-              tab === 0
-                ? "No purchases yet"
-                : "No sales yet"
-            }
-            sub={
-              tab === 0
-                ? "Items you buy will appear here"
-                : "Orders from your listings will appear here"
-            }
-          />
+          <Box sx={{ py: 6 }}>
+            <EmptyState
+              message={tab === 0 ? "No purchases yet" : "No sales yet"}
+              sub={
+                tab === 0
+                  ? "Items you buy will appear here."
+                  : "Orders from your listings will appear here."
+              }
+            />
+          </Box>
         )}
       </Box>
     </Paper>

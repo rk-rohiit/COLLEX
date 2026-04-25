@@ -1,50 +1,64 @@
 // components/profile/OrderDetailPanel.jsx
 
-import { Paper, Box, Typography, Stack, Divider } from "@mui/material";
+import { Paper, Box, Typography, Stack, Divider, useTheme,Avatar } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
 import OrderTimeline from "./OrderTimeline";
 
-const DetailRow = ({ label, value, mono }) => (
-  <Stack direction="row" justifyContent="space-between" alignItems="center" py={0.625}>
-    <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
-      {label}
-    </Typography>
-    <Typography
-      sx={{
-        fontSize: "11px",
-        fontWeight: 500,
-        color: "text.primary",
-        fontFamily: mono ? "'JetBrains Mono', monospace" : "inherit",
-      }}
-    >
-      {value}
-    </Typography>
-  </Stack>
-);
+const DetailRow = ({ label, value, highlight }) => {
+  const theme = useTheme();
+  return (
+    <Stack direction="row" justifyContent="space-between" alignItems="center" py={0.75}>
+      <Typography sx={{ fontSize: "11px", color: "text.secondary", fontWeight: 500 }}>
+        {label}
+      </Typography>
+      <Typography
+        sx={{
+          fontSize: "11px",
+          fontWeight: highlight ? 700 : 500,
+          color: highlight ? theme.palette.primary.main : "text.primary",
+          fontFamily: highlight ? "'JetBrains Mono', monospace" : "inherit",
+        }}
+      >
+        {value}
+      </Typography>
+    </Stack>
+  );
+};
 
 const OrderDetailPanel = ({ order }) => {
+  const theme = useTheme();
+
   if (!order) {
     return (
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3,
-          border: "0.5px solid",
+          borderRadius: `${theme.shape.borderRadius}px`,
+          border: "1px solid",
           borderColor: "divider",
-          bgcolor: "background.paper",
-          p: 2,
+          bgcolor: alpha(theme.palette.background.default, 0.5),
+          p: 3,
           height: "100%",
-          minHeight: 200,
+          minHeight: 240,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 1,
+          gap: 1.5,
         }}
       >
-        <InboxOutlinedIcon sx={{ fontSize: 32, color: "text.disabled" }} />
-        <Typography sx={{ fontSize: "12px", color: "text.secondary", textAlign: "center" }}>
+        <Avatar 
+          sx={{ 
+            bgcolor: alpha(theme.palette.text.disabled, 0.1),
+            width: 56, 
+            height: 56 
+          }}
+        >
+          <InboxOutlinedIcon sx={{ fontSize: 28, color: "text.disabled" }} />
+        </Avatar>
+        <Typography variant="body2" sx={{ color: "text.secondary", fontWeight: 500 }}>
           Select an order to view details
         </Typography>
       </Paper>
@@ -55,7 +69,6 @@ const OrderDetailPanel = ({ order }) => {
     listing,
     status,
     _id,
-    buyer,
     seller,
     createdAt,
     deliveryLocation,
@@ -70,58 +83,56 @@ const OrderDetailPanel = ({ order }) => {
       })
     : "—";
 
-  const sellerName =
-    typeof seller === "object"
-      ? seller?.fullName || "—"
-      : "—";
-
   return (
     <Paper
       elevation={0}
       sx={{
-        borderRadius: 3,
-        border: "0.5px solid",
+        borderRadius: `${theme.shape.borderRadius}px`,
+        border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
         overflow: "hidden",
       }}
     >
-      {/* Panel header label */}
+      {/* Header Label */}
       <Box
         sx={{
-          px: 1.75,
-          py: 1.25,
-          borderBottom: "0.5px solid",
+          px: 2,
+          py: 1.5,
+          borderBottom: "1px solid",
           borderColor: "divider",
+          bgcolor: alpha(theme.palette.primary.main, 0.02),
         }}
       >
         <Typography
           sx={{
             fontSize: "10px",
-            fontWeight: 600,
-            color: "text.secondary",
+            fontWeight: 800,
+            color: theme.palette.primary.main,
             textTransform: "uppercase",
-            letterSpacing: "0.7px",
+            letterSpacing: "1px",
           }}
         >
           Order detail
         </Typography>
       </Box>
 
-      <Box sx={{ p: 1.75 }}>
-        {/* Order card header */}
-        <Stack direction="row" spacing={1.25} alignItems="center" mb={1.5}>
+      <Box sx={{ p: 2 }}>
+        {/* Product Info Section */}
+        <Stack direction="row" spacing={2} alignItems="center" mb={2}>
           <Box
             sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "8px",
+              width: 48,
+              height: 48,
+              borderRadius: 2,
               bgcolor: "action.hover",
               overflow: "hidden",
               flexShrink: 0,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              border: "1px solid",
+              borderColor: "divider",
             }}
           >
             {listing?.images?.[0] ? (
@@ -132,66 +143,74 @@ const OrderDetailPanel = ({ order }) => {
                 sx={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             ) : (
-              <ImageOutlinedIcon sx={{ fontSize: 16, color: "text.disabled" }} />
+              <ImageOutlinedIcon sx={{ fontSize: 20, color: "text.disabled" }} />
             )}
           </Box>
 
           <Box>
             <Typography
-              sx={{ fontSize: "13px", fontWeight: 500, color: "text.primary" }}
+              variant="body2"
+              sx={{ fontWeight: 700, color: "text.primary", lineHeight: 1.2 }}
             >
-              {listing?.title || "Untitled"}
+              {listing?.title || "Untitled Product"}
             </Typography>
             <Typography
+              variant="caption"
               sx={{
-                fontSize: "10px",
+                display: "block",
                 color: "text.secondary",
                 fontFamily: "'JetBrains Mono', monospace",
-                mt: 0.25,
+                mt: 0.5,
               }}
             >
-              #{_id?.slice(-6)?.toUpperCase() || "N/A"} · {formattedDate}
+              ID: {_id?.slice(-6)?.toUpperCase()} • {formattedDate}
             </Typography>
           </Box>
         </Stack>
 
-        <Divider sx={{ mb: 1.25 }} />
+        <Divider sx={{ mb: 1.5, borderStyle: "dashed" }} />
 
-        {/* Key-value rows */}
-        <Box>
-          <DetailRow label="Seller" value={sellerName} />
+        {/* Transaction Details */}
+        <Box mb={2}>
+          <DetailRow label="Seller" value={seller?.fullName || "Collex Member"} />
           <DetailRow
-            label="Amount"
+            label="Total Amount"
             value={`₹${listing?.price?.toLocaleString() || 0}`}
-            mono
+            highlight // Applies Primary Blue and Mono font
           />
           <DetailRow
             label="Payment"
             value={paymentMethod || "UPI · Confirmed"}
           />
           <DetailRow
-            label="Pickup"
-            value={deliveryLocation || "Campus Block C"}
+            label="Pickup point"
+            value={deliveryLocation || "Central Library"}
           />
         </Box>
 
-        <Divider sx={{ my: 1.25 }} />
-
-        {/* Timeline */}
-        <Typography
-          sx={{
-            fontSize: "10px",
-            fontWeight: 600,
-            color: "text.secondary",
-            textTransform: "uppercase",
-            letterSpacing: "0.7px",
-            mb: 0.5,
+        {/* Status Section */}
+        <Box 
+          sx={{ 
+            p: 1.5, 
+            borderRadius: 2, 
+            bgcolor: alpha(theme.palette.secondary.main, 0.04),
+            border: "1px solid",
+            borderColor: alpha(theme.palette.secondary.main, 0.1)
           }}
         >
-          Status
-        </Typography>
-
-        <OrderTimeline status={status} />
+          <Typography
+            sx={{
+              fontSize: "10px",
+              fontWeight: 800,
+              color: theme.palette.secondary.main, // Action Orange
+              textTransform: "uppercase",
+              mb: 1,
+            }}
+          >
+            Order Status
+          </Typography>
+          <OrderTimeline status={status} />
+        </Box>
       </Box>
     </Paper>
   );
