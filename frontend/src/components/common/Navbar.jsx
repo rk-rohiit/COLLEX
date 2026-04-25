@@ -1,3 +1,5 @@
+// components/layout/Navbar.jsx
+
 import {
   AppBar,
   Toolbar,
@@ -19,27 +21,25 @@ import {
   Divider,
   Paper,
   Stack,
+  useTheme,
 } from "@mui/material";
-
-import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import SearchIcon from "@mui/icons-material/Search";
-import AddIcon from "@mui/icons-material/Add";
-// import DashboardIcon from "@mui/icons-material/Dashboard";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LogoutIcon from "@mui/icons-material/Logout";
-import MessageIcon from "@mui/icons-material/Message";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import SchoolIcon from "@mui/icons-material/School";
-import WarningIcon from '@mui/icons-material/Warning';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-
+import { alpha } from "@mui/material/styles";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+
+// Icons
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import AddIcon from "@mui/icons-material/Add";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from "@mui/icons-material/Logout";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import SchoolIcon from "@mui/icons-material/School";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
 import { logout } from "../../features/auth/authSlice";
-import { toast } from "react-toastify";
 
 const categories = [
   { name: "Books", icon: "📚" },
@@ -50,6 +50,7 @@ const categories = [
 ];
 
 const Navbar = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
@@ -64,110 +65,126 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  const handleCreateList = () => {
-    navigate("/create-listing")
-    //  toast("Under Construction");
-  }
-
-  // Theme Colors from Prototype
-  const colors = {
-    primary: "#0A2647", // Deep Blue
-    accent: "#E86A33",  // Orange Action
-    verified: "#2ECC71", // Green
-  };
-
   return (
     <AppBar
       position="fixed"
+      elevation={0}
       sx={{
-        bgcolor: "white",
-        color: colors.primary,
-        boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-        borderBottom: `2px solid ${colors.primary}10`
+        bgcolor: "background.paper",
+        color: "text.primary",
+        borderBottom: "1px solid",
+        borderColor: "divider",
+        zIndex: theme.zIndex.drawer + 1,
       }}
     >
       <Container maxWidth="xl">
-        <Toolbar sx={{ justifyContent: "space-between", py: 0.5 }}>
-
-          <Box
+        <Toolbar sx={{ justifyContent: "space-between", height: 70, px: { xs: 1, md: 2 } }}>
+          
+          {/* LEFT: LOGO */}
+          <Stack 
+            direction="row" 
+            alignItems="center" 
+            spacing={1.5} 
             onClick={() => navigate("/")}
-            sx={{
-              px: 2.5,
-              py: 2,
-              display: "flex",
-              alignItems: "center",
-              gap: 1.25,
-              borderColor: "divider",
-              mb: 1,
-              cursor: "pointer"
-            }}
+            sx={{ cursor: "pointer" }}
           >
             <Box
               sx={{
-                width: 32,
-                height: 32,
-                borderRadius: "9px",
-                bgcolor: "primary.main",
+                width: 36,
+                height: 36,
+                borderRadius: "10px",
+                bgcolor: theme.palette.primary.main,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
               }}
             >
-              <SchoolIcon sx={{ fontSize: 17, color: "white" }} />
+              <SchoolIcon sx={{ fontSize: 20, color: "white" }} />
             </Box>
-            <Typography fontWeight={800} fontSize="0.95rem" color="text.primary">
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 800, 
+                letterSpacing: "-0.5px", 
+                display: { xs: "none", sm: "block" },
+                color: theme.palette.primary.main 
+              }}
+            >
               COLLEX
             </Typography>
-          </Box>
+          </Stack>
 
-          {/* CENTER: SEARCH BAR (DESKTOP) */}
-          <Box sx={{ flex: 1, display: { xs: "none", md: "flex" }, justifyContent: "center" }}>
+          {/* CENTER: SEARCH BAR */}
+          <Box sx={{ flex: 1, display: { xs: "none", md: "flex" }, justifyContent: "center", px: 4 }}>
             <Paper
               elevation={0}
               sx={{
                 display: "flex",
                 alignItems: "center",
                 px: 2,
-                py: 0.5,
                 borderRadius: "12px",
                 width: "100%",
-                maxWidth: 500,
-                border: "1.5px solid #E0E0E0",
-                bgcolor: "#F8F9FA"
+                maxWidth: 600,
+                height: 44,
+                border: "1px solid",
+                borderColor: "divider",
+                bgcolor: alpha(theme.palette.background.default, 0.8),
+                transition: "all 0.2s",
+                "&:focus-within": {
+                  borderColor: theme.palette.primary.main,
+                  bgcolor: "background.paper",
+                  boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.1)}`
+                }
               }}
             >
-              <SearchIcon sx={{ color: "gray", mr: 1, fontSize: 20 }} />
+              <SearchIcon sx={{ color: "text.disabled", mr: 1.5, fontSize: 20 }} />
               <InputBase
-                placeholder="Search textbooks, dorm goods, tech..."
+                placeholder="Search textbooks, tech, dorm essentials..."
                 fullWidth
-                sx={{ fontSize: "0.9rem" }}
+                sx={{ 
+                  fontSize: "0.875rem", 
+                  fontWeight: 500,
+                  "& input::placeholder": { color: "text.disabled", opacity: 1 }
+                }}
               />
             </Paper>
           </Box>
 
           {/* RIGHT: ACTIONS */}
-          <Stack direction="row" alignItems="center" spacing={2}>
+          <Stack direction="row" alignItems="center" spacing={{ xs: 1, md: 2 }}>
             {user ? (
               <>
                 <Button
                   variant="contained"
-                  onClick={handleCreateList}
+                  disableElevation
+                  onClick={() => navigate("/create-listing")}
                   startIcon={<AddIcon />}
                   sx={{
                     display: { xs: "none", sm: "flex" },
-                    bgcolor: colors.primary,
-                    borderRadius: "8px",
-                    fontWeight: "bold",
+                    bgcolor: theme.palette.primary.main,
+                    borderRadius: "10px",
+                    fontWeight: 700,
+                    textTransform: "none",
                     px: 3,
-                    "&:hover": { bgcolor: "#06172a" }
+                    "&:hover": { bgcolor: theme.palette.primary.dark }
                   }}
                 >
-                  LIST AN ITEM
+                  Post Listing
                 </Button>
 
-                <IconButton sx={{ color: colors.primary }} onClick={() =>navigate("/profile/cart")}>
-                  <Badge badgeContent={3} color="error">
-                    <ShoppingCartIcon />
+                <IconButton 
+                  onClick={() => navigate("/profile/cart")}
+                  sx={{ 
+                    color: "text.secondary",
+                    "&:hover": { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.05) }
+                  }}
+                >
+                  <Badge 
+                    badgeContent={3} 
+                    sx={{ "& .MuiBadge-badge": { bgcolor: theme.palette.secondary.main, color: "white", fontWeight: 700 } }}
+                  >
+                    <ShoppingCartIcon fontSize="medium" />
                   </Badge>
                 </IconButton>
 
@@ -177,73 +194,128 @@ const Navbar = () => {
                   alignItems="center"
                   spacing={1}
                   onClick={(e) => setAnchorEl(e.currentTarget)}
-                  sx={{ cursor: "pointer", ml: 1 }}
+                  sx={{ 
+                    cursor: "pointer", 
+                    ml: 1, 
+                    p: 0.5, 
+                    borderRadius: "12px",
+                    transition: "0.2s",
+                    "&:hover": { bgcolor: alpha(theme.palette.action.hover, 0.04) }
+                  }}
                 >
-                  <Avatar sx={{ width: 35, height: 35, bgcolor: colors.primary }}>
-                    {user?.fullName?.charAt(0)}
+                  <Avatar 
+                    sx={{ 
+                      width: 36, 
+                      height: 36, 
+                      bgcolor: alpha(theme.palette.primary.main, 0.1),
+                      color: theme.palette.primary.main,
+                      fontWeight: 700,
+                      fontSize: "0.9rem",
+                      border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
+                    }}
+                  >
+                    {user?.fullName?.charAt(0).toUpperCase()}
                   </Avatar>
                   <Box sx={{ display: { xs: "none", lg: "block" } }}>
-                    <Typography variant="subtitle2" fontWeight="bold" lineHeight={1.2}>
-                      {user?.fullName || "User"} <CheckCircleIcon sx={{ fontSize: 14, color: colors.verified, ml: 0.5 }} />
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      LPU University
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                      <Typography variant="body2" fontWeight={700} color="text.primary">
+                        {user?.fullName?.split(' ')[0]}
+                      </Typography>
+                      <CheckCircleIcon sx={{ fontSize: 14, color: theme.palette.success.main }} />
+                    </Stack>
+                    <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500, display: "block", mt: -0.2 }}>
+                      Verified Student
                     </Typography>
                   </Box>
-                  <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "gray" }} />
+                  <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "text.disabled" }} />
                 </Stack>
 
                 <Menu
                   anchorEl={anchorEl}
                   open={open}
                   onClose={() => setAnchorEl(null)}
+                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                   PaperProps={{
-                    sx: { mt: 1.5, width: 200, borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }
+                    elevation: 0,
+                    sx: { 
+                      mt: 1.5, 
+                      width: 220, 
+                      borderRadius: "14px", 
+                      border: "1px solid",
+                      borderColor: "divider",
+                      boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
+                      p: 0.5
+                    }
                   }}
                 >
-                  <MenuItem onClick={() => navigate("/profile")}>
+                  <MenuItem onClick={() => { setAnchorEl(null); navigate("/profile"); }} sx={{ borderRadius: "10px", py: 1 }}>
                     <ListItemIcon><AccountCircleIcon fontSize="small" /></ListItemIcon>
-                    Profile
+                    <Typography variant="body2" fontWeight={600}>My Profile</Typography>
                   </MenuItem>
-                  {/* <MenuItem onClick={() => navigate("/profile/cart")}>
-                    <ListItemIcon><ShoppingCartIcon fontSize="small" /></ListItemIcon>
-                    Cart
-                  </MenuItem> */}
-                  <Divider />
-                  <MenuItem onClick={handleLogout} sx={{ color: "error.main" }}>
+                  <Divider sx={{ my: 1, borderStyle: "dashed" }} />
+                  <MenuItem onClick={handleLogout} sx={{ borderRadius: "10px", py: 1, color: "error.main" }}>
                     <ListItemIcon><LogoutIcon fontSize="small" color="error" /></ListItemIcon>
-                    Logout
+                    <Typography variant="body2" fontWeight={600}>Sign Out</Typography>
                   </MenuItem>
                 </Menu>
               </>
             ) : (
-              <Stack direction="row" spacing={1}>
-                <Button sx={{ color: colors.primary, fontWeight: "bold" }} onClick={() => navigate("/login")}>
-                  LOGIN
+              <Stack direction="row" spacing={1.5}>
+                <Button 
+                  sx={{ color: theme.palette.primary.main, fontWeight: 700, textTransform: "none" }} 
+                  onClick={() => navigate("/login")}
+                >
+                  Login
                 </Button>
                 <Button
-                  variant="outlined"
-                  sx={{ borderColor: colors.accent, color: colors.accent, fontWeight: "bold", "&:hover": { borderColor: colors.accent } }}
+                  variant="contained"
+                  disableElevation
+                  sx={{ 
+                    bgcolor: theme.palette.secondary.main, 
+                    fontWeight: 700, 
+                    textTransform: "none",
+                    borderRadius: "10px",
+                    px: 3,
+                    "&:hover": { bgcolor: theme.palette.secondary.dark }
+                  }}
                   onClick={() => navigate("/register")}
                 >
-                  REGISTER
+                  Join Collex
                 </Button>
               </Stack>
             )}
+            
+            <IconButton 
+              sx={{ display: { xs: "flex", md: "none" }, color: "text.primary" }}
+              onClick={() => setDrawer(true)}
+            >
+              <MenuIcon />
+            </IconButton>
           </Stack>
         </Toolbar>
       </Container>
 
       {/* MOBILE DRAWER */}
-      <Drawer open={drawer} onClose={() => setDrawer(false)}>
-        <Box sx={{ width: 280, pt: 2 }}>
-          <Typography variant="h6" sx={{ px: 2, pb: 2, fontWeight: "bold" }}>Categories</Typography>
-          <Divider />
+      <Drawer 
+        anchor="right"
+        open={drawer} 
+        onClose={() => setDrawer(false)}
+        PaperProps={{ sx: { width: 280 } }}
+      >
+        <Box sx={{ p: 3 }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>Categories</Typography>
+          <Divider sx={{ mb: 2 }} />
           <List>
             {categories.map((cat) => (
-              <ListItem button key={cat.name}>
-                <ListItemIcon sx={{ fontSize: 20 }}>{cat.icon}</ListItemIcon>
-                <ListItemText primary={cat.name} />
+              <ListItem 
+                button 
+                key={cat.name} 
+                sx={{ borderRadius: "10px", mb: 0.5 }}
+                onClick={() => setDrawer(false)}
+              >
+                <ListItemIcon sx={{ fontSize: 20, minWidth: 40 }}>{cat.icon}</ListItemIcon>
+                <ListItemText primary={cat.name} primaryTypographyProps={{ fontWeight: 600, fontSize: "0.9rem" }} />
               </ListItem>
             ))}
           </List>

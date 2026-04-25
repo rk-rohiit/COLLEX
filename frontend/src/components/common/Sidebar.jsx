@@ -1,9 +1,13 @@
+// components/admin/Sidebar.jsx
+
 import {
   Box, List, ListItem, ListItemButton,
-  ListItemIcon, ListItemText, Typography, Avatar, Divider, IconButton
+  ListItemIcon, ListItemText, Typography, Avatar, Divider, IconButton, useTheme
 } from "@mui/material";
-import { useState } from "react";
+import { alpha } from "@mui/material/styles";
 import { useNavigate, useLocation } from "react-router-dom";
+
+// Icons
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import ReceiptIcon from "@mui/icons-material/Receipt";
@@ -29,42 +33,51 @@ const bottomMenu = [
   { text: "Support",  icon: <HelpOutlineIcon sx={{ fontSize: 18 }} />, path: "/admin/support" },
 ];
 
-const NavItem = ({ item, active, onClick }) => (
-  <ListItem disablePadding sx={{ mb: 0.25 }}>
-    <ListItemButton
-      onClick={() => onClick(item.path)}
-      sx={{
-        borderRadius: "10px",
-        px: 1.5,
-        py: 0.9,
-        bgcolor: active ? "rgba(26,35,126,0.08)" : "transparent",
-        color: active ? "primary.main" : "text.secondary",
-        "&:hover": {
-          bgcolor: active ? "rgba(26,35,126,0.08)" : "rgba(0,0,0,0.04)",
-        },
-      }}
-    >
-      <ListItemIcon
+const NavItem = ({ item, active, onClick }) => {
+  const theme = useTheme();
+  
+  return (
+    <ListItem disablePadding sx={{ mb: 0.5 }}>
+      <ListItemButton
+        onClick={() => onClick(item.path)}
         sx={{
-          minWidth: 32,
-          color: active ? "primary.main" : "text.disabled",
+          borderRadius: "10px",
+          px: 1.75,
+          py: 1,
+          // Use Trust Blue from theme
+          bgcolor: active ? alpha(theme.palette.primary.main, 0.08) : "transparent",
+          color: active ? theme.palette.primary.main : theme.palette.text.secondary,
+          transition: "all 0.2s ease",
+          "&:hover": {
+            bgcolor: active ? alpha(theme.palette.primary.main, 0.12) : alpha(theme.palette.action.hover, 0.04),
+            transform: active ? "none" : "translateX(4px)",
+          },
         }}
       >
-        {item.icon}
-      </ListItemIcon>
-      <ListItemText
-        primary={item.text}
-        primaryTypographyProps={{
-          fontSize: "0.875rem",
-          fontWeight: active ? 700 : 500,
-          color: "inherit",
-        }}
-      />
-    </ListItemButton>
-  </ListItem>
-);
+        <ListItemIcon
+          sx={{
+            minWidth: 32,
+            color: active ? theme.palette.primary.main : theme.palette.text.disabled,
+          }}
+        >
+          {item.icon}
+        </ListItemIcon>
+        <ListItemText
+          primary={item.text}
+          primaryTypographyProps={{
+            fontSize: "0.85rem",
+            fontWeight: active ? 700 : 600, // Bold active states
+            color: "inherit",
+            letterSpacing: "-0.2px"
+          }}
+        />
+      </ListItemButton>
+    </ListItem>
+  );
+};
 
 const Sidebar = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -73,51 +86,57 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        width: 220,
+        width: 240, // Slightly wider for better text breathing room
         height: "100vh",
         bgcolor: "background.paper",
-        borderRight: "0.5px solid",
+        borderRight: "1px solid",
         borderColor: "divider",
         display: "flex",
         flexDirection: "column",
-        flexShrink: 0, // CRITICAL: Prevents sidebar from squishing
-        position: "sticky", // Changed from fixed to sticky
+        flexShrink: 0,
+        position: "sticky",
         top: 0,
-        // Removed left: 0 and zIndex: 100
       }}
     >
-      {/* LOGO */}
+      {/* LOGO AREA */}
       <Box
         sx={{
           px: 2.5,
-          py: 2,
+          py: 2.5,
           display: "flex",
           alignItems: "center",
-          gap: 1.25,
-          borderBottom: "0.5px solid",
-          borderColor: "divider",
+          gap: 1.5,
           mb: 1,
         }}
       >
         <Box
           sx={{
-            width: 32,
-            height: 32,
-            borderRadius: "9px",
-            bgcolor: "primary.main",
+            width: 34,
+            height: 34,
+            borderRadius: "10px",
+            // Trust Blue Logo
+            bgcolor: theme.palette.primary.main,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            boxShadow: `0 4px 10px ${alpha(theme.palette.primary.main, 0.3)}`,
           }}
         >
-          <SchoolIcon sx={{ fontSize: 17, color: "white" }} />
+          <SchoolIcon sx={{ fontSize: 18, color: "white" }} />
         </Box>
-        <Typography fontWeight={800} fontSize="0.95rem" color="text.primary">
-          College Market
+        <Typography 
+          sx={{ 
+            fontWeight: 800, 
+            fontSize: "1.05rem", 
+            color: "text.primary",
+            letterSpacing: "-0.5px"
+          }}
+        >
+          Collex <Box component="span" sx={{ color: theme.palette.secondary.main }}>Admin</Box>
         </Typography>
       </Box>
 
-      {/* MAIN MENU */}
+      {/* NAVIGATION SCROLL AREA */}
       <Box sx={{ flex: 1, px: 1.5, overflowY: "auto" }}>
         <List dense disablePadding>
           {mainMenu.map((item) => (
@@ -130,7 +149,7 @@ const Sidebar = () => {
           ))}
         </List>
 
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 2.5, borderStyle: 'dashed' }} />
 
         <List dense disablePadding>
           {bottomMenu.map((item) => (
@@ -144,12 +163,15 @@ const Sidebar = () => {
         </List>
       </Box>
 
-      {/* USER */}
+      {/* USER PROFILE SECTION */}
       <Box
         sx={{
-          px: 2,
-          py: 1.75,
-          borderTop: "0.5px solid",
+          mx: 1.5,
+          mb: 2,
+          p: 1.5,
+          borderRadius: "12px",
+          bgcolor: alpha(theme.palette.background.default, 0.8),
+          border: "1px solid",
           borderColor: "divider",
           display: "flex",
           alignItems: "center",
@@ -158,26 +180,27 @@ const Sidebar = () => {
       >
         <Avatar
           sx={{
-            width: 32,
-            height: 32,
-            fontSize: "0.8rem",
-            fontWeight: 700,
-            bgcolor: "rgba(26,35,126,0.12)",
-            color: "primary.main",
+            width: 34,
+            height: 34,
+            fontSize: "0.85rem",
+            fontWeight: 800,
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            color: theme.palette.primary.main,
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`
           }}
         >
           A
         </Avatar>
         <Box flex={1} minWidth={0}>
-          <Typography fontSize="0.82rem" fontWeight={700} noWrap color="text.primary">
+          <Typography fontSize="0.8rem" fontWeight={700} noWrap color="text.primary">
             Admin User
           </Typography>
-          <Typography fontSize="0.7rem" color="text.secondary" noWrap>
-            admin@college.edu
+          <Typography fontSize="0.7rem" color="text.secondary" noWrap fontWeight={500}>
+            System Master
           </Typography>
         </Box>
-        <IconButton size="small" sx={{ color: "text.disabled" }}>
-          <MoreHorizIcon sx={{ fontSize: 16 }} />
+        <IconButton size="small" sx={{ color: "text.disabled", "&:hover": { color: theme.palette.secondary.main } }}>
+          <SettingsIcon sx={{ fontSize: 16 }} />
         </IconButton>
       </Box>
     </Box>
