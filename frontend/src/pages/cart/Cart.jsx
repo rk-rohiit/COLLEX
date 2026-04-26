@@ -3,22 +3,352 @@
 import { useSelector, useDispatch } from "react-redux";
 import {
   Container, Typography, Button, Box, Grid,
-  Paper, Stack, IconButton, Divider
+  Paper, Stack, IconButton, Divider,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import {
   removeFromCart,
   increaseQty,
-  decreaseQty
+  decreaseQty,
 } from "@/features/cart/cartSlice";
 import { useNavigate } from "react-router-dom";
 
-// Icons
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import DeleteOutlineIcon  from "@mui/icons-material/DeleteOutline";
+import AddIcon            from "@mui/icons-material/Add";
+import RemoveIcon         from "@mui/icons-material/Remove";
+import ArrowBackIcon      from "@mui/icons-material/ArrowBack";
+import ImageOutlinedIcon  from "@mui/icons-material/ImageOutlined";
+import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 
+/* ─── Item card ──────────────────────────────────────────────── */
+const CartItem = ({ item, dispatch }) => (
+  <Paper
+    elevation={0}
+    sx={{
+      p: { xs: "12px 14px", md: "14px 16px" },
+      borderRadius: "12px",
+      border: "0.5px solid",
+      borderColor: "divider",
+      bgcolor: "background.paper",
+    }}
+  >
+    <Stack direction="row" alignItems="center" gap={{ xs: 1.25, sm: 1.75 }}>
+
+      {/* ── Image — fixed square, never stretches ── */}
+      <Box
+        sx={{
+          width: { xs: 64, sm: 72 },
+          height: { xs: 64, sm: 72 },
+          flexShrink: 0,           // ← never shrinks on small screens
+          borderRadius: "8px",
+          border: "0.5px solid",
+          borderColor: "divider",
+          overflow: "hidden",
+          bgcolor: "action.hover",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {item.images?.[0] ? (
+          <Box
+            component="img"
+            src={item.images[0]}
+            alt={item.title}
+            sx={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",   // ← always fills the square, no stretch/squash
+              display: "block",
+            }}
+          />
+        ) : (
+          <ImageOutlinedIcon sx={{ fontSize: 22, color: "text.disabled" }} />
+        )}
+      </Box>
+
+      {/* ── Item info ── */}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography
+          sx={{
+            fontSize: { xs: "13px", sm: "14px" },
+            fontWeight: 500,
+            color: "text.primary",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {item.title}
+        </Typography>
+
+        <Typography
+          sx={{ fontSize: "11px", color: "text.secondary", mt: 0.375 }}
+        >
+          Seller: {item.postedBy?.fullName || "—"}
+        </Typography>
+
+        <Typography
+          sx={{
+            fontSize: "14px",
+            fontWeight: 500,
+            color: "#1D9E75",
+            fontFamily: "'JetBrains Mono', monospace",
+            mt: 0.625,
+          }}
+        >
+          ₹{Number(item.price).toLocaleString("en-IN")}
+        </Typography>
+      </Box>
+
+      {/* ── Qty + delete controls ── */}
+      <Stack direction="row" alignItems="center" gap={0.5} flexShrink={0}>
+        {/* Decrease */}
+        <IconButton
+          size="small"
+          onClick={() => dispatch(decreaseQty(item._id))}
+          sx={{
+            width: 28,
+            height: 28,
+            borderRadius: "7px",
+            border: "0.5px solid",
+            borderColor: "divider",
+            bgcolor: "background.default",
+            "&:hover": { bgcolor: "action.hover" },
+          }}
+        >
+          <RemoveIcon sx={{ fontSize: 13 }} />
+        </IconButton>
+
+        {/* Qty number */}
+        <Typography
+          sx={{
+            fontSize: "13px",
+            fontWeight: 500,
+            color: "text.primary",
+            minWidth: "22px",
+            textAlign: "center",
+            fontFamily: "'JetBrains Mono', monospace",
+          }}
+        >
+          {item.qty || 1}
+        </Typography>
+
+        {/* Increase */}
+        <IconButton
+          size="small"
+          onClick={() => dispatch(increaseQty(item._id))}
+          sx={{
+            width: 28,
+            height: 28,
+            borderRadius: "7px",
+            border: "0.5px solid",
+            borderColor: "divider",
+            bgcolor: "background.default",
+            "&:hover": { bgcolor: "action.hover" },
+          }}
+        >
+          <AddIcon sx={{ fontSize: 13 }} />
+        </IconButton>
+
+        {/* Delete */}
+        <IconButton
+          size="small"
+          onClick={() => dispatch(removeFromCart(item._id))}
+          sx={{
+            width: 28,
+            height: 28,
+            borderRadius: "7px",
+            border: "0.5px solid",
+            borderColor: "#FCEBEB",
+            bgcolor: "#FCEBEB",
+            ml: 0.5,
+            "&:hover": { bgcolor: "#F7C1C1" },
+          }}
+        >
+          <DeleteOutlineIcon sx={{ fontSize: 14, color: "#A32D2D" }} />
+        </IconButton>
+      </Stack>
+    </Stack>
+  </Paper>
+);
+
+/* ─── Order summary panel ────────────────────────────────────── */
+const SummaryPanel = ({ items, total, onCheckout }) => {
+  const totalQty = items.reduce((acc, i) => acc + (i.qty || 1), 0);
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        borderRadius: "12px",
+        border: "0.5px solid",
+        borderColor: "divider",
+        bgcolor: "background.paper",
+        overflow: "hidden",
+        // Sticky only on md+; on mobile it stacks below the items
+        position: { md: "sticky" },
+        top: { md: 100 },
+      }}
+    >
+      {/* Header */}
+      <Box
+        sx={{
+          px: 2,
+          py: 1.5,
+          borderBottom: "0.5px solid",
+          borderColor: "divider",
+        }}
+      >
+        <Typography
+          sx={{ fontSize: "13px", fontWeight: 500, color: "text.primary" }}
+        >
+          Order summary
+        </Typography>
+      </Box>
+
+      {/* Rows */}
+      <Box sx={{ px: 2, py: 1.5 }}>
+        <Stack spacing={0.25}>
+          <Stack direction="row" justifyContent="space-between" py={0.625}>
+            <Typography sx={{ fontSize: "12px", color: "text.secondary" }}>
+              Subtotal ({totalQty} {totalQty === 1 ? "item" : "items"})
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "12px",
+                fontWeight: 500,
+                fontFamily: "'JetBrains Mono', monospace",
+                color: "text.primary",
+              }}
+            >
+              ₹{total.toLocaleString("en-IN")}
+            </Typography>
+          </Stack>
+
+          <Stack direction="row" justifyContent="space-between" py={0.625}>
+            <Typography sx={{ fontSize: "12px", color: "text.secondary" }}>
+              Delivery
+            </Typography>
+            <Typography
+              sx={{ fontSize: "12px", fontWeight: 500, color: "#3B6D11" }}
+            >
+              Free
+            </Typography>
+          </Stack>
+
+          <Stack direction="row" justifyContent="space-between" py={0.625}>
+            <Typography sx={{ fontSize: "12px", color: "text.secondary" }}>
+              Platform fee
+            </Typography>
+            <Typography
+              sx={{ fontSize: "12px", fontWeight: 500, color: "#3B6D11" }}
+            >
+              Free
+            </Typography>
+          </Stack>
+        </Stack>
+
+        <Divider sx={{ my: 1.25 }} />
+
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Typography
+            sx={{ fontSize: "13px", fontWeight: 500, color: "text.primary" }}
+          >
+            Total
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "16px",
+              fontWeight: 500,
+              fontFamily: "'JetBrains Mono', monospace",
+              color: "text.primary",
+              letterSpacing: "-0.5px",
+            }}
+          >
+            ₹{total.toLocaleString("en-IN")}
+          </Typography>
+        </Stack>
+
+        {/* CTA */}
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={onCheckout}
+          sx={{
+            mt: 1.75,
+            py: 1.125,
+            bgcolor: "#1D9E75",
+            color: "#fff",
+            fontSize: "13px",
+            fontWeight: 500,
+            textTransform: "none",
+            borderRadius: "8px",
+            boxShadow: "none",
+            "&:hover": { bgcolor: "#17876A", boxShadow: "none" },
+          }}
+        >
+          Proceed to checkout
+        </Button>
+
+        {/* Trust note */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="center"
+          gap={0.625}
+          mt={1.25}
+        >
+          <ShieldOutlinedIcon sx={{ fontSize: 13, color: "#3B6D11" }} />
+          <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
+            Secure campus exchange
+          </Typography>
+        </Stack>
+      </Box>
+    </Paper>
+  );
+};
+
+/* ─── Empty state ────────────────────────────────────────────── */
+const EmptyCart = ({ onNavigate }) => (
+  <Box
+    sx={{
+      textAlign: "center",
+      mt: { xs: 10, md: 15 },
+      px: 2,
+    }}
+  >
+    <Typography
+      sx={{ fontSize: "20px", fontWeight: 500, color: "text.primary" }}
+    >
+      Your cart is empty
+    </Typography>
+    <Typography
+      sx={{ fontSize: "14px", color: "text.secondary", mt: 1 }}
+    >
+      Browse the marketplace and add items to get started.
+    </Typography>
+    <Button
+      variant="contained"
+      onClick={onNavigate}
+      sx={{
+        mt: 3,
+        bgcolor: "#1D9E75",
+        color: "#fff",
+        textTransform: "none",
+        fontSize: "13px",
+        fontWeight: 500,
+        borderRadius: "8px",
+        boxShadow: "none",
+        px: 3,
+        "&:hover": { bgcolor: "#17876A", boxShadow: "none" },
+      }}
+    >
+      Go to marketplace
+    </Button>
+  </Box>
+);
+
+/* ─── Main Cart ──────────────────────────────────────────────── */
 const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,173 +359,95 @@ const Cart = () => {
     0
   );
 
-  /* ================= EMPTY STATE ================= */
   if (!items.length) {
-    return (
-      <Box sx={{ textAlign: "center", mt: 15 }}>
-        <Typography variant="h5" fontWeight={800}>
-          Your cart is empty 🛒
-        </Typography>
-        <Button
-          variant="contained"
-          sx={{ mt: 3 }}
-          onClick={() => navigate("/")}
-        >
-          Go Shopping
-        </Button>
-      </Box>
-    );
+    return <EmptyCart onNavigate={() => navigate("/")} />;
   }
 
   return (
-    <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pt: { xs: 10, md: 14 }, pb: 10 }}>
-      <Container maxWidth="lg">
-
-        {/* HEADER */}
-        <Box sx={{ mb: 5 }}>
+    <Box
+      sx={{
+        bgcolor: "background.default",
+        minHeight: "100vh",
+        pt: { xs: 9, md: 12 },
+        pb: { xs: 6, md: 10 },
+      }}
+    >
+      <Container
+        maxWidth="lg"
+        sx={{ px: { xs: 2, sm: 3, md: 4 } }}
+      >
+        {/* Back + title */}
+        <Box mb={{ xs: 2.5, md: 3.5 }}>
           <Button
-            startIcon={<ChevronLeftIcon />}
+            startIcon={<ArrowBackIcon sx={{ fontSize: 14 }} />}
             onClick={() => navigate("/")}
-            sx={{ textTransform: "none", mb: 1 }}
+            sx={{
+              mb: 1.25,
+              fontSize: "12px",
+              fontWeight: 500,
+              color: "text.secondary",
+              textTransform: "none",
+              px: 1.5,
+              py: 0.625,
+              border: "0.5px solid",
+              borderColor: "divider",
+              borderRadius: "8px",
+              bgcolor: "background.paper",
+              minWidth: "auto",
+              "&:hover": { bgcolor: "action.hover" },
+            }}
           >
-            Back to Marketplace
+            Back to marketplace
           </Button>
 
-          <Typography variant="h4" fontWeight={900}>
-            My Cart ({items.length})
-          </Typography>
+          <Stack direction="row" alignItems="baseline" gap={1}>
+            <Typography
+              sx={{
+                fontSize: { xs: "20px", md: "22px" },
+                fontWeight: 500,
+                color: "text.primary",
+                letterSpacing: "-0.4px",
+              }}
+            >
+              My cart
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "13px",
+                color: "text.secondary",
+                fontFamily: "'JetBrains Mono', monospace",
+              }}
+            >
+              {items.length} {items.length === 1 ? "item" : "items"}
+            </Typography>
+          </Stack>
         </Box>
 
-        <Grid container spacing={4}>
+        {/*
+          ── Layout:
+             xs/sm  → single column, summary below items
+             md+    → items left (8 cols), summary right (4 cols)
+        ──*/}
+        <Grid container spacing={{ xs: 1.5, md: 2.5 }} alignItems="flex-start">
 
-          {/* ================= LEFT: PRODUCTS ================= */}
+          {/* Left — item list */}
           <Grid item xs={12} md={8}>
-            <Stack spacing={3}>
+            <Stack spacing={{ xs: 1, md: 1.25 }}>
               {items.map((item) => (
-                <Paper
-                  key={item._id}
-                  sx={{
-                    p: 2.5,
-                    borderRadius: 4,
-                    border: "1px solid",
-                    borderColor: "divider",
-                  }}
-                >
-                  <Stack
-                    direction={{ xs: "column", sm: "row" }}
-                    spacing={2}
-                    alignItems="center"
-                  >
-                    {/* ✅ IMAGE FIX */}
-                    <Box
-                      component="img"
-                      src={item.images?.[0]}
-                      sx={{
-                        width: 90,
-                        height: 90,
-                        borderRadius: 2,
-                        objectFit: "cover",
-                        flexShrink: 0,
-                      }}
-                    />
-
-                    {/* CONTENT */}
-                    <Box sx={{ flex: 1, width: "100%" }}>
-                      <Typography fontWeight={800}>
-                        {item.title}
-                      </Typography>
-
-                      <Typography variant="body2" color="text.secondary">
-                        Seller: {item.postedBy?.fullName}
-                      </Typography>
-
-                      <Typography fontWeight={700} mt={1}>
-                        ₹{item.price}
-                      </Typography>
-                    </Box>
-
-                    {/* ACTIONS */}
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      spacing={1}
-                    >
-                      <IconButton onClick={() => dispatch(decreaseQty(item._id))}>
-                        <RemoveIcon />
-                      </IconButton>
-
-                      <Typography fontWeight={700}>
-                        {item.qty}
-                      </Typography>
-
-                      <IconButton onClick={() => dispatch(increaseQty(item._id))}>
-                        <AddIcon />
-                      </IconButton>
-
-                      <IconButton
-                        color="error"
-                        onClick={() => dispatch(removeFromCart(item._id))}
-                      >
-                        <DeleteOutlineIcon />
-                      </IconButton>
-                    </Stack>
-                  </Stack>
-                </Paper>
+                <CartItem key={item._id} item={item} dispatch={dispatch} />
               ))}
             </Stack>
           </Grid>
 
-          {/* ================= RIGHT: SUMMARY ================= */}
+          {/* Right — summary */}
           <Grid item xs={12} md={4}>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: 4,
-                border: "1px solid",
-                borderColor: "divider",
-                bgcolor: (theme) =>
-                  alpha(theme.palette.primary.main, 0.04),
-                position: "sticky",
-                top: 100,
-              }}
-            >
-              <Typography variant="h6" fontWeight={800} mb={2}>
-                Order Summary
-              </Typography>
-
-              <Stack spacing={2}>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography>Subtotal</Typography>
-                  <Typography fontWeight={700}>
-                    ₹{total}
-                  </Typography>
-                </Stack>
-
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography>Delivery</Typography>
-                  <Typography color="success.main">FREE</Typography>
-                </Stack>
-
-                <Divider />
-
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography fontWeight={800}>Total</Typography>
-                  <Typography fontWeight={900}>
-                    ₹{total}
-                  </Typography>
-                </Stack>
-              </Stack>
-
-              <Button
-                fullWidth
-                variant="contained"
-                size="large"
-                sx={{ mt: 3, borderRadius: 3 }}
-              >
-                Checkout
-              </Button>
-            </Paper>
+            <SummaryPanel
+              items={items}
+              total={total}
+              onCheckout={() => navigate("/checkout")}
+            />
           </Grid>
+
         </Grid>
       </Container>
     </Box>
