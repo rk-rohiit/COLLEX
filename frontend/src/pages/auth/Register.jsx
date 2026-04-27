@@ -222,7 +222,14 @@ const Register = () => {
                   label="Phone"
                   value={form.phone || ""}
                   onChange={handleChange}
-                />
+                  inputProps={{ maxLength: 10, pattern: "[0-9]*" }}
+                  error={form.phone?.length > 10}
+                  helperText={
+                    form.phone?.length > 10 ? "Phone number cannot exceed 10 digits" : ""
+                  }
+                >
+                  {/* {form.phone maxLength} */}
+                </TextField>
 
                 <Stack direction="row" spacing={2}>
                   <TextField
@@ -233,7 +240,7 @@ const Register = () => {
                     onChange={handleChange}
                     fullWidth
                   >
-                    {["btech", "mtech", "bba", "mba", "bca", "mca"].map((c) => (
+                    {["B.Tech", "M.Tech", "BBA", "MBA", "BCA", "MCA"].map((c) => (
                       <MenuItem key={c} value={c}>
                         {c}
                       </MenuItem>
@@ -247,23 +254,56 @@ const Register = () => {
                     value={form.year || ""}
                     onChange={handleChange}
                     fullWidth
+                    disabled={!form.course}   // ✅ disables until a course is chosen
                   >
-                    {[1, 2, 3, 4, 5].map((y) => (
-                      <MenuItem key={y} value={y}>{y}</MenuItem>
-                    ))}
+                    {form.course === "M.Tech" || form.course === "MCA"
+                      ? [1, 2].map((y) => (
+                        <MenuItem key={y} value={y}>
+                          {y}
+                        </MenuItem>
+                      ))
+                      : [1, 2, 3, 4].map((z) => (
+                        <MenuItem key={z} value={z}>
+                          {z}
+                        </MenuItem>
+                      ))}
                   </TextField>
                 </Stack>
+                <TextField
+                  select
+                  name="addressType"
+                  label="Hostel / Day Scholar"
+                  value={form.addressType || ""}   
+                  onChange={handleChange}
+                  fullWidth
+                >
+                  {["Day Scholar", "Hosteller"].map((c) => (
+                    <MenuItem key={c} value={c}>
+                      {c}
+                    </MenuItem>
+                  ))}
+                </TextField>
 
                 <TextField
                   select
                   name="hostelBlock"
-                  label="Hostel"
+                  label="Address"
                   value={form.hostelBlock || ""}
                   onChange={handleChange}
+                  disabled={!form.addressType}
                 >
-                  {["block-a", "block-b", "block-c", "block-d"].map((b) => (
-                    <MenuItem key={b} value={b}>{b}</MenuItem>
-                  ))}
+                  {form.addressType === "Hosteller"
+                    ? ["block-a", "block-b", "block-c", "block-d"].map((b) => (
+                      <MenuItem key={b} value={b}>
+                        {b}
+                      </MenuItem>
+                    ))
+                    : ["Law Gate", "Green Valley", "Main Gate"].map((loc) => (
+                      <MenuItem key={loc} value={loc}>
+                        {loc}
+                      </MenuItem>
+                    ))}
+
                 </TextField>
 
                 <Stack direction="row" spacing={2}>

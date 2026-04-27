@@ -22,6 +22,7 @@ import {
   Paper,
   Stack,
   useTheme,
+  patch,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useState } from "react";
@@ -42,11 +43,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { logout } from "../../features/auth/authSlice";
 
 const categories = [
-  { name: "Books", icon: "📚" },
-  { name: "Electronics", icon: "💻" },
-  { name: "Dorm", icon: "🛏️" },
-  { name: "Clothing", icon: "👕" },
-  { name: "Stationery", icon: "✏️" },
+  { name: "Post Listings", path:"/listings" },
+  { name: "Browse Listings",path:"" }
 ];
 
 const Navbar = () => {
