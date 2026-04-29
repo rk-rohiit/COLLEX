@@ -91,7 +91,7 @@ const CartItem = ({ item, dispatch }) => (
           sx={{
             fontSize: "14px",
             fontWeight: 500,
-            color: "#1D9E75",
+            color: "secondary.main",
             fontFamily: "'JetBrains Mono', monospace",
             mt: 0.625,
           }}
@@ -277,14 +277,14 @@ const SummaryPanel = ({ items, total, onCheckout }) => {
           sx={{
             mt: 1.75,
             py: 1.125,
-            bgcolor: "#1D9E75",
+            bgcolor: "primary.main",
             color: "#fff",
             fontSize: "13px",
             fontWeight: 500,
             textTransform: "none",
             borderRadius: "8px",
             boxShadow: "none",
-            "&:hover": { bgcolor: "#17876A", boxShadow: "none" },
+            "&:hover": { bgcolor: "primary.dark", boxShadow: "none" },
           }}
         >
           Proceed to checkout
@@ -332,7 +332,7 @@ const EmptyCart = ({ onNavigate }) => (
       onClick={onNavigate}
       sx={{
         mt: 3,
-        bgcolor: "#1D9E75",
+        bgcolor: "primary.main",
         color: "#fff",
         textTransform: "none",
         fontSize: "13px",
@@ -340,7 +340,7 @@ const EmptyCart = ({ onNavigate }) => (
         borderRadius: "8px",
         boxShadow: "none",
         px: 3,
-        "&:hover": { bgcolor: "#17876A", boxShadow: "none" },
+        "&:hover": { bgcolor: "primary.dark", boxShadow: "none" },
       }}
     >
       Go to marketplace
