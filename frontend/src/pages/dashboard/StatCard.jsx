@@ -1,81 +1,108 @@
 import { Paper, Avatar, Typography, Box, Stack } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 
-const StatCard = ({ label, value, icon, iconBg, iconColor, accent }) => {
+/**
+ * StatCard
+ * Props:
+ *   label    – string  KPI label (e.g. "Total Products")
+ *   value    – number  KPI value
+ *   icon     – node    MUI SvgIcon element
+ *   accent   – string  hex color for left bar + icon tint
+ *   footer   – string  small footer text (e.g. "+38 this week")
+ */
+const StatCard = ({ label, value, icon, accent = "#cc0102", footer }) => {
   return (
     <Paper
       elevation={0}
       sx={{
-        p: 2.5,
+        p: "18px 20px",
         height: "100%",
-        borderRadius: 3,
-        border: "1px solid",
+        borderRadius: "14px",
+        border: "0.5px solid",
         borderColor: "divider",
         position: "relative",
-        overflow: "hidden", // Ensures the 'accent' bar doesn't bleed out
+        overflow: "hidden",
+        bgcolor: "background.paper",
+        transition: "transform 0.18s ease, border-color 0.18s ease",
         display: "flex",
         flexDirection: "column",
-        gap: 2,
-        transition: "all 0.3s ease-in-out",
-        
-        // Removed fixed width: let the Collection/Grid handle the width
-        width: "100%", 
+        justifyContent: "space-between",
+        width:"285px",
 
+        // Left accent bar
         "&::before": {
           content: '""',
           position: "absolute",
           left: 0,
-          top: 0,
-          bottom: 0,
-          width: "4px",
-          bgcolor: accent || "transparent",
+          top: "22%",
+          bottom: "22%",
+          width: "3px",
+          borderRadius: "0 3px 3px 0",
+          bgcolor: accent,
         },
 
         "&:hover": {
-          transform: "translateY(-4px)",
-          boxShadow: "0 4px 20px 0 rgba(0,0,0,0.05)",
-          borderColor: accent || "divider",
+          transform: "translateY(-2px)",
+          borderColor: alpha(accent, 0.4),
         },
       }}
     >
-      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-        <Avatar 
-          variant="rounded" // Rounded squares often look more modern for stats
-          sx={{ 
-            bgcolor: iconBg, 
-            color: iconColor,
-            width: 42,
-            height: 42,
-            borderRadius: 2
-          }}
-        >
-          {icon}
-        </Avatar>
-      </Stack>
+      {/* Icon */}
+      <Avatar
+        variant="rounded"
+        sx={{
+          bgcolor: alpha(accent, 0.1),
+          color: accent,
+          width: 38,
+          height: 38,
+          borderRadius: "10px",
+          mb: 1.75,
+          "& .MuiSvgIcon-root": { fontSize: "1.15rem" },
+        }}
+      >
+        {icon ?? <Box sx={{ width: 20, height: 20 }} />}
+      </Avatar>
 
+      {/* Label + Value */}
       <Box>
-        <Typography 
-          variant="h4" 
-          sx={{ 
-            fontWeight: 700, 
-            lineHeight: 1.2,
-            letterSpacing: "-0.02em" 
-          }}
-        >
-          {value ?? "—"}
-        </Typography>
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            color: "text.secondary", 
-            fontWeight: 500,
+        <Typography
+          sx={{
+            fontSize: "10px",
+            fontWeight: 600,
+            color: "text.secondary",
+            letterSpacing: "0.8px",
             textTransform: "uppercase",
-            letterSpacing: "0.05em",
-            fontSize: "0.65rem"
+            mb: 0.5,
           }}
         >
           {label}
         </Typography>
+        <Typography
+          sx={{
+            fontSize: "28px",
+            fontWeight: 700,
+            letterSpacing: "-1px",
+            lineHeight: 1,
+            color: "text.primary",
+          }}
+        >
+          {value ?? "—"}
+        </Typography>
       </Box>
+
+      {/* Footer */}
+      {footer && (
+        <Typography
+          sx={{
+            fontSize: "11px",
+            color: "text.disabled",
+            mt: 1.25,
+            fontFamily: "'DM Mono', monospace",
+          }}
+        >
+          {footer}
+        </Typography>
+      )}
     </Paper>
   );
 };
