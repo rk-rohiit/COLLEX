@@ -11,7 +11,7 @@ import StatCard     from "../dashboard/StatCard";
 import SectionCard  from "../dashboard/SectionCard";
 import OrderRow     from "../dashboard/OrderRow";
 import CategoryRow  from "../dashboard/CategoryRow";
-import SummaryStrip from "../dashboard/SummaryStrip";
+import SummaryStrip from "../dashboard/Summarystrip";
 import DashSkeleton from "../dashboard/DashSkeleton";
 
 import {
