@@ -1,5 +1,5 @@
 // components/profile/ProfileHeader.jsx
-
+import { useState } from "react";
 import {
   Paper,
   Stack,
@@ -11,6 +11,8 @@ import {
   Chip,
   Tooltip,
   useTheme,
+  Menu,
+  MenuItem
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -20,11 +22,25 @@ import { alpha } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VerifiedIcon from "@mui/icons-material/Verified";
+import EditIcon from "@mui/icons-material/Edit";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const ProfileHeader = () => {
   const { user } = useSelector((s) => s.auth);
   const navigate = useNavigate();
   const theme = useTheme();
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <Paper
@@ -78,8 +94,8 @@ const ProfileHeader = () => {
             <Stack direction="row" alignItems="center" spacing={0.75}>
               <Typography
                 variant="subtitle1"
-                sx={{ 
-                  fontWeight: 700, 
+                sx={{
+                  fontWeight: 700,
                   color: "text.primary",
                   lineHeight: 1.2
                 }}
@@ -152,12 +168,13 @@ const ProfileHeader = () => {
 
           <IconButton
             size="small"
+             onClick={handleMenuOpen}
             sx={{
               border: "1px solid",
               borderColor: "divider",
               borderRadius: 2,
               p: 1,
-              "&:hover": { 
+              "&:hover": {
                 bgcolor: "action.hover",
                 color: theme.palette.secondary.main // Action Orange on hover
               },
@@ -165,6 +182,45 @@ const ProfileHeader = () => {
           >
             <MoreVertIcon fontSize="small" />
           </IconButton>
+          <Menu
+  anchorEl={anchorEl}
+  open={open}
+  onClose={handleMenuClose}
+  PaperProps={{
+    sx: {
+      borderRadius: 2,
+      minWidth: 180,
+      boxShadow: 3,
+    },
+  }}
+>
+  <MenuItem
+    onClick={() => {
+      handleMenuClose();
+      navigate("/edit-profile");
+    }}
+  >
+    <EditIcon sx={{ mr: 1 }} /> Edit Profile
+  </MenuItem>
+
+  <MenuItem
+    onClick={() => {
+      handleMenuClose();
+      navigate("/settings");
+    }}
+  >
+    <SettingsIcon sx={{ mr: 1 }} /> Settings
+  </MenuItem>
+
+  <MenuItem
+    onClick={() => {
+      handleMenuClose();
+      console.log("Logout clicked");
+    }}
+  >
+    <LogoutIcon sx={{ mr: 1 }} /> Logout
+  </MenuItem>
+</Menu>
         </Stack>
       </Stack>
     </Paper>
