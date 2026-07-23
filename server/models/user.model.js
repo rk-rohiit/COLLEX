@@ -29,6 +29,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["btech", "mtech", "bba", "mba", "bca", "mca"],
       required: true,
+      lowercase: true,
+      trim: true,
+      set: (v) => typeof v === "string" ? v.toLowerCase().replace(/\./g, "") : v,
     },
 
     year: {

@@ -105,10 +105,15 @@ export const sendOtpService = async (data) => {
 
   console.log("🔢 Generated OTP:", otp);
 
+  // Normalize course if present
+  const normalizedCourse = data.course && typeof data.course === "string"
+    ? data.course.toLowerCase().replace(/\./g, "")
+    : data.course;
+
   await Otp.create({
     email,
     otp,
-    data: { ...data, email }, // 🔥 ensure normalized email saved
+    data: { ...data, email, course: normalizedCourse }, // 🔥 ensure normalized email and course saved
     expiresAt: new Date(Date.now() + 10 * 60 * 1000),
     resendAfter: new Date(Date.now() + 30 * 1000),
   });
@@ -117,8 +122,16 @@ export const sendOtpService = async (data) => {
     await sendEmail(email, otp);
     console.log("✅ OTP EMAIL SENT");
   } catch (err) {
-    console.error("❌ Email Error:", err);
-    throw new Error("Failed to send OTP email");
+    console.error("❌ Email Error:", err.message || err);
+    console.log("-----------------------------------------");
+    console.log(`🔑 [DEVELOPMENT FALLBACK] Generated OTP for ${email}: ${otp}`);
+    console.log("-----------------------------------------");
+
+    if (process.env.NODE_ENV !== "production") {
+      console.log("⚠️ Non-production environment detected. Bypassing email send failure to allow signup flow testing.");
+    } else {
+      throw new Error("Failed to send OTP email");
+    }
   }
 
   return {
@@ -237,7 +250,9 @@ export const verifyOtpAndRegisterService = async (data) => {
     email: storedData.email,
     fullName: storedData.fullName,
     phone: storedData.phone,
-    course: storedData.course,
+    course: storedData.course && typeof storedData.course === "string"
+      ? storedData.course.toLowerCase().replace(/\./g, "")
+      : storedData.course,
     year: storedData.year,
     password: storedData.password,
     isVerified: true,
@@ -410,7 +425,20 @@ export const resendOtpService = async ({ email }) => {
 
     await otpDoc.save();
 
-    await sendEmail(email, newOtp);
+    try {
+      await sendEmail(email, newOtp);
+    } catch (err) {
+      console.error("❌ Email Resend Error:", err.message || err);
+      console.log("-----------------------------------------");
+      console.log(`🔑 [DEVELOPMENT RESEND FALLBACK] Generated OTP for ${email}: ${newOtp}`);
+      console.log("-----------------------------------------");
+
+      if (process.env.NODE_ENV !== "production") {
+        console.log("⚠️ Non-production environment detected. Bypassing email resend failure to allow signup flow testing.");
+      } else {
+        throw new Error("Failed to send OTP email");
+      }
+    }
 
     return {
       success: true,
