@@ -3,12 +3,16 @@ import {
   verifyOtpAndRegisterService,
   loginUserService,
   resendOtpService,
+  forgotPasswordService,
+  resetPasswordService,
 } from "./auth.service.js";
 
 import {
   validateRegisterInput,
   validateOtpInput,
   validateLoginInput,
+  validateForgotPasswordInput,
+  validateResetPasswordInput,
 } from "./auth.validation.js";
 
 import jwt from "jsonwebtoken";
@@ -147,5 +151,47 @@ export const refreshToken = async (req, res) => {
   } catch (err) {
     console.error("REFRESH ERROR:", err);
     return res.status(500).json({ message: "Server error" });
+  }
+};
+
+/* =========================
+   FORGOT PASSWORD
+ ========================= */
+export const forgotPassword = async (req, res, next) => {
+  try {
+    console.log("📩 FORGOT PASSWORD BODY:", req.body);
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+      throw new Error("Request body is missing");
+    }
+
+    validateForgotPasswordInput(req.body);
+
+    const result = await forgotPasswordService(req.body);
+
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/* =========================
+   RESET PASSWORD
+ ========================= */
+export const resetPassword = async (req, res, next) => {
+  try {
+    console.log("🔐 RESET PASSWORD BODY:", req.body);
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+      throw new Error("Request body is missing");
+    }
+
+    validateResetPasswordInput(req.body);
+
+    const result = await resetPasswordService(req.body);
+
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
   }
 };

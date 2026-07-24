@@ -9,6 +9,7 @@ import MainLayout from "@/layouts/MainLayout";
 
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
 
 import ProtectedRoute from "./ProtectedRoute";
 import ProductList from "../pages/products/ProductList";
@@ -160,6 +161,7 @@ const AppRoutes = () => {
         {/* 🔥 AUTH (NO NAVBAR) */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         {/* Not Found page */}
         <Route path="*" element={<NotFound />} />
 

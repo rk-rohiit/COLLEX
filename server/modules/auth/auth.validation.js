@@ -25,3 +25,28 @@ export const validateLoginInput = (data) => {
     throw new Error("Email and password are required");
   }
 };
+
+export const validateForgotPasswordInput = (data) => {
+  const { email } = data;
+
+  if (!email) {
+    throw new Error("Email is required");
+  }
+};
+
+export const validateResetPasswordInput = (data) => {
+  const { email, otp, newPassword } = data;
+
+  if (!email || !otp || !newPassword) {
+    throw new Error("Email, OTP, and new password are required");
+  }
+
+  if (newPassword.length < 8) {
+    throw new Error("Password must be at least 8 characters");
+  }
+
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+  if (!passwordRegex.test(newPassword)) {
+    throw new Error("Password must contain uppercase, lowercase and number");
+  }
+};

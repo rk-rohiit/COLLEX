@@ -449,3 +449,136 @@ export const resendOtpService = async ({ email }) => {
   // 🔥 If NO OTP found → create new (edge case)
   throw new Error("Please register again");
 };
+
+/* =========================
+   FORGOT PASSWORD (STEP 1)
+ ========================= */
+export const forgotPasswordService = async (data) => {
+  console.log("📩 FORGOT PASSWORD REQUEST:", data);
+
+  if (!data) {
+    throw new Error("Request body is missing");
+  }
+
+  let { email } = data;
+
+  if (!email) {
+    throw new Error("Email is required");
+  }
+
+  email = email.trim().toLowerCase();
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("User with this email does not exist");
+  }
+
+  const existingOtp = await Otp.findOne({ email });
+
+  if (existingOtp) {
+    console.log("⚠️ Existing Forgot Password OTP found:", existingOtp);
+
+    if (existingOtp.resendAfter > new Date()) {
+      const seconds = Math.ceil(
+        (existingOtp.resendAfter - new Date()) / 1000
+      );
+      throw new Error(`Wait ${seconds}s before requesting OTP again`);
+    }
+
+    await Otp.deleteOne({ email });
+  }
+
+  const otp = generateOtp();
+
+  console.log("🔢 Generated Forgot Password OTP:", otp);
+
+  await Otp.create({
+    email,
+    otp,
+    data: { purpose: "forgot-password" },
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 min
+    resendAfter: new Date(Date.now() + 30 * 1000),   // 30 sec
+  });
+
+  try {
+    await sendEmail(email, otp, "Password Reset OTP", "Use the OTP below to reset your password");
+    console.log("✅ FORGOT PASSWORD OTP EMAIL SENT");
+  } catch (err) {
+    console.error("❌ Email Error:", err.message || err);
+    console.log("-----------------------------------------");
+    console.log(`🔑 [DEVELOPMENT FALLBACK] Generated Forgot Password OTP for ${email}: ${otp}`);
+    console.log("-----------------------------------------");
+
+    if (process.env.NODE_ENV !== "production") {
+      console.log("⚠️ Non-production environment detected. Bypassing email send failure to allow forgot password testing.");
+    } else {
+      throw new Error("Failed to send OTP email");
+    }
+  }
+
+  return {
+    success: true,
+    message: "OTP sent successfully",
+  };
+};
+
+/* =========================
+   RESET PASSWORD (STEP 2)
+ ========================= */
+export const resetPasswordService = async (data) => {
+  console.log("📥 RESET PASSWORD REQUEST:", data);
+
+  if (!data) {
+    throw new Error("Request body is missing");
+  }
+
+  let { email, otp, newPassword } = data;
+
+  if (!email || !otp || !newPassword) {
+    throw new Error("Email, OTP, and new password are required");
+  }
+
+  email = email.trim().toLowerCase();
+
+  const otpDoc = await Otp.findOne({ email });
+
+  console.log("📦 OTP DOC FROM DB FOR RESET:", otpDoc);
+
+  if (!otpDoc) {
+    throw new Error("No OTP found. Please request again");
+  }
+
+  if (otpDoc.otp !== otp) {
+    console.log("❌ OTP mismatch:", otpDoc.otp, otp);
+    throw new Error("Invalid OTP");
+  }
+
+  if (otpDoc.expiresAt < new Date()) {
+    console.log("⏰ OTP expired:", otpDoc.expiresAt);
+    throw new Error("OTP expired");
+  }
+
+  if (otpDoc.data?.purpose !== "forgot-password") {
+    console.log("❌ OTP purpose mismatch:", otpDoc.data?.purpose);
+    throw new Error("Invalid OTP purpose");
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Update password (hashed automatically via schema pre-save middleware)
+  user.password = newPassword;
+  await user.save();
+
+  // Delete OTP
+  await Otp.deleteOne({ email });
+
+  console.log("✅ PASSWORD RESET SUCCESSFUL FOR:", user.email);
+
+  return {
+    success: true,
+    message: "Password reset successful. You can now log in with your new password.",
+  };
+};

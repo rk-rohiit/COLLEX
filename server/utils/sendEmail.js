@@ -10,7 +10,7 @@ const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 /* =========================
    SEND OTP EMAIL
 ========================= */
-export const sendEmail = async (email, otp) => {
+export const sendEmail = async (email, otp, subject = "OTP Verification", headerText = "Verify your email to continue") => {
   try {
     await apiInstance.sendTransacEmail({
       sender: {
@@ -18,7 +18,7 @@ export const sendEmail = async (email, otp) => {
         name: "Collex",
       },
       to: [{ email }],
-      subject: "OTP Verification",
+      subject: subject,
 
       // ✅ ADD TEXT (important for delivery)
       textContent: `Your OTP is ${otp}`,
@@ -30,7 +30,7 @@ export const sendEmail = async (email, otp) => {
     
     <h2 style="color:#0A2647;">Collex</h2>
 
-    <p style="color:#555;">Verify your email to continue</p>
+    <p style="color:#555;">${headerText}</p>
 
     <h1 style="letter-spacing:8px; color:#E86A33;">
       ${otp}

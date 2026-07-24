@@ -26,3 +26,11 @@ export const getMeAPI = () =>
 
 export const refreshTokenAPI = (refreshToken) =>
   api.post("/auth/refresh-token", { refreshToken });
+
+// 📩 FORGOT PASSWORD
+export const forgotPasswordAPI = (data) =>
+  api.post("/auth/forgot-password", data);
+
+// 🔐 RESET PASSWORD
+export const resetPasswordAPI = (data) =>
+  api.post("/auth/reset-password", data);
