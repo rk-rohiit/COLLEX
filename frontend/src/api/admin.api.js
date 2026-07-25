@@ -41,3 +41,9 @@ export const updateListingAdminAPI = (id, data) =>
 
 export const deleteListingAdminAPI = (id) =>
   api.delete(`/admin/listings/${id}`);
+
+export const getContactMessagesAPI = () =>
+  api.get("/contact");
+
+export const deleteContactMessageAPI = (id) =>
+  api.delete(`/contact/${id}`);

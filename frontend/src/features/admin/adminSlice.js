@@ -11,6 +11,8 @@ import {
   updateUserAdminAPI,
   updateListingAdminAPI,
   deleteListingAdminAPI,
+  getContactMessagesAPI,
+  deleteContactMessageAPI,
 } from "@/api/admin.api";
 
 /* =========================
@@ -189,6 +191,37 @@ export const updateUserAdmin = createAsyncThunk(
 );
 
 /* =========================
+   🔥 CONTACT MESSAGES
+========================= */
+export const getContactMessages = createAsyncThunk(
+  "admin/getContactMessages",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getContactMessagesAPI();
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch contact messages"
+      );
+    }
+  }
+);
+
+export const deleteContactMessage = createAsyncThunk(
+  "admin/deleteContactMessage",
+  async (id, { rejectWithValue }) => {
+    try {
+      await deleteContactMessageAPI(id);
+      return id;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to delete contact message"
+      );
+    }
+  }
+);
+
+/* =========================
    🔥 INITIAL STATE
 ========================= */
 const initialState = {
@@ -206,6 +239,8 @@ const initialState = {
   listingsTotal: 0,
   listingsPages: 1,
   listingsPage: 1,
+
+  contactMessages: [],
 };
 
 /* =========================
@@ -318,6 +353,18 @@ const adminSlice = createSlice({
         if (index !== -1) {
           state.users[index] = action.payload;
         }
+      })
+
+      /* =========================
+         CONTACT MESSAGES
+      ========================= */
+      .addCase(getContactMessages.fulfilled, (state, action) => {
+        state.contactMessages = action.payload;
+      })
+      .addCase(deleteContactMessage.fulfilled, (state, action) => {
+        state.contactMessages = state.contactMessages.filter(
+          (m) => m._id !== action.payload
+        );
       })
 
       /* =========================
