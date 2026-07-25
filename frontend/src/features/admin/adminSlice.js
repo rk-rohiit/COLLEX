@@ -7,6 +7,10 @@ import {
   deleteUserAPI,
   getAllOrdersAPI,
   updateOrderStatusAPI,
+  getAllListingsAdminAPI,
+  updateUserAdminAPI,
+  updateListingAdminAPI,
+  deleteListingAdminAPI,
 } from "@/api/admin.api";
 
 /* =========================
@@ -123,6 +127,68 @@ export const updateOrderStatus = createAsyncThunk(
 );
 
 /* =========================
+   🔥 LISTINGS
+========================= */
+export const getAllListingsAdmin = createAsyncThunk(
+  "admin/getAllListingsAdmin",
+  async ({ page, limit, status } = {}, { rejectWithValue }) => {
+    try {
+      const res = await getAllListingsAdminAPI(page, limit, status);
+      return res.data; // includes data, total, page, pages
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch listings"
+      );
+    }
+  }
+);
+
+export const updateListingAdmin = createAsyncThunk(
+  "admin/updateListingAdmin",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const res = await updateListingAdminAPI(id, data);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to update listing"
+      );
+    }
+  }
+);
+
+export const deleteListingAdmin = createAsyncThunk(
+  "admin/deleteListingAdmin",
+  async (id, { rejectWithValue }) => {
+    try {
+      await deleteListingAdminAPI(id);
+      return id;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to delete listing"
+      );
+    }
+  }
+);
+
+/* =========================
+   🔥 UPDATE USER
+========================= */
+export const updateUserAdmin = createAsyncThunk(
+  "admin/updateUserAdmin",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const res = await updateUserAdminAPI(id, data);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to update student"
+      );
+    }
+  }
+);
+
+/* =========================
    🔥 INITIAL STATE
 ========================= */
 const initialState = {
@@ -135,6 +201,11 @@ const initialState = {
 
   users: [],
   orders: [],
+
+  listings: [],
+  listingsTotal: 0,
+  listingsPages: 1,
+  listingsPage: 1,
 };
 
 /* =========================
@@ -210,6 +281,42 @@ const adminSlice = createSlice({
 
         if (index !== -1) {
           state.orders[index] = updated;
+        }
+      })
+
+      /* =========================
+         LISTINGS
+      ========================= */
+      .addCase(getAllListingsAdmin.fulfilled, (state, action) => {
+        state.listings = action.payload.data;
+        state.listingsTotal = action.payload.total;
+        state.listingsPages = action.payload.pages;
+        state.listingsPage = action.payload.page;
+      })
+      .addCase(updateListingAdmin.fulfilled, (state, action) => {
+        const index = state.listings.findIndex(
+          (l) => l._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.listings[index] = action.payload;
+        }
+      })
+      .addCase(deleteListingAdmin.fulfilled, (state, action) => {
+        state.listings = state.listings.filter(
+          (l) => l._id !== action.payload
+        );
+        state.listingsTotal -= 1;
+      })
+
+      /* =========================
+         UPDATE USER
+      ========================= */
+      .addCase(updateUserAdmin.fulfilled, (state, action) => {
+        const index = state.users.findIndex(
+          (u) => u._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.users[index] = action.payload;
         }
       })
 

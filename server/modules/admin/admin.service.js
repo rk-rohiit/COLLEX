@@ -167,3 +167,82 @@ export const getAllListingsAdminService = async (
     data: listings,
   };
 };
+
+/* =========================
+   UPDATE USER (ADMIN)
+========================= */
+export const updateUserAdminService = async (userId, data) => {
+  const user = await User.findById(userId);
+  if (!user) throw new Error("User not found");
+
+  const allowedFields = [
+    "fullName",
+    "email",
+    "phone",
+    "course",
+    "year",
+    "hostelBlock",
+    "role",
+  ];
+
+  allowedFields.forEach((field) => {
+    if (data[field] !== undefined) {
+      if (field === "course" && typeof data[field] === "string") {
+        user[field] = data[field].toLowerCase().replace(/\./g, "");
+      } else {
+        user[field] = data[field];
+      }
+    }
+  });
+
+  await user.save();
+
+  const updatedUser = await User.findById(userId).select("-password -refreshToken");
+  return updatedUser;
+};
+
+/* =========================
+   UPDATE LISTING (ADMIN)
+========================= */
+export const updateListingAdminService = async (listingId, data) => {
+  const listing = await Listing.findById(listingId);
+  if (!listing) throw new Error("Listing not found");
+
+  const allowedFields = [
+    "title",
+    "description",
+    "price",
+    "category",
+    "type",
+    "condition",
+    "location",
+    "status",
+    "rentPeriod",
+    "rentDeposit",
+  ];
+
+  allowedFields.forEach((field) => {
+    if (data[field] !== undefined) {
+      listing[field] =
+        field === "price" || field === "rentDeposit"
+          ? Number(data[field])
+          : data[field];
+    }
+  });
+
+  await listing.save();
+
+  const updatedListing = await Listing.findById(listingId).populate("postedBy", "fullName email");
+  return updatedListing;
+};
+
+/* =========================
+   DELETE LISTING (ADMIN)
+========================= */
+export const deleteListingAdminService = async (listingId) => {
+  const listing = await Listing.findById(listingId);
+  if (!listing) throw new Error("Listing not found");
+
+  await listing.deleteOne();
+  return { message: "Listing deleted successfully" };
+};

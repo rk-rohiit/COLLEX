@@ -30,6 +30,14 @@ export const getAllOrdersAPI = () =>
 export const updateOrderStatusAPI = (id, status) =>
   api.put(`/admin/orders/${id}`, { status });
 
-export const getAllListingAPI = () =>{
-  api.get("listings");
-}
+export const getAllListingsAdminAPI = (page = 1, limit = 10, status = "") =>
+  api.get(`/admin/listings?page=${page}&limit=${limit}${status ? `&status=${status}` : ""}`);
+
+export const updateUserAdminAPI = (id, data) =>
+  api.put(`/admin/users/${id}`, data);
+
+export const updateListingAdminAPI = (id, data) =>
+  api.put(`/admin/listings/${id}`, data);
+
+export const deleteListingAdminAPI = (id) =>
+  api.delete(`/admin/listings/${id}`);

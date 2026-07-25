@@ -4,10 +4,13 @@ import {
   getRecentOrders,
   getTopCategories,
   getAllUsers,
+  updateUserAdmin,
   deleteUser,
   getAllOrders,
   updateOrderStatusAdmin,
   getAllListingsAdmin,
+  updateListingAdmin,
+  deleteListingAdmin,
 } from "./admin.controller.js";
 
 import { protect } from "../../middlewares/auth.middleware.js";
@@ -26,6 +29,7 @@ router.get("/dashboard/categories", protect, authorizeRoles("admin"), getTopCate
    USERS
 ========================= */
 router.get("/users", protect, authorizeRoles("admin"), getAllUsers);
+router.put("/users/:id", protect, authorizeRoles("admin"), updateUserAdmin);
 router.delete("/users/:id", protect, authorizeRoles("admin"), deleteUser);
 
 /* =========================
@@ -34,7 +38,6 @@ router.delete("/users/:id", protect, authorizeRoles("admin"), deleteUser);
 router.get("/orders", protect, authorizeRoles("admin"), getAllOrders);
 router.put("/orders/:id", protect, authorizeRoles("admin"), updateOrderStatusAdmin);
 
-// listing
 /* =========================
    LISTINGS
 ========================= */
@@ -43,6 +46,18 @@ router.get(
   protect,
   authorizeRoles("admin"),
   getAllListingsAdmin
+);
+router.put(
+  "/listings/:id",
+  protect,
+  authorizeRoles("admin"),
+  updateListingAdmin
+);
+router.delete(
+  "/listings/:id",
+  protect,
+  authorizeRoles("admin"),
+  deleteListingAdmin
 );
 
 export default router;

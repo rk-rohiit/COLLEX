@@ -80,12 +80,12 @@ const Dashboard = () => {
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        gap: 2,
+        gap: 3.5, // Increased vertical spacing for airier dashboard feel
       }}
     >
 
       {/* ── KPI cards ── */}
-      <Grid container spacing={1.5}>
+      <Grid container spacing={2} sx={{ width: "100%", m: 0 }}>
         {KPI_CONFIG.map(({ key, label, icon, accent, footer }) => (
           <Grid item xs={12} sm={6} md={3} key={key}>
             <StatCard
@@ -103,7 +103,7 @@ const Dashboard = () => {
       <SummaryStrip items={summaryItems} />
 
       {/* ── Detail panels ── */}
-      <Grid container spacing={1.5}>
+      <Grid container spacing={2.5} sx={{ width: "100%", m: 0 }}>
         {/* Recent Activity */}
         <Grid item xs={12} md={6} sx={{ display: "flex" }}>
           <SectionCard
