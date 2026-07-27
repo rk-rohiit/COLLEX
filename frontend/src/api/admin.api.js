@@ -47,3 +47,6 @@ export const getContactMessagesAPI = () =>
 
 export const deleteContactMessageAPI = (id) =>
   api.delete(`/contact/${id}`);
+
+export const getTransactionsAPI = (range = "") =>
+  api.get(`/admin/transactions?range=${range}`);

@@ -35,6 +35,7 @@ import VerifyDeliveryPage from "../pages/order/VerifyDeliveryPage";
 import ProductsPage from "../pages/admin/ProductsPage";
 import ReportPage from "../pages/admin/ReportPage";
 import SupportPage from "../pages/admin/SupportPage";
+import TransactionsPage from "../pages/admin/TransactionsPage";
 
 // Landing page
 const LandingPage = () => (
@@ -154,6 +155,7 @@ const AppRoutes = () => {
           <Route path="orders" element={<OrdersPage />} />
           <Route path="students" element={<StudentsPage />} />
           <Route path="categories" element={<CategoriesPage />} />
+          <Route path="transactions" element={<TransactionsPage />} />
           <Route path="reports" element={<ReportPage />} />
           <Route path="support" element={<SupportPage />} />
         </Route>

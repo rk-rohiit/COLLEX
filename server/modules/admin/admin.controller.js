@@ -10,6 +10,7 @@ import {
   updateUserAdminService,
   updateListingAdminService,
   deleteListingAdminService,
+  getAllTransactionsAdminService,
 } from "./admin.service.js";
 
 /* =========================
@@ -158,6 +159,19 @@ export const deleteListingAdmin = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: result.message,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getAllTransactionsAdmin = async (req, res, next) => {
+  try {
+    const { range } = req.query; // "daily", "weekly", "monthly", or undefined
+    const transactions = await getAllTransactionsAdminService(req.user, range);
+    res.status(200).json({
+      success: true,
+      data: transactions,
     });
   } catch (err) {
     next(err);

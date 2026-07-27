@@ -13,6 +13,7 @@ import {
   deleteListingAdminAPI,
   getContactMessagesAPI,
   deleteContactMessageAPI,
+  getTransactionsAPI,
 } from "@/api/admin.api";
 
 /* =========================
@@ -222,6 +223,23 @@ export const deleteContactMessage = createAsyncThunk(
 );
 
 /* =========================
+   🔥 TRANSACTIONS
+========================= */
+export const getTransactionsAdmin = createAsyncThunk(
+  "admin/getTransactionsAdmin",
+  async (range = "", { rejectWithValue }) => {
+    try {
+      const res = await getTransactionsAPI(range);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch transactions"
+      );
+    }
+  }
+);
+
+/* =========================
    🔥 INITIAL STATE
 ========================= */
 const initialState = {
@@ -241,6 +259,7 @@ const initialState = {
   listingsPage: 1,
 
   contactMessages: [],
+  transactions: [],
 };
 
 /* =========================
@@ -365,6 +384,13 @@ const adminSlice = createSlice({
         state.contactMessages = state.contactMessages.filter(
           (m) => m._id !== action.payload
         );
+      })
+
+      /* =========================
+         TRANSACTIONS
+      ========================= */
+      .addCase(getTransactionsAdmin.fulfilled, (state, action) => {
+        state.transactions = action.payload;
       })
 
       /* =========================

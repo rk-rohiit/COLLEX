@@ -11,6 +11,7 @@ import {
   getAllListingsAdmin,
   updateListingAdmin,
   deleteListingAdmin,
+  getAllTransactionsAdmin,
 } from "./admin.controller.js";
 
 import { protect } from "../../middlewares/auth.middleware.js";
@@ -58,6 +59,16 @@ router.delete(
   protect,
   authorizeRoles("admin"),
   deleteListingAdmin
+);
+
+/* =========================
+   TRANSACTIONS
+========================= */
+router.get(
+  "/transactions",
+  protect,
+  authorizeRoles("admin"),
+  getAllTransactionsAdmin
 );
 
 export default router;

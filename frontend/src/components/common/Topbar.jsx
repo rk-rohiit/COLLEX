@@ -35,14 +35,15 @@ import {
 
 // Map paths to page titles
 const pageTitles = {
-  "/admin":            "System Overview",
-  "/admin/products":   "Product Inventory",
-  "/admin/orders":     "Order Management",
-  "/admin/students":   "Student Directory",
-  "/admin/categories": "Category Hierarchy",
-  "/admin/reports":    "Analytics & Reports",
-  "/admin/settings":   "System Settings",
-  "/admin/support":    "Support Tickets",
+  "/admin":              "System Overview",
+  "/admin/products":     "Product Inventory",
+  "/admin/orders":       "Order Management",
+  "/admin/students":     "Student Directory",
+  "/admin/categories":   "Category Hierarchy",
+  "/admin/transactions": "Transaction History",
+  "/admin/reports":      "Analytics & Reports",
+  "/admin/settings":     "System Settings",
+  "/admin/support":      "Support Tickets",
 };
 
 const Topbar = () => {

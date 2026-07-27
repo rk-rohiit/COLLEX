@@ -1,6 +1,7 @@
 import Listing from "../../models/listing.model.js";
 import Order from "../../models/order.model.js";
 import User from "../../models/user.model.js";
+import Payment from "../../models/payment.model.js";
 
 /* =========================
    DASHBOARD STATS
@@ -245,4 +246,42 @@ export const deleteListingAdminService = async (listingId) => {
 
   await listing.deleteOne();
   return { message: "Listing deleted successfully" };
+};
+
+/* =========================
+   GET ALL TRANSACTIONS (ADMIN)
+========================= */
+export const getAllTransactionsAdminService = async (user, range) => {
+  let dateFilter = {};
+  const now = new Date();
+
+  if (range === "daily") {
+    const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+    dateFilter.createdAt = { $gte: startOfDay };
+  } else if (range === "weekly") {
+    const startOfWeek = new Date(now.setDate(now.getDate() - 7));
+    dateFilter.createdAt = { $gte: startOfWeek };
+  } else if (range === "monthly") {
+    const startOfMonth = new Date(now.setDate(now.getDate() - 30));
+    dateFilter.createdAt = { $gte: startOfMonth };
+  }
+
+  // Find paid payments or all payments (since status index is on orderId, status)
+  const payments = await Payment.find(dateFilter)
+    .populate({
+      path: "orderId",
+      populate: [
+        { path: "buyer", select: "fullName email" },
+        { path: "seller", select: "fullName email" },
+        { path: "listing", select: "title price category" },
+      ],
+    })
+    .sort({ createdAt: -1 });
+
+  // Filter payments by admin's campusId
+  const campusPayments = payments.filter(
+    (payment) => payment.orderId && payment.orderId.campusId === user.campusId
+  );
+
+  return campusPayments;
 };

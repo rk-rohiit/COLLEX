@@ -18,14 +18,16 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SchoolIcon from "@mui/icons-material/School";
+import PaidIcon from "@mui/icons-material/Paid";
 
 const mainMenu = [
-  { text: "Dashboard",  icon: <DashboardIcon  sx={{ fontSize: 18 }} />, path: "/admin" },
-  { text: "Products",   icon: <ShoppingBagIcon sx={{ fontSize: 18 }} />, path: "/admin/products" },
-  { text: "Orders",     icon: <ReceiptIcon     sx={{ fontSize: 18 }} />, path: "/admin/orders" },
-  { text: "Students",   icon: <PeopleIcon      sx={{ fontSize: 18 }} />, path: "/admin/students" },
-  { text: "Categories", icon: <CategoryIcon    sx={{ fontSize: 18 }} />, path: "/admin/categories" },
-  { text: "Reports",    icon: <BarChartIcon    sx={{ fontSize: 18 }} />, path: "/admin/reports" },
+  { text: "Dashboard",    icon: <DashboardIcon  sx={{ fontSize: 18 }} />, path: "/admin" },
+  { text: "Products",     icon: <ShoppingBagIcon sx={{ fontSize: 18 }} />, path: "/admin/products" },
+  { text: "Orders",       icon: <ReceiptIcon     sx={{ fontSize: 18 }} />, path: "/admin/orders" },
+  { text: "Students",     icon: <PeopleIcon      sx={{ fontSize: 18 }} />, path: "/admin/students" },
+  { text: "Categories",   icon: <CategoryIcon    sx={{ fontSize: 18 }} />, path: "/admin/categories" },
+  { text: "Transactions", icon: <PaidIcon        sx={{ fontSize: 18 }} />, path: "/admin/transactions" },
+  { text: "Reports",      icon: <BarChartIcon    sx={{ fontSize: 18 }} />, path: "/admin/reports" },
 ];
 
 const bottomMenu = [
