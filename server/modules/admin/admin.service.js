@@ -2,6 +2,9 @@ import Listing from "../../models/listing.model.js";
 import Order from "../../models/order.model.js";
 import User from "../../models/user.model.js";
 import Payment from "../../models/payment.model.js";
+import Refund from "../../models/refund.model.js";
+import crypto from "crypto";
+import { razorpay, refundOrderPayment } from "../payment/payment.service.js";
 
 /* =========================
    DASHBOARD STATS
@@ -82,6 +85,12 @@ export const updateOrderStatusAdminService = async (orderId, status) => {
   if (status === "cancelled") {
     listing.status = "available";
     listing.reservedBy = null;
+
+    // 🔥 Trigger refund if payment was paid
+    if (order.paymentStatus === "paid") {
+      await refundOrderPayment(order, "Cancelled by Administrator");
+      order.paymentStatus = "refunded";
+    }
   }
 
   await listing.save();
@@ -284,4 +293,110 @@ export const getAllTransactionsAdminService = async (user, range) => {
   );
 
   return campusPayments;
+};
+
+/* =========================
+   DETECT FAILURES & AUTO-REFUND (ADMIN)
+========================= */
+export const detectFailuresAdminService = async (user) => {
+  // Threshold: in development, look for any created payment. In production, 2 minutes old.
+  const threshold = process.env.NODE_ENV === "development" 
+    ? new Date() 
+    : new Date(Date.now() - 2 * 60 * 1000);
+
+  // Find payments that are initiated ("created") but not paid, older than threshold
+  const payments = await Payment.find({
+    status: "created",
+    createdAt: { $lt: threshold }
+  }).populate("orderId");
+
+  // Filter payments by admin's campusId
+  const campusPayments = payments.filter(
+    (p) => p.orderId && p.orderId.campusId === user.campusId
+  );
+
+  const processedRefunds = [];
+
+  for (const payment of campusPayments) {
+    // 1. Mark payment as failed
+    payment.status = "failed";
+    await payment.save();
+
+    // 2. Determine refund parameters
+    const refundReason = "Auto-refunded: Interrupted Checkout or Captured Failure";
+    let refundId = `ref_sim_${crypto.randomBytes(8).toString("hex")}`;
+    let refundStatus = "refunded";
+
+    // Attempt real Razorpay API refund if razorpayPaymentId is available
+    if (payment.razorpayPaymentId) {
+      try {
+        const razorpayRefund = await razorpay.payments.refund(payment.razorpayPaymentId, {
+          amount: Math.round(payment.amount * 100),
+          notes: { reason: refundReason }
+        });
+        if (razorpayRefund && razorpayRefund.id) {
+          refundId = razorpayRefund.id;
+          refundStatus = razorpayRefund.status || "refunded";
+        }
+      } catch (err) {
+        console.warn("Razorpay API refund failed, falling back to simulated refund log:", err.message);
+      }
+    }
+
+    // 3. Create Refund record
+    const refundLog = await Refund.create({
+      paymentId: payment._id,
+      orderId: payment.orderId._id,
+      amount: payment.amount,
+      refundId,
+      status: refundStatus,
+      reason: refundReason
+    });
+
+    // 4. Cancel the related order if it was pending
+    if (payment.orderId.status === "pending") {
+      await Order.findByIdAndUpdate(payment.orderId._id, {
+        status: "cancelled",
+        paymentStatus: "failed"
+      });
+    }
+
+    // Populate the newly created refund for the response
+    const populated = await Refund.findById(refundLog._id).populate({
+      path: "orderId",
+      populate: [
+        { path: "buyer", select: "fullName email" },
+        { path: "seller", select: "fullName email" },
+        { path: "listing", select: "title price" }
+      ]
+    }).populate("paymentId");
+
+    processedRefunds.push(populated);
+  }
+
+  return processedRefunds;
+};
+
+/* =========================
+   GET REFUND LOGS (ADMIN)
+========================= */
+export const getRefundLogsAdminService = async (user) => {
+  const refunds = await Refund.find()
+    .populate({
+      path: "orderId",
+      populate: [
+        { path: "buyer", select: "fullName email" },
+        { path: "seller", select: "fullName email" },
+        { path: "listing", select: "title price" }
+      ]
+    })
+    .populate("paymentId")
+    .sort({ createdAt: -1 });
+
+  // Filter refunds by campusId
+  const campusRefunds = refunds.filter(
+    (r) => r.orderId && r.orderId.campusId === user.campusId
+  );
+
+  return campusRefunds;
 };

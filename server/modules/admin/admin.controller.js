@@ -11,6 +11,8 @@ import {
   updateListingAdminService,
   deleteListingAdminService,
   getAllTransactionsAdminService,
+  detectFailuresAdminService,
+  getRefundLogsAdminService,
 } from "./admin.service.js";
 
 /* =========================
@@ -172,6 +174,31 @@ export const getAllTransactionsAdmin = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: transactions,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const detectFailuresAdmin = async (req, res, next) => {
+  try {
+    const refunds = await detectFailuresAdminService(req.user);
+    res.status(200).json({
+      success: true,
+      message: `Scanned successfully. ${refunds.length} payments marked as failed and auto-refunded.`,
+      data: refunds,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getRefundLogsAdmin = async (req, res, next) => {
+  try {
+    const logs = await getRefundLogsAdminService(req.user);
+    res.status(200).json({
+      success: true,
+      data: logs,
     });
   } catch (err) {
     next(err);

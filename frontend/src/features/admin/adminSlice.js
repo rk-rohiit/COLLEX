@@ -14,6 +14,8 @@ import {
   getContactMessagesAPI,
   deleteContactMessageAPI,
   getTransactionsAPI,
+  detectFailuresAPI,
+  getRefundLogsAPI,
 } from "@/api/admin.api";
 
 /* =========================
@@ -240,6 +242,37 @@ export const getTransactionsAdmin = createAsyncThunk(
 );
 
 /* =========================
+   🔥 FAILURES & REFUNDS
+========================= */
+export const detectFailuresAdmin = createAsyncThunk(
+  "admin/detectFailuresAdmin",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await detectFailuresAPI();
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to trigger failure scanning"
+      );
+    }
+  }
+);
+
+export const getRefundLogsAdmin = createAsyncThunk(
+  "admin/getRefundLogsAdmin",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getRefundLogsAPI();
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch refund logs"
+      );
+    }
+  }
+);
+
+/* =========================
    🔥 INITIAL STATE
 ========================= */
 const initialState = {
@@ -260,6 +293,7 @@ const initialState = {
 
   contactMessages: [],
   transactions: [],
+  refundLogs: [],
 };
 
 /* =========================
@@ -391,6 +425,13 @@ const adminSlice = createSlice({
       ========================= */
       .addCase(getTransactionsAdmin.fulfilled, (state, action) => {
         state.transactions = action.payload;
+      })
+      .addCase(detectFailuresAdmin.fulfilled, (state, action) => {
+        // Append newly created refund logs to the list
+        state.refundLogs = [...action.payload.data, ...state.refundLogs];
+      })
+      .addCase(getRefundLogsAdmin.fulfilled, (state, action) => {
+        state.refundLogs = action.payload;
       })
 
       /* =========================

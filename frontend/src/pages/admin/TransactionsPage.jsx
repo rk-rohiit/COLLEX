@@ -5,29 +5,53 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Box, Paper, Typography, Table, TableBody, TableCell,
   TableHead, TableRow, Chip, Stack, useTheme, Grid, FormControl,
-  InputLabel, Select, MenuItem
+  InputLabel, Select, MenuItem, Button, ButtonGroup, CircularProgress
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import ReceiptIcon from "@mui/icons-material/Receipt";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
+import { toast } from "react-toastify";
 
-import { getTransactionsAdmin } from "@/features/admin/adminSlice";
+import { 
+  getTransactionsAdmin, 
+  getRefundLogsAdmin, 
+  detectFailuresAdmin 
+} from "@/features/admin/adminSlice";
 
 const TransactionsPage = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { transactions } = useSelector((s) => s.admin);
+  const { transactions, refundLogs } = useSelector((s) => s.admin);
 
-  // Timeframe filter state: "", "daily", "weekly", "monthly"
+  // Filter state
   const [filterRange, setFilterRange] = useState("");
+  const [activeTab, setActiveTab] = useState("payments"); // "payments" | "refunds"
+  const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
     dispatch(getTransactionsAdmin(filterRange));
+    dispatch(getRefundLogsAdmin());
   }, [dispatch, filterRange]);
 
   const handleFilterChange = (e) => {
     setFilterRange(e.target.value);
+  };
+
+  const handleScanFailures = async () => {
+    try {
+      setScanning(true);
+      const res = await dispatch(detectFailuresAdmin()).unwrap();
+      toast.success(res.message || "Scan complete!");
+      // Re-fetch ledger data
+      dispatch(getTransactionsAdmin(filterRange));
+      dispatch(getRefundLogsAdmin());
+    } catch (err) {
+      toast.error(err || "Scan failed");
+    } finally {
+      setScanning(false);
+    }
   };
 
   // Derived stats
@@ -178,121 +202,255 @@ const TransactionsPage = () => {
             </Typography>
           </Box>
 
-          <FormControl size="small" sx={{ minWidth: 160 }}>
-            <InputLabel>Timeframe Filter</InputLabel>
-            <Select
-              value={filterRange}
-              label="Timeframe Filter"
-              onChange={handleFilterChange}
-              sx={{ borderRadius: "10px" }}
+          <Stack direction="row" spacing={2} alignItems="center">
+            {/* Toggle tabs */}
+            <ButtonGroup size="small" sx={{ borderRadius: "10px", overflow: "hidden" }}>
+              <Button
+                variant={activeTab === "payments" ? "contained" : "outlined"}
+                onClick={() => setActiveTab("payments")}
+                sx={{ textTransform: "none", fontWeight: 700 }}
+              >
+                Payments
+              </Button>
+              <Button
+                variant={activeTab === "refunds" ? "contained" : "outlined"}
+                onClick={() => setActiveTab("refunds")}
+                sx={{ textTransform: "none", fontWeight: 700 }}
+              >
+                Refund Logs ({refundLogs?.length || 0})
+              </Button>
+            </ButtonGroup>
+
+            {/* Scan Failures Action */}
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="small"
+              onClick={handleScanFailures}
+              disabled={scanning}
+              startIcon={scanning ? <CircularProgress size={16} color="inherit" /> : <AutorenewIcon />}
+              sx={{
+                borderRadius: "10px",
+                textTransform: "none",
+                fontWeight: 700,
+                height: 40,
+                borderColor: theme.palette.secondary.main,
+                color: theme.palette.secondary.main,
+                '&:hover': {
+                  borderColor: theme.palette.secondary.dark,
+                  bgcolor: alpha(theme.palette.secondary.main, 0.05),
+                }
+              }}
             >
-              <MenuItem value="">All Transactions</MenuItem>
-              <MenuItem value="daily">Daily (Last 24h)</MenuItem>
-              <MenuItem value="weekly">Weekly (Last 7d)</MenuItem>
-              <MenuItem value="monthly">Monthly (Last 30d)</MenuItem>
-            </Select>
-          </FormControl>
+              {scanning ? "Scanning..." : "Scan Failures"}
+            </Button>
+
+            {activeTab === "payments" && (
+              <FormControl size="small" sx={{ minWidth: 160 }}>
+                <InputLabel>Timeframe Filter</InputLabel>
+                <Select
+                  value={filterRange}
+                  label="Timeframe Filter"
+                  onChange={handleFilterChange}
+                  sx={{ borderRadius: "10px" }}
+                >
+                  <MenuItem value="">All Transactions</MenuItem>
+                  <MenuItem value="daily">Daily (Last 24h)</MenuItem>
+                  <MenuItem value="weekly">Weekly (Last 7d)</MenuItem>
+                  <MenuItem value="monthly">Monthly (Last 30d)</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          </Stack>
         </Stack>
 
-        <Table>
-          <TableHead>
-            <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
-              <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>TRANSACTION ID</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>ORDER ID</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>PARTIES (BUYER / SELLER)</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>PRODUCT</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>AMOUNT</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>STATUS</TableCell>
-              <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem", textAlign: "right" }}>DATE</TableCell>
-            </TableRow>
-          </TableHead>
+        {activeTab === "payments" ? (
+          <Table>
+            <TableHead>
+              <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>TRANSACTION ID</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>ORDER ID</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>PARTIES (BUYER / SELLER)</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>PRODUCT</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>AMOUNT</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>STATUS</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem", textAlign: "right" }}>DATE</TableCell>
+              </TableRow>
+            </TableHead>
 
-          <TableBody>
-            {transactions && transactions.map((item) => {
-              const statusStyle = getStatusColor(item.status);
-              return (
-                <TableRow key={item._id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  {/* Razorpay Transaction ID */}
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={700} sx={{ fontFamily: "monospace", fontSize: "0.8rem" }}>
-                      {item.razorpayPaymentId || item._id.slice(-10).toUpperCase()}
-                    </Typography>
-                  </TableCell>
+            <TableBody>
+              {transactions && transactions.map((item) => {
+                const statusStyle = getStatusColor(item.status);
+                return (
+                  <TableRow key={item._id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight={700} sx={{ fontFamily: "monospace", fontSize: "0.8rem" }}>
+                        {item.razorpayPaymentId || item._id.slice(-10).toUpperCase()}
+                      </Typography>
+                    </TableCell>
 
-                  {/* Order ID */}
-                  <TableCell>
-                    <Typography variant="caption" sx={{ fontFamily: "monospace", color: "text.secondary" }}>
-                      #{item.orderId?._id?.slice(-6).toUpperCase() || "N/A"}
-                    </Typography>
-                  </TableCell>
+                    <TableCell>
+                      <Typography variant="caption" sx={{ fontFamily: "monospace", color: "text.secondary" }}>
+                        #{item.orderId?._id?.slice(-6).toUpperCase() || "N/A"}
+                      </Typography>
+                    </TableCell>
 
-                  {/* Parties (Buyer & Seller) */}
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={600} color="text.primary">
-                      {item.orderId?.buyer?.fullName || "System Buyer"}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: -0.5 }}>
-                      to: {item.orderId?.seller?.fullName || "System Seller"}
-                    </Typography>
-                  </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight={600} color="text.primary">
+                        {item.orderId?.buyer?.fullName || "System Buyer"}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: -0.5 }}>
+                        to: {item.orderId?.seller?.fullName || "System Seller"}
+                      </Typography>
+                    </TableCell>
 
-                  {/* Product Details */}
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={600}>
-                      {item.orderId?.listing?.title || "Product Listing"}
-                    </Typography>
-                  </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight={600}>
+                        {item.orderId?.listing?.title || "Product Listing"}
+                      </Typography>
+                    </TableCell>
 
-                  {/* Amount Paid */}
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={800} color="primary.main">
-                      ₹{item.amount?.toLocaleString()}
-                    </Typography>
-                  </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight={800} color="primary.main">
+                        ₹{item.amount?.toLocaleString()}
+                      </Typography>
+                    </TableCell>
 
-                  {/* Razorpay Status */}
-                  <TableCell>
-                    <Chip
-                      label={item.status}
-                      size="small"
-                      sx={{
-                        fontSize: "10px",
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        bgcolor: statusStyle.bg,
-                        color: statusStyle.text,
-                        borderRadius: 1.5,
-                      }}
-                    />
-                  </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={item.status}
+                        size="small"
+                        sx={{
+                          fontSize: "10px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          bgcolor: statusStyle.bg,
+                          color: statusStyle.text,
+                          borderRadius: 1.5,
+                        }}
+                      />
+                    </TableCell>
 
-                  {/* Date Created */}
-                  <TableCell align="right">
-                    <Typography variant="caption" color="text.secondary">
-                      {new Date(item.createdAt).toLocaleString()}
-                    </Typography>
+                    <TableCell align="right">
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(item.createdAt).toLocaleString()}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+
+              {(!transactions || transactions.length === 0) && (
+                <TableRow>
+                  <TableCell colSpan={7} align="center" sx={{ py: 5 }}>
+                    <Typography color="text.secondary">No transactions found for the selected timeframe.</Typography>
                   </TableCell>
                 </TableRow>
-              );
-            })}
-
-            {(!transactions || transactions.length === 0) && (
-              <TableRow>
-                <TableCell colSpan={7} align="center" sx={{ py: 5 }}>
-                  <Typography color="text.secondary">No transactions found for the selected timeframe.</Typography>
-                </TableCell>
+              )}
+            </TableBody>
+          </Table>
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.02) }}>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>REFUND ID</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>ORDER ID</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>PARTIES (BUYER / SELLER)</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>PRODUCT</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>AMOUNT</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>REASON</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem" }}>STATUS</TableCell>
+                <TableCell sx={{ fontWeight: 700, color: "text.secondary", fontSize: "0.85rem", textAlign: "right" }}>DATE</TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHead>
+
+            <TableBody>
+              {refundLogs && refundLogs.map((item) => {
+                const statusStyle = {
+                  bg: alpha(theme.palette.info.main, 0.1),
+                  text: theme.palette.info.main,
+                };
+                return (
+                  <TableRow key={item._id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight={700} sx={{ fontFamily: "monospace", fontSize: "0.8rem" }}>
+                        {item.refundId || item._id.slice(-10).toUpperCase()}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography variant="caption" sx={{ fontFamily: "monospace", color: "text.secondary" }}>
+                        #{item.orderId?._id?.slice(-6).toUpperCase() || "N/A"}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography variant="body2" fontWeight={600} color="text.primary">
+                        {item.orderId?.buyer?.fullName || "System Buyer"}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: -0.5 }}>
+                        to: {item.orderId?.seller?.fullName || "System Seller"}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography variant="body2" fontWeight={600}>
+                        {item.orderId?.listing?.title || "Product Listing"}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography variant="body2" fontWeight={800} color="secondary.main">
+                        ₹{item.amount?.toLocaleString()}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Typography variant="body2" sx={{ fontSize: "0.85rem" }}>
+                        {item.reason || "Auto-refunded"}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={item.status}
+                        size="small"
+                        sx={{
+                          fontSize: "10px",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          bgcolor: statusStyle.bg,
+                          color: statusStyle.text,
+                          borderRadius: 1.5,
+                        }}
+                      />
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(item.createdAt).toLocaleString()}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+
+              {(!refundLogs || refundLogs.length === 0) && (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 5 }}>
+                    <Typography color="text.secondary">No refund logs found.</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </Paper>
     </Box>
   );
 };
 
-// Help helper
 const Avatar = ({ children, sx }) => {
-  const theme = useTheme();
   return (
     <Box
       sx={{

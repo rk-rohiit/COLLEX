@@ -50,3 +50,9 @@ export const deleteContactMessageAPI = (id) =>
 
 export const getTransactionsAPI = (range = "") =>
   api.get(`/admin/transactions?range=${range}`);
+
+export const detectFailuresAPI = () =>
+  api.post("/admin/payments/detect-failures");
+
+export const getRefundLogsAPI = () =>
+  api.get("/admin/payments/refund-logs");

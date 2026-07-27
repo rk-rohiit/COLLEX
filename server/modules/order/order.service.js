@@ -2,6 +2,7 @@
 
 import Order from "../../models/order.model.js";
 import Listing from "../../models/listing.model.js";
+import { refundOrderPayment } from "../payment/payment.service.js";
 
 /* =========================
    Create Order
@@ -165,6 +166,14 @@ export const updateOrderStatusService = async (orderId, user, status) => {
     await listing.save();
   }
 
+  // 🔥 Trigger refund if payment was paid
+  if (order.paymentStatus === "paid") {
+    const isSeller = order.seller.toString() === user._id.toString();
+    const reason = isSeller ? "Cancelled by seller" : "Cancelled by buyer";
+    await refundOrderPayment(order, reason);
+    order.paymentStatus = "refunded";
+  }
+
   order.status = "cancelled";
   await order.save();
 
@@ -224,10 +233,22 @@ export const cancelOrderService = async (orderId, user) => {
     throw new Error("Cannot cancel processed order");
   }
 
+  const listing = await Listing.findById(order.listing);
+  
+  // ✅ restore listing ONLY if it was reserved
+  if (listing && listing.status === "reserved") {
+    listing.status = "available";
+    listing.reservedBy = null;
+    await listing.save();
+  }
+
+  // 🔥 Trigger refund if payment was paid
+  if (order.paymentStatus === "paid") {
+    await refundOrderPayment(order, "Cancelled by buyer");
+    order.paymentStatus = "refunded";
+  }
+
   order.status = "cancelled";
-
-  // ❌ listing untouched (correct, since we didn’t reserve)
-
   await order.save();
 
   return order;

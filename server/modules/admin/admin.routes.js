@@ -12,6 +12,8 @@ import {
   updateListingAdmin,
   deleteListingAdmin,
   getAllTransactionsAdmin,
+  detectFailuresAdmin,
+  getRefundLogsAdmin,
 } from "./admin.controller.js";
 
 import { protect } from "../../middlewares/auth.middleware.js";
@@ -69,6 +71,23 @@ router.get(
   protect,
   authorizeRoles("admin"),
   getAllTransactionsAdmin
+);
+
+/* =========================
+   FAILED PAYMENTS & REFUNDS
+========================= */
+router.post(
+  "/payments/detect-failures",
+  protect,
+  authorizeRoles("admin"),
+  detectFailuresAdmin
+);
+
+router.get(
+  "/payments/refund-logs",
+  protect,
+  authorizeRoles("admin"),
+  getRefundLogsAdmin
 );
 
 export default router;
