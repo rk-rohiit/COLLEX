@@ -52,6 +52,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const cartItems = useSelector((state) => state.cart.items);
+  const cartCount = user ? cartItems.reduce((acc, item) => acc + item.qty, 0) : 0;
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawer, setDrawer] = useState(false);
@@ -151,6 +153,24 @@ const Navbar = () => {
 
           {/* RIGHT: ACTIONS */}
           <Stack direction="row" alignItems="center" spacing={{ xs: 1, md: 2 }}>
+            
+            {/* CART BADGE - Always visible, showing 0 if not logged in or empty */}
+            <IconButton 
+              onClick={() => navigate(user ? "/profile/cart" : "/login")}
+              sx={{ 
+                color: "text.secondary",
+                "&:hover": { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.05) }
+              }}
+            >
+              <Badge 
+                badgeContent={cartCount} 
+                showZero
+                sx={{ "& .MuiBadge-badge": { bgcolor: theme.palette.secondary.main, color: "white", fontWeight: 700 } }}
+              >
+                <ShoppingCartIcon fontSize="medium" />
+              </Badge>
+            </IconButton>
+
             {user ? (
               <>
                 <Button
@@ -170,21 +190,6 @@ const Navbar = () => {
                 >
                   Post Listing
                 </Button>
-
-                <IconButton 
-                  onClick={() => navigate("/profile/cart")}
-                  sx={{ 
-                    color: "text.secondary",
-                    "&:hover": { color: theme.palette.primary.main, bgcolor: alpha(theme.palette.primary.main, 0.05) }
-                  }}
-                >
-                  <Badge 
-                    badgeContent={3} 
-                    sx={{ "& .MuiBadge-badge": { bgcolor: theme.palette.secondary.main, color: "white", fontWeight: 700 } }}
-                  >
-                    <ShoppingCartIcon fontSize="medium" />
-                  </Badge>
-                </IconButton>
 
                 {/* USER PROFILE BOX */}
                 <Stack
